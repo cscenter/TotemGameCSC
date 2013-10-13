@@ -1,11 +1,11 @@
+import java.util.*;
 class Game
 {
     ArrayList<Player> players;
     ArrayList<Card> allCards;
     ArrayList<Card> cardsUnderTotem;
     
-    View gameView;
-    
+
     int turnNumber;
     
     // Не вижу смысла для перечисления - ситуации "стрелки наружу" и "стрелки внутрь" можно обрабатывать
@@ -36,9 +36,9 @@ class Game
         return false;
     }
     
-    public void makeMove(int playerIndex, boolean tookTotem)
+    public boolean makeMove(int playerIndex, boolean tookTotem)
     {
-        
+        return true;
     }
     
     public int getPlayersCount()

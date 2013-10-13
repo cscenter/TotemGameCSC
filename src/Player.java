@@ -1,16 +1,28 @@
+import java.util.*;
+
 class Player
 {
     ArrayList<Card> openedCards, closedCards;
     String name;
-    
+
     public Player(String name)
     {
         
     }
-    
+    public String getName(){
+    	return name;    
+    }    
     public int getCardsCount()
     {
         return openedCards.size() + closedCards.size();
+    }
+    public int getOpenCardsCount()
+    {
+        return openedCards.size();
+    }
+    public int getCloseCardsCount()
+    {
+        return closedCards.size();
     }
     
     public Card openNextCard()
