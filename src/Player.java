@@ -1,14 +1,57 @@
 import java.util.*;
 
+/**
+ * один игрок
+ * у него есть имя.
+ * и открытые и закрытые карты
+ */
 class Player
 {
-    ArrayList<Card> openedCards, closedCards;
-    String name;
+    private LinkedList<Card> openedCards, closedCards;
+    private String name;
 
-    public Player(String name)
-    {
-        
+    /**
+     * конструктор.
+     * Открытых карт нет
+     * @param playerName имя игрока
+     * */
+    public Player(String playerName){
+        name = playerName;
+        openedCards = new LinkedList<Card>();
+        closedCards = new LinkedList<Card>();
     }
+
+    /**
+     * вот теперь мы будем знать имя игрока
+     * @param givenName имя, которое будет у игрока
+     */
+    public void initializePlayerName(String givenName){
+        name = givenName;
+    }
+
+    /**
+     * заносим закрытые карты
+     * @param cards часть allCards, которая будет передана в качестве закрытых
+     */
+    public void setCardsToPlayer(LinkedList<Card> cards){
+        closedCards.addAll(cards);
+    }
+
+    /**
+     * на всякий случай пока. вывод информации о игроке в консоль
+     */
+    public void printInformation(){
+        System.out.printf("Player %s:\nClosed card: ", name);
+        for (Card card : closedCards){
+            System.out.printf("%d ", card.getCardNumber());
+        }
+        System.out.printf("\nOpened card: ");
+        for (Card card : openedCards){
+            System.out.printf("%d ", card.getCardNumber());
+        }
+        System.out.printf("\n\n");
+    }
+
     public String getName(){
     	return name;    
     }    
@@ -27,26 +70,21 @@ class Player
     
     public Card openNextCard()
     {
-        Card card = closedCards.get(0);
-        closedCards.remove(0);
-        openedCards.add(card);
-        
+        if (closedCards.size() == 0){
+            return openedCards.get(openedCards.size() - 1);
+        }
+        Card card = closedCards.pollFirst();
+        openedCards.addLast(card);
         return card;
     }
     
     public Card getTopOpenedCard()
     {
-        return openedCards.get(0);
+        return openedCards.getLast();
     }
-    
-    public void pushCards(ArrayList<Card> cards)
-    {
-        
-    }
-    
-    public ArrayList<Card> pickUpAllOpenedCards()
-    {
-        ArrayList<Card> result = new ArrayList<Card>(openedCards);
+
+    public LinkedList<Card> pickUpAllOpenedCards(){
+        LinkedList<Card> result = new LinkedList<Card>(openedCards);
         openedCards.clear();
         
         return result;

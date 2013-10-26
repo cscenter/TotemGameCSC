@@ -1,15 +1,30 @@
-import java.io.*;
 import java.util.*;
+
+/**
+ * Класс, отвечающий за работу с игроками
+ */
 class View{
+    Game myGame;
+    /**
+     * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
+     */
     public static void main(String[] args){
-        startView();
+        View myView = new View();
+        //int n =  ;
+        myView.myGame = new Game(myView.startView());
+//        for (int i = 0; i < n; i++){
+  //          myView.myGame.getPlayer(i).initializePlayerName(myView.playersView.get(i).playerViewName);
+    //    }
+        myView.run();
     }
 
-
-	private static class PlayerView{
+    /**
+     * Поля, которые нужно знать View о игроках
+     */
+	private class PlayerView{
 		public char openCardKey;
 		public char catchTotemKey;
-        public String playerViewName;
+        public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
         public PlayerView(){
 
         }
@@ -23,8 +38,7 @@ class View{
             catchTotemKey = pw.catchTotemKey;
         }
 	}
-	static ArrayList <PlayerView> playersView;
-    Game myGame;
+	ArrayList <PlayerView> playersView;
 /**
  * ввести число игроков, а так же кнопки управления
  * по умолчанию:
@@ -34,134 +48,279 @@ class View{
  * t, y
  * u, i
 */
-	public static int startView(){
+    private char getNewChar(String inputMessage, String errorOutputMessage){
+        String inputString;
+        char inputChar;
+        Scanner scan = new Scanner(System.in);
+        do{
+            try{
+                System.out.println(inputMessage);
+                inputString = scan.nextLine();
+                inputChar = inputString.charAt(0);
+            } catch (StringIndexOutOfBoundsException e){
+                System.out.printf("%s\n", errorOutputMessage);
+                continue;
+            }
+            break;
+        }while(true);
+        return inputChar;
+    }
+    private void defaultSettings(ArrayList <String> rezultStrings){
+        char inputOpenCardKey;
+        char inputCatchTotemKey;
+        int numberOfPeople = 4;
+        inputOpenCardKey = 'q';
+        inputCatchTotemKey = 'w';
+        playersView.ensureCapacity(numberOfPeople);
+        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya"));
+        rezultStrings.add("Vasya");
+
+        inputOpenCardKey = 'e';
+        inputCatchTotemKey = 'r';
+        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya"));
+        rezultStrings.add("Petya");
+
+        inputOpenCardKey = 't';
+        inputCatchTotemKey = 'y';
+        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha"));
+        rezultStrings.add("Gosha");
+
+        inputOpenCardKey = 'u';
+        inputCatchTotemKey = 'i';
+        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey,"Manya"));
+        rezultStrings.add("Manya");
+
+    }
+    private int setNumberOfPlayers(){
+        int numberOfPeople;
+        Scanner scan = new Scanner(System.in);
+        String inputString;
+        do {
+            try{
+                System.out.println("Please, insert number of players");
+                numberOfPeople = scan.nextInt();
+                inputString = scan.nextLine();
+            } catch (InputMismatchException | StringIndexOutOfBoundsException e){
+                System.out.println("Integer must be integer, you, clever user! try again\n");
+                inputString = scan.nextLine();
+                continue;
+            }
+            System.out.printf("\n");
+            if (numberOfPeople <= 1){
+                System.out.printf("%d isn't correct number of players! try again\n", numberOfPeople);
+            }else{
+                break;
+            }
+        } while(true);
+        return numberOfPeople;
+    }
+    private void notDefaultSettings(ArrayList<String> rezultStrings){
+        int numberOfPeople = setNumberOfPlayers();
+        Scanner scan = new Scanner(System.in);
+        String inputString;
+        char inputCatchTotemKey;
+        char inputOpenCardKey;
+        playersView.ensureCapacity(numberOfPeople);
+        for (int i = 0; i < numberOfPeople; i++){
+            String inputS = "";
+            do {
+                System.out.printf("player %d: insert your name\n", i+1);
+                inputS = scan.nextLine();
+                if (inputS.length()!=0){
+                    break;
+                }else{
+                    System.out.println("Name can't be empty string! try again");
+                    continue;
+                }
+            }while(true);
+            rezultStrings.add(inputS);
+            label:
+            do {
+                try{
+                    System.out.printf("%s: insert key to open first card\n", inputS);
+                    inputString = scan.nextLine();
+                    inputOpenCardKey = inputString.charAt(0);
+                    Character tmp = inputOpenCardKey;
+                    inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
+                    for (PlayerView p : playersView){
+                        if ((inputOpenCardKey == p.catchTotemKey) || (inputOpenCardKey == p.openCardKey)){
+                            System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
+                            continue label;
+                        }
+                    }
+                    break label;
+                }catch (StringIndexOutOfBoundsException e){
+                    System.out.printf("%s, you know, what you just did?? You may drop the game!" +
+                            " Thing about your behaviour and try once more!\n", inputS);
+                }
+
+            }while(true);
+            label:
+            do{
+                try {
+                    System.out.printf("%s: insert key to catch totem\n", inputS);
+                    inputString = scan.nextLine();
+                    inputCatchTotemKey = inputString.charAt(0);
+                    Character tmp = inputCatchTotemKey;
+                    inputCatchTotemKey = tmp.toString().toLowerCase().charAt(0);
+                    if (inputCatchTotemKey == inputOpenCardKey){
+                        System.out.println("you already use this key for key that open last card! try another key");
+                        continue label;
+                    }
+                    for (PlayerView p : playersView){
+                        if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
+                            System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
+                            continue label;
+                        }
+                    }
+                    break label;
+                }catch (StringIndexOutOfBoundsException e){
+                    System.out.printf("%s, you know, what you just did?? You may drop the game!" +
+                            " Thing about your behaviour and try once more!\n", inputS);
+                }
+
+            }while (true);
+            playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, inputS));
+        }
+
+    }
+	private ArrayList<String> startView(){
+        ArrayList <String> rezultStrings = new ArrayList<String>();
         boolean flag = true;
         int numberOfPeople = 4;
         do{
-            System.out.println("Use the default settings? (Y/N)");
+//            System.out.println("Use the default settings? (Y/N)");
             Scanner scan = new Scanner(System.in);
             String inputString; /* Считывается строка и воспринимается первый символ как ответ*/
             Character inputChar;
             char inputOpenCardKey;
             char inputCatchTotemKey;
             playersView = new ArrayList<PlayerView>();
-            inputString = scan.nextLine();
-            inputChar = inputString.charAt(0);
-            switch (inputChar.toString().toUpperCase().charAt(0)){
-                case 'Y':
-                    numberOfPeople = 4;
+            inputChar = getNewChar("Use the default settings? (Y/N)", "No-No-NO, %username% ! Char means char, not empty string!");
+            switch (inputChar.toString().toUpperCase().charAt(0)){ /* использовать параметры по умолчанию?*/
+                case 'Y':           /*да*/
                     flag = false;
-                    inputOpenCardKey = 'q';
-                    inputCatchTotemKey = 'w';
-                    playersView.ensureCapacity(numberOfPeople);
-                    playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya"));
-
-                    inputOpenCardKey = 'e';
-                    inputCatchTotemKey = 'r';
-                    playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya"));
-
-                    inputOpenCardKey = 't';
-                    inputCatchTotemKey = 'y';
-                    playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha"));
-
-                    inputOpenCardKey = 'u';
-                    inputCatchTotemKey = 'i';
-                    playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey,"Manya"));
+                    defaultSettings(rezultStrings);
                     break;
-                case 'N':
+                case 'N':               /*нет*/
                     flag = false;
-                    do {
-                        System.out.println("Please, insert number of players");
-                        numberOfPeople = scan.nextInt();
-                        System.out.printf("\n");
-                        inputString = scan.nextLine();
-                        if (numberOfPeople <= 1){
-                            System.out.printf("%d isn't correct number of players! try again\n", numberOfPeople);
-                        }else{
-                            break;
-                        }
-                    } while(true);
-                    playersView.ensureCapacity(numberOfPeople);
-                    for (int i = 0; i < numberOfPeople; i++){
-                        System.out.printf("player %d: insert your name\n", i+1);
-                        String inputS = scan.nextLine();
-                        label:
-                        do {
-                            System.out.printf("%s: insert key to open first card\n", inputS);
-                            inputString = scan.nextLine();
-                            inputOpenCardKey = inputString.charAt(0);
-                            Character tmp = inputOpenCardKey;
-                            inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
-                            for (PlayerView p : playersView){
-                                if ((inputOpenCardKey == p.catchTotemKey) || (inputOpenCardKey == p.openCardKey)){
-                                    System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
-                                    continue label;
-                                }
-                            }
-                            break label;
-                        }while(true);
-                        label:
-                        do{
-                            System.out.printf("%s: insert key to catch totem\n", inputS);
-                            inputString = scan.nextLine();
-                            inputCatchTotemKey = inputString.charAt(0);
-                            Character tmp = inputCatchTotemKey;
-                            inputCatchTotemKey = tmp.toString().toLowerCase().charAt(0);
-                            if (inputCatchTotemKey == inputOpenCardKey){
-                                System.out.println("you already use this key for key that open last card! try another key");
-                                continue label;
-                            }
-                            for (PlayerView p : playersView){
-                                if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
-                                    System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
-                                    continue label;
-                                }
-                            }
-                            break label;
-                        }while (true);
-                        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, inputS));
-                    }
+                    notDefaultSettings(rezultStrings);
                     break;
                 default:
                         System.out.println("What are you doing?? Try once more!");
                 }
         } while ((flag));
+
+        /*показываем то, что получаем в итоге*/
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
         for (PlayerView p : playersView){
-            System.out.printf("Player %s has %c as key to open last card and %c as key to catch totem\n",
+            System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
                     p.playerViewName, p.openCardKey, p.catchTotemKey);
         }
-		return numberOfPeople;
+		return rezultStrings;
 	}
-	
-    public View(int numberOfPlayers)
-    {
-        
+
+    void printInformationAboutRound(){
+        System.out.printf("name:            ");
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            System.out.printf("%15s", myGame.getPlayer(i).getName());
+        }
+        System.out.printf("    under totem: \nall cards:     ");
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            System.out.printf("%15s", myGame.getPlayer(i).getCardsCount());
+        }
+
+        System.out.printf("%15d\nclose cards    ", myGame.getCardsUnderTotemCount());
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            System.out.printf("%15s", myGame.getPlayer(i).getCloseCardsCount());
+        }
+        System.out.printf("\nopen cards:    ");
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            System.out.printf("%15s", myGame.getPlayer(i).getOpenCardsCount());
+        }
+
+        System.out.printf("\nlast open card:");
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            if (myGame.getPlayer(i).getOpenCardsCount() > 0){
+                System.out.printf("%15d", myGame.getPlayer(i).getTopOpenedCard().getCardNumber());
+            } else {
+                System.out.printf("              -");
+
+            }
+        }
+
+        System.out.printf("\n\n");
+
+        System.out.printf("Round %d, it's %s's turn\n", myGame.getTurnNumber(),
+                myGame.getPlayer(myGame.getPlayerWhoWillGo()).getName());
+
     }
     void run(){
-/*		while (!(Game.isGameEnded())true){ //сюда, получается, надо ссылку на экземляр Game?
-		String readL;
-		char oc;
-			do{
-				System.out.printf("Round: %d\n", turnNumber);
-				for (Player p : players){
-					System.out.printf("player %s, %d open cards,  %d closed card \n the last card: %d\n\n",
-						p.getName(), p.getOpenCardsCount(), p.getCloseCardsCount(), 
-						p.getTopOpenedCard().getCardNumber());
-				}
-				System.out.printf("play!\n");
-				readL=sc.nextLine();
-				oc=readL.charAt(0);
-				for (int i=0; i<players.length; i++){
-					if (playersView.elementAt(i).openCardKey==oc){
-						makeMove(i, false);
-					}
-					if (playersView.elementAt(i).catchTotemKey==oc){
-						makeMove(i, true);
-					}
-				}
-			}while(!(isRoundEnded()));
-		}                           */
+        while (!(myGame.isGameEnded())){
+            String inputString = "";
+            Scanner scan = new Scanner(System.in);
+            char inputChar;
+ //           myGame.isRoundEnded = false;
+  //          do{
+                printInformationAboutRound();
+                System.out.printf("insert key:\n");
+                try {
+                    inputString = scan.nextLine();
+                    inputChar = inputString.charAt(0);
+                    inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                }catch (StringIndexOutOfBoundsException e){
+                    System.out.printf("You can't use empty string!\n");
+                    continue;
+                }
+                boolean suchKeyHere = false;
+                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+                int whoPlayed = 0;
+                for (int i = 0; i < myGame.getPlayersCount(); i++){
+                    if (playersView.get(i).openCardKey == inputChar){
+                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        suchKeyHere = true;
+                        whoPlayed = i;
+                        break;
+                    }
+                    if (playersView.get(i).catchTotemKey == inputChar){
+                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        suchKeyHere = true;
+                        whoPlayed = i;
+                        break;
+                    }
+                }
+                if (!(suchKeyHere)){
+                    System.out.println("Nobody have such key. Try again.\n");
+                    continue;
+                }
+                switch (resultOfMakeMove){
+                    case INCORRECT:
+                        System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case TOTEM_WAS_CATCH_CORRECT:
+                        System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case TOTEM_WAS_CATCH_INCORRECT:
+                        System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case CARD_OPENED:
+
+                        System.out.printf("%s open next card\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    default:
+                }
+
+//            }while (!(myGame.isRoundEnded));
+        }
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            if (myGame.getPlayer(i).getCardsCount() == 0){
+                System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
+            }
+        }
 	}
 }
