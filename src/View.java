@@ -256,6 +256,38 @@ class View{
                 myGame.getPlayer(myGame.getPlayerWhoWillGo()).getName());
 
     }
+
+    int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
+        int looser;
+        Scanner scan = new Scanner(System.in);
+        String inputString;
+        do {
+            try{
+                System.out.println("Please, choose a player from this list");
+                for (Integer i : playersIndex){
+                    System.out.printf("name: %15s", myGame.getPlayer(i).getName());
+                }
+                System.out.printf("\n");
+                for (int i = 0; i < playersIndex.size(); i++){
+                    System.out.printf("type: %15d", i);
+                }
+                System.out.printf("\n");
+                looser = scan.nextInt();
+                inputString = scan.nextLine();
+            } catch (InputMismatchException | StringIndexOutOfBoundsException e){
+                System.out.println("Integer must be integer, you, clever user! try again\n");
+                inputString = scan.nextLine();
+                continue;
+            }
+            if ((looser < 0) || (looser >= playersIndex.size())){
+                System.out.printf("%d isn't correct number of player! try again\n", looser);
+            }else{
+                break;
+            }
+        } while(true);
+        return looser;
+
+    }
     void run(){
         while (!(myGame.isGameEnded())){
             String inputString = "";
@@ -263,6 +295,7 @@ class View{
             char inputChar;
  //           myGame.isRoundEnded = false;
   //          do{
+
                 printInformationAboutRound();
                 System.out.printf("insert key:\n");
                 try {
@@ -312,6 +345,38 @@ class View{
                         System.out.printf("%s open next card\n",
                                 myGame.getPlayer(whoPlayed).getName());
                         break;
+                    case NOT_DEFINED_CATCH:
+                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                        if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+                            label:
+                            do{
+                                inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
+                                        "want to use effect of won duel or of card? type (D/C)", "Try again!");
+                                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                                switch (inputChar){
+                                    case 'd':
+                                        if (possibleLosers.size() == 1){
+                                            System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
+                                            myGame.afterDuelMakeMove(whoPlayed,possibleLosers.get(0));
+                                        }
+                                        break label;
+                                    case 'c':
+                                        System.out.println("You put all cards under totem");
+                                        myGame.arrowsInMakeMove(whoPlayed);
+                                        break label;
+                                    default:
+                                        System.out.println("try again");
+                                }
+                            }while (true);
+                        }
+                        int looser = chooseOneOfPlayers(possibleLosers);
+                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
+                        break;
+                    case ALL_CARDS_OPENED:
+                        System.out.println("All players will open top cards. To do this, press Enter");
+                        scan.nextLine();
+                        myGame.openAllTopCards();
                     default:
                 }
 

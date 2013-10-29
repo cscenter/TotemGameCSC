@@ -11,7 +11,7 @@ class Game{
     public static final int NUMBER_OF_CARDS = 80;
     private int turnNumber;
     private int playerWhoWillGo;
-    private enum GameMode{
+    public enum GameMode{
         NORMAL_MODE,
         COLOR_MODE,
         CATCH_TOTEM_MODE,
@@ -124,7 +124,7 @@ class Game{
      * @return номер игорока, с которым дуэль. -1, если таких игроков нет.
      * НЕ ПОНЯТНО, что делать, если совпадений больше чем два?
      */
-    private ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem){
+    public ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem){
         if (playerTookTotem.getOpenCardsCount() ==0){
             return null;
         }
@@ -163,7 +163,9 @@ class Game{
         INCORRECT,
         TOTEM_WAS_CATCH_CORRECT,
         TOTEM_WAS_CATCH_INCORRECT,
-        CARD_OPENED;
+        CARD_OPENED,
+        NOT_DEFINED_CATCH,
+        ALL_CARDS_OPENED;
     }
     public enum WhatPlayerDid{
         TOOK_TOTEM,
@@ -174,19 +176,23 @@ class Game{
             case TOOK_TOTEM:
                 ArrayList<Integer> result = checkDuelWithPlayer(players.get(playerIndex));
                 if (gameMode == GameMode.CATCH_TOTEM_MODE){
-                    cardsUnderTotem.addAll(players.get(playerIndex).pickUpAllOpenedCards());
-                }
-                if (result == null){
-                    takeAllCardsOnTheTable(players.get(playerIndex));
-                    return ResultOfMakeMove.TOTEM_WAS_CATCH_INCORRECT;
+                    if (result == null){
+                        arrowsInMakeMove(playerIndex);
+//                        takeAllCardsOnTheTable(players.get(playerIndex));
+                        return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
+                    }else{
+                        return ResultOfMakeMove.NOT_DEFINED_CATCH;
+                    }
                 }else{
-                    int rez = result.get(0);
-                    players.get(rez).setCardsToPlayer(pickUpAllCardsFromTotem());
-                    players.get(rez).setCardsToPlayer(players.get(playerIndex).pickUpAllOpenedCards());
-                    players.get(rez).setCardsToPlayer(players.get(rez).pickUpAllOpenedCards());
-                    playerWhoWillGo = rez;
-                    gameMode = GameMode.NORMAL_MODE; //после дуэли карта "цветные стрелки" перестаёт действовать
-                    return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
+                    if (result == null){
+                        takeAllCardsOnTheTable(players.get(playerIndex));
+                        return ResultOfMakeMove.TOTEM_WAS_CATCH_INCORRECT;
+                    }else if (result.size() == 1){
+                        afterDuelMakeMove(playerIndex,result.get(0));
+                        return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
+                    }else{
+                        return ResultOfMakeMove.NOT_DEFINED_CATCH;
+                    }
                 }
             case OPEN_NEW_CARD:
                 if (playerIndex == playerWhoWillGo){
@@ -200,7 +206,7 @@ class Game{
                             break;
                         case ARROWS_OUT:
                             gameMode = GameMode.OPEN_CARD_MODE;
-                            break;
+                            return ResultOfMakeMove.ALL_CARDS_OPENED;
                     }
                     int flagOfEnd = playerWhoWillGo; //На случай, если вдруг у всех кончались закрытые карты
                     do{
@@ -215,7 +221,32 @@ class Game{
         }
         return ResultOfMakeMove.CARD_OPENED;
     }
+    public void arrowsInMakeMove(int winner){
+        cardsUnderTotem.addAll(players.get(winner).pickUpAllOpenedCards());
+        gameMode = GameMode.NORMAL_MODE;
+    }
+    public void afterDuelMakeMove(int winner, int looser){
+        players.get(looser).setCardsToPlayer(pickUpAllCardsFromTotem());
+        players.get(looser).setCardsToPlayer(players.get(winner).pickUpAllOpenedCards());
+        players.get(looser).setCardsToPlayer(players.get(looser).pickUpAllOpenedCards());
+        playerWhoWillGo = looser;
+        gameMode = GameMode.NORMAL_MODE; //после дуэли карта "цветные стрелки" перестаёт действовать
 
+    }
+    public void openAllTopCards(){
+        for (Player player : players){
+            switch (player.openNextCard().getCardType()){
+                case ARROWS_COLORED:
+                    gameMode = GameMode.COLOR_MODE;
+                    break;
+                case ARROWS_IN:
+                    gameMode = GameMode.CATCH_TOTEM_MODE;
+                    break;
+                case ARROWS_OUT:
+                    gameMode = GameMode.OPEN_CARD_MODE;
+            }
+        }
+    }
     public int getPlayersCount(){
         return players.size();
     }
