@@ -15,7 +15,7 @@ class Game{
         NORMAL_MODE,
         COLOR_MODE,
         CATCH_TOTEM_MODE,
-        OPEN_CARD_MODE;
+        OPEN_CARD_MODE
     }
     private GameMode gameMode;
     public GameMode getGameMode(){
@@ -47,7 +47,7 @@ class Game{
      * Карты переставляются в таком же порядке, в котором сортируется созданный случайным массив
      */
     void generateAllCards(ArrayList<Integer> names){
-        allCards = new LinkedList<Card>();
+        allCards = new LinkedList<>();
         NUMBER_OF_CARDS = names.size();
         for (int i = 0; i < NUMBER_OF_CARDS; i++){
             allCards.add(new Card(names.get(i)));
@@ -64,11 +64,11 @@ class Game{
      */
     void generatePlayers(ArrayList<String> playersNames){
         int numberOfPlayers = playersNames.size();
-        players = new ArrayList<Player>(numberOfPlayers);
+        players = new ArrayList<>(numberOfPlayers);
         int numberOfCardsForPlayers = NUMBER_OF_CARDS / numberOfPlayers;
         for (int i = 0; i < numberOfPlayers; i++){
             players.add(new Player(playersNames.get(i)));
-            players.get(i).setCardsToPlayer(new LinkedList<Card>(allCards.subList(i * numberOfCardsForPlayers,
+            players.get(i).setCardsToPlayer(new LinkedList<>(allCards.subList(i * numberOfCardsForPlayers,
                     (i + 1) * numberOfCardsForPlayers)));
         }
     }
@@ -79,7 +79,7 @@ class Game{
      * @param numberOfPlayers количество играющих людей
      */
     void generateCardsUnderTotem(int numberOfPlayers){
-        cardsUnderTotem = new LinkedList<Card>(allCards.subList( (NUMBER_OF_CARDS / numberOfPlayers) * numberOfPlayers,
+        cardsUnderTotem = new LinkedList<>(allCards.subList( (NUMBER_OF_CARDS / numberOfPlayers) * numberOfPlayers,
                 NUMBER_OF_CARDS));
     }
 
@@ -91,7 +91,7 @@ class Game{
         return turnNumber;
     }
     public LinkedList<Card> pickUpAllCardsFromTotem(){
-        LinkedList<Card> result = new LinkedList<Card>(cardsUnderTotem);
+        LinkedList<Card> result = new LinkedList<>(cardsUnderTotem);
         cardsUnderTotem.clear();
         return result;
     }
@@ -165,11 +165,11 @@ class Game{
         TOTEM_WAS_CATCH_INCORRECT,
         CARD_OPENED,
         NOT_DEFINED_CATCH,
-        ALL_CARDS_OPENED;
+        ALL_CARDS_OPENED
     }
     public enum WhatPlayerDid{
         TOOK_TOTEM,
-        OPEN_NEW_CARD;
+        OPEN_NEW_CARD
     }
     public ResultOfMakeMove makeMove(int playerIndex, WhatPlayerDid whatPlayerDid){
         switch (whatPlayerDid){

@@ -13,7 +13,7 @@ class View{
     public static void main(String[] args){
         View myView = new View();
         //int n =  ;
-        myView.myGame = new Game(myView.startView(), myView.cardsWiew.getCardsNumbers());
+        myView.myGame = new Game(myView.startView(), myView.cardsView.getCardsNumbers());
 //        for (int i = 0; i < n; i++){
   //          myView.myGame.getPlayer(i).initializePlayerName(myView.playersView.get(i).playerViewName);
     //    }
@@ -27,34 +27,22 @@ class View{
 		public char openCardKey;
 		public char catchTotemKey;
         public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
-        public PlayerView(){
-
-        }
         public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name){
             openCardKey = newOpenCardKey;
             catchTotemKey = newCatchTotemKey;
             playerViewName = name;
         }
-        public PlayerView(PlayerView pw){
-            openCardKey = pw.openCardKey;
-            catchTotemKey = pw.catchTotemKey;
-        }
 	}
 	ArrayList <PlayerView> playersView;
 
-    private class CardsWiew{
+    private class CardsView {
         private ArrayList <File> cards;
-        public CardsWiew(){
+        public CardsView(){
             File dir = new File("data/");
-            cards = new ArrayList<File>();
-            File [] arr = dir.listFiles();
-            for (int i =0; i < arr.length; i++){
-                cards.add(arr[i]);
-            }
-//            Arrays.asList(dir.listFiles())
+            cards = new ArrayList<>(Arrays.asList(dir.listFiles()));
         }
         public ArrayList<Integer> getCardsNumbers(){
-            ArrayList<Integer> rezult = new ArrayList<Integer>();
+            ArrayList<Integer> rezult = new ArrayList<>();
             for (int i = 0; i < cards.size(); i++){
                 rezult.add(getCardNumber(i));
             }
@@ -67,7 +55,7 @@ class View{
             return Integer.parseInt(numberMatcher.group());
         }
     }
-    private CardsWiew cardsWiew;
+    private CardsView cardsView;
  /**
  * ввести число игроков, а так же кнопки управления
  * по умолчанию:
@@ -123,15 +111,14 @@ class View{
     private int setNumberOfPlayers(){
         int numberOfPeople;
         Scanner scan = new Scanner(System.in);
-        String inputString;
         do {
             try{
                 System.out.println("Please, insert number of players");
                 numberOfPeople = scan.nextInt();
-                inputString = scan.nextLine();
+                scan.nextLine();
             } catch (InputMismatchException | StringIndexOutOfBoundsException e){
                 System.out.println("Integer must be integer, you, clever user! try again\n");
-                inputString = scan.nextLine();
+                scan.nextLine();
                 continue;
             }
             System.out.printf("\n");
@@ -151,7 +138,7 @@ class View{
         char inputOpenCardKey;
         playersView.ensureCapacity(numberOfPeople);
         for (int i = 0; i < numberOfPeople; i++){
-            String inputS = "";
+            String inputS;
             do {
                 System.out.printf("player %d: insert your name\n", i+1);
                 inputS = scan.nextLine();
@@ -159,7 +146,6 @@ class View{
                     break;
                 }else{
                     System.out.println("Name can't be empty string! try again");
-                    continue;
                 }
             }while(true);
             rezultStrings.add(inputS);
@@ -177,7 +163,7 @@ class View{
                             continue label;
                         }
                     }
-                    break label;
+                    break;
                 }catch (StringIndexOutOfBoundsException e){
                     System.out.printf("%s, you know, what you just did?? You may drop the game!" +
                             " Thing about your behaviour and try once more!\n", inputS);
@@ -194,7 +180,7 @@ class View{
                     inputCatchTotemKey = tmp.toString().toLowerCase().charAt(0);
                     if (inputCatchTotemKey == inputOpenCardKey){
                         System.out.println("you already use this key for key that open last card! try another key");
-                        continue label;
+                        continue;
                     }
                     for (PlayerView p : playersView){
                         if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
@@ -202,7 +188,7 @@ class View{
                             continue label;
                         }
                     }
-                    break label;
+                    break;
                 }catch (StringIndexOutOfBoundsException e){
                     System.out.printf("%s, you know, what you just did?? You may drop the game!" +
                             " Thing about your behaviour and try once more!\n", inputS);
@@ -214,17 +200,12 @@ class View{
 
     }
 	private ArrayList<String> startView(){
-        ArrayList <String> rezultStrings = new ArrayList<String>();
+        ArrayList <String> rezultStrings = new ArrayList<>();
         boolean flag = true;
         int numberOfPeople = 4;
         do{
-//            System.out.println("Use the default settings? (Y/N)");
-            Scanner scan = new Scanner(System.in);
-            String inputString; /* Считывается строка и воспринимается первый символ как ответ*/
             Character inputChar;
-            char inputOpenCardKey;
-            char inputCatchTotemKey;
-            playersView = new ArrayList<PlayerView>();
+            playersView = new ArrayList<>();
             inputChar = getNewChar("Use the default settings? (Y/N)", "No-No-NO, %username% ! Char means char, not empty string!");
             switch (inputChar.toString().toUpperCase().charAt(0)){ /* использовать параметры по умолчанию?*/
                 case 'Y':           /*да*/
@@ -289,7 +270,6 @@ class View{
     int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
         int looser;
         Scanner scan = new Scanner(System.in);
-        String inputString;
         do {
             try{
                 System.out.println("Please, choose a player from this list");
@@ -304,10 +284,10 @@ class View{
                 }
                 System.out.printf("\n");
                 looser = scan.nextInt();
-                inputString = scan.nextLine();
+                scan.nextLine();
             } catch (InputMismatchException | StringIndexOutOfBoundsException e){
                 System.out.println("Integer must be integer, you, clever user! try again\n");
-                inputString = scan.nextLine();
+                scan.nextLine();
                 continue;
             }
             if ((looser < 0) || (looser >= playersIndex.size())){
@@ -321,7 +301,7 @@ class View{
     }
     void run(){
         while (!(myGame.isGameEnded())){
-            String inputString = "";
+            String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
  //           myGame.isRoundEnded = false;
@@ -420,6 +400,6 @@ class View{
         }
 	}
     private View(){
-        cardsWiew = new CardsWiew();
+        cardsView = new CardsView();
     }
 }

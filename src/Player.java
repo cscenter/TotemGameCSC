@@ -17,17 +17,10 @@ class Player
      * */
     public Player(String playerName){
         name = playerName;
-        openedCards = new LinkedList<Card>();
-        closedCards = new LinkedList<Card>();
+        openedCards = new LinkedList<>();
+        closedCards = new LinkedList<>();
     }
 
-    /**
-     * вот теперь мы будем знать имя игрока
-     * @param givenName имя, которое будет у игрока
-     */
-    public void initializePlayerName(String givenName){
-        name = givenName;
-    }
 
     /**
      * заносим закрытые карты
@@ -40,7 +33,7 @@ class Player
     /**
      * на всякий случай пока. вывод информации о игроке в консоль
      */
-    public void printInformation(){
+/*    public void printInformation(){
         System.out.printf("Player %s:\nClosed card: ", name);
         for (Card card : closedCards){
             System.out.printf("%d ", card.getCardNumber());
@@ -51,7 +44,7 @@ class Player
         }
         System.out.printf("\n\n");
     }
-
+*/
     public String getName(){
     	return name;    
     }    
@@ -84,7 +77,7 @@ class Player
     }
 
     public LinkedList<Card> pickUpAllOpenedCards(){
-        LinkedList<Card> result = new LinkedList<Card>(openedCards);
+        LinkedList<Card> result = new LinkedList<>(openedCards);
         openedCards.clear();
         
         return result;
