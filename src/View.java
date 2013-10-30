@@ -1,4 +1,6 @@
+import java.io.File;
 import java.util.*;
+import java.util.regex.*;
 
 /**
  * Класс, отвечающий за работу с игроками
@@ -11,7 +13,7 @@ class View{
     public static void main(String[] args){
         View myView = new View();
         //int n =  ;
-        myView.myGame = new Game(myView.startView());
+        myView.myGame = new Game(myView.startView(), myView.cardsWiew.getCardsNumbers());
 //        for (int i = 0; i < n; i++){
   //          myView.myGame.getPlayer(i).initializePlayerName(myView.playersView.get(i).playerViewName);
     //    }
@@ -39,7 +41,34 @@ class View{
         }
 	}
 	ArrayList <PlayerView> playersView;
-/**
+
+    private class CardsWiew{
+        private ArrayList <File> cards;
+        public CardsWiew(){
+            File dir = new File("data/");
+            cards = new ArrayList<File>();
+            File [] arr = dir.listFiles();
+            for (int i =0; i < arr.length; i++){
+                cards.add(arr[i]);
+            }
+//            Arrays.asList(dir.listFiles())
+        }
+        public ArrayList<Integer> getCardsNumbers(){
+            ArrayList<Integer> rezult = new ArrayList<Integer>();
+            for (int i = 0; i < cards.size(); i++){
+                rezult.add(getCardNumber(i));
+            }
+            return rezult;
+        }
+        public int getCardNumber(int index){
+            Pattern numberPattern = Pattern.compile("[0-9]+");
+            Matcher numberMatcher = numberPattern.matcher(cards.get(index).getName());
+            numberMatcher.find();
+            return Integer.parseInt(numberMatcher.group());
+        }
+    }
+    private CardsWiew cardsWiew;
+ /**
  * ввести число игроков, а так же кнопки управления
  * по умолчанию:
  * 4 игрока, клавиши
@@ -264,12 +293,14 @@ class View{
         do {
             try{
                 System.out.println("Please, choose a player from this list");
+                System.out.printf("name: ");
                 for (Integer i : playersIndex){
-                    System.out.printf("name: %15s", myGame.getPlayer(i).getName());
+                    System.out.printf("%15s", myGame.getPlayer(i).getName());
                 }
                 System.out.printf("\n");
+                System.out.printf("type: ");
                 for (int i = 0; i < playersIndex.size(); i++){
-                    System.out.printf("type: %15d", i);
+                    System.out.printf("%15d", i);
                 }
                 System.out.printf("\n");
                 looser = scan.nextInt();
@@ -357,7 +388,7 @@ class View{
                                     case 'd':
                                         if (possibleLosers.size() == 1){
                                             System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                            myGame.afterDuelMakeMove(whoPlayed,possibleLosers.get(0));
+                                            myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
                                         }
                                         break label;
                                     case 'c':
@@ -388,4 +419,7 @@ class View{
             }
         }
 	}
+    private View(){
+        cardsWiew = new CardsWiew();
+    }
 }

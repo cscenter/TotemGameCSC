@@ -8,7 +8,7 @@ class Game{
     private ArrayList<Player> players;
     private LinkedList<Card> allCards;
     private LinkedList<Card> cardsUnderTotem;
-    public static final int NUMBER_OF_CARDS = 80;
+    public static int NUMBER_OF_CARDS;
     private int turnNumber;
     private int playerWhoWillGo;
     public enum GameMode{
@@ -21,7 +21,6 @@ class Game{
     public GameMode getGameMode(){
         return gameMode;
     }
-
     /*
      * Блок генерирования: создание карт, игроков, конструктор Игры
      */
@@ -30,10 +29,10 @@ class Game{
      * говорим что пойдёт первый раунд
      * @param playersNames имена играющих людей
      */
-    public Game(ArrayList<String> playersNames){
+    public Game(ArrayList<String> playersNames, ArrayList<Integer> names){
         turnNumber = 1;
         playerWhoWillGo = 0;
-        generateAllCards();
+        generateAllCards(names);
         int numberOfPlayers = playersNames.size();
         generatePlayers(playersNames);
         generateCardsUnderTotem(numberOfPlayers);
@@ -47,10 +46,11 @@ class Game{
      * Он сортируется.
      * Карты переставляются в таком же порядке, в котором сортируется созданный случайным массив
      */
-    void generateAllCards(){
+    void generateAllCards(ArrayList<Integer> names){
         allCards = new LinkedList<Card>();
+        NUMBER_OF_CARDS = names.size();
         for (int i = 0; i < NUMBER_OF_CARDS; i++){
-            allCards.add(new Card((int)(Math.random() * 4 + 1), i/5));
+            allCards.add(new Card(names.get(i)));
         }
         Collections.shuffle(allCards);
     }

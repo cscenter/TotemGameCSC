@@ -16,6 +16,11 @@ class Card{
     CardType getCardType(){
         return cardType;
     }
+    public Card (int number){
+        color = number % 10;
+        this.number = number / 10;
+        cardType = CardType.NORMAL;
+    }
     public Card(int c, int n){
         color = c;
         number = n;
