@@ -12,6 +12,9 @@ class GraphicsView extends JFrame{
     private static int FRAME_SIZE;
     private char lastPressedKey;
     private boolean allOpenFlag;
+    private boolean catchTotemModeFlag;
+    private boolean multyDuelFlag;
+    private int whoPlayed;
     String directory = "data/";
     private class MyPanel extends JPanel {
         @Override
@@ -19,33 +22,111 @@ class GraphicsView extends JFrame{
             FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
             (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
             cardsView.cardSize = FRAME_SIZE / 10;
+            g.clearRect((int)(FRAME_SIZE/2.2)-cardsView.cardSize/2-30, (int)(FRAME_SIZE/2.2)-cardsView.cardSize/2-30,
+                    (int)(cardsView.cardSize*1.8), cardsView.cardSize+50);
+            g.drawChars((new Integer(myGame.getCardsUnderTotemCount())).toString().toCharArray(), 0,
+                    Integer.toString(myGame.getCardsUnderTotemCount()).length(),(int)(FRAME_SIZE/2.2)-cardsView.cardSize/2+10, (int)(FRAME_SIZE/2.2)+cardsView.cardSize/2+20);
+            if (myGame.getCardsUnderTotemCount()!=0){
+                g.drawRect((int)(FRAME_SIZE/2.2)-cardsView.cardSize/2, (int)(FRAME_SIZE/2.2)-cardsView.cardSize/2, cardsView.cardSize, cardsView.cardSize);
+            }
+            g.drawOval((int)(FRAME_SIZE/2.2)-10, (int)(FRAME_SIZE/2.2)-10,20,20);
             for (int i=0; i<playersView.size(); i++){
                 PlayerView playerView = playersView.get(i);
                 playerView.xСoordinate = (int)((FRAME_SIZE/3.5) * Math.sin(playerView.angle*Math.PI/180) + FRAME_SIZE / 2.2);
                 playerView.yСoordinate = (int)((FRAME_SIZE/3.5) * Math.cos(playerView.angle*Math.PI/180) + FRAME_SIZE / 2.5);
                 g.drawChars(playerView.playerViewName.toCharArray(), 0, playerView.playerViewName.length(), playerView.xСoordinate-cardsView.cardSize/3, playerView.yСoordinate -20);
-                g.clearRect(playerView.xСoordinate-(int)(cardsView.cardSize*2.1), playerView.yСoordinate, (int)(2.1*cardsView.cardSize), cardsView.cardSize*2);
-                g.drawChars(new Integer(myGame.getPlayer(i).getOpenCardsCount()).toString().toCharArray(), 0,
-                        new Integer(myGame.getPlayer(i).getOpenCardsCount()).toString().length(), playerView.xСoordinate+10, playerView.yСoordinate+cardsView.cardSize+20);
+                g.clearRect(playerView.xСoordinate-(int)(cardsView.cardSize*2.1), playerView.yСoordinate, (int)(2.5*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
+                g.drawChars(Integer.toString(myGame.getPlayer(i).getOpenCardsCount()).toCharArray(), 0,
+                        Integer.toString(myGame.getPlayer(i).getOpenCardsCount()).length(), playerView.xСoordinate+10, playerView.yСoordinate+cardsView.cardSize+20);
 
                 if (myGame.getPlayer(i).getOpenCardsCount()!=0){
                     Image image = Toolkit.getDefaultToolkit().getImage(directory+
                             +myGame.getPlayer(i).getTopOpenedCard().getCardNumber()+".jpg");
                     g.drawImage(image, playerView.xСoordinate, playerView.yСoordinate, cardsView.cardSize, cardsView.cardSize, this);
                 }
-                g.drawChars(new Integer(myGame.getPlayer(i).getCloseCardsCount()).toString().toCharArray(), 0,
-                        new Integer(myGame.getPlayer(i).getCloseCardsCount()).toString().length(), playerView.xСoordinate-cardsView.cardSize+10, playerView.yСoordinate+cardsView.cardSize+20);
+                g.drawChars(Integer.toString(myGame.getPlayer(i).getCloseCardsCount()).toCharArray(), 0,
+                        Integer.toString(myGame.getPlayer(i).getCloseCardsCount()).length(), playerView.xСoordinate-cardsView.cardSize+10, playerView.yСoordinate+cardsView.cardSize+20);
 
                 if (myGame.getPlayer(i).getCloseCardsCount()!=0){
                     g.fillRect(playerView.xСoordinate - (int)(1.1 * cardsView.cardSize), playerView.yСoordinate,
                             cardsView.cardSize, cardsView.cardSize);
 
                 }
-
-//                g.drawImage(image)
-                //g.drawLine(playerView.xСoordinate, playerView.yСoordinate, playerView.xСoordinate+cardsView.cardSize, playerView.yСoordinate+10);
             }
+            if (catchTotemModeFlag){
+                g.drawChars(("Do you want to use effect of won duel or of Arrows-In card? Clicked on Totem/player").toCharArray(), 0,
+                        ("Do you want to use effect of won duel or of Arrows-In card? Clicked on Totem/player").length(), 30, FRAME_SIZE-50);
+            }else{
+                g.clearRect(20, FRAME_SIZE-70, FRAME_SIZE-30, 70);
+            }
+            if (multyDuelFlag){
+                g.drawChars("You one duel, here is several loosers. clicked to one of them".toCharArray(), 0, "You one duel, here is several loosers. clicked to one of them".length(),
+                        30, FRAME_SIZE-50);
+            }else{
+                g.clearRect(20, FRAME_SIZE-70, FRAME_SIZE-30, 70);
+            }
+
 //            g.drawLine(10,10,100,100);
+        }
+    }
+    private class MyMouseListener implements MouseListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (catchTotemModeFlag){
+                Point p = e.getLocationOnScreen();
+                ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                for (int i=0; i<playersView.size();i++){
+                    if (playersView.get(i).isIn(p)){
+                        int looser = i;
+                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        catchTotemModeFlag = false;
+                        break;
+                    }
+                }
+                if (p.distance(FRAME_SIZE/2.2,FRAME_SIZE/2.2)<20){
+                    catchTotemModeFlag = false;
+                    myGame.arrowsInMakeMove(whoPlayed);
+                    catchTotemModeFlag = false;
+                }
+            }
+            if (multyDuelFlag){
+                Point p = e.getLocationOnScreen();
+                ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                for (int i=0; i<playersView.size();i++){
+                    if (playersView.get(i).isIn(p)){
+                        int looser = i;
+                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        multyDuelFlag = false;
+                        break;
+                    }
+                }
+            }
+
+
+        }
+
+//        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
+
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            //To change body of implemented methods use File | Settings | File Templates.
         }
     }
     private class MyKeyListener implements KeyListener{
@@ -61,7 +142,7 @@ class GraphicsView extends JFrame{
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
                 boolean suchKeyHere = false;
                 Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
-                int whoPlayed = 0;
+                whoPlayed = 0;
                 for (int i = 0; i < myGame.getPlayersCount(); i++){
                     if (playersView.get(i).openCardKey == inputChar){
                         resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
@@ -99,30 +180,10 @@ class GraphicsView extends JFrame{
                     case NOT_DEFINED_CATCH:
                         ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
                         if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
-                            label:
-                            do{
-                                inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
-                                        "want to use effect of won duel or of card? type (D/C)", "Try again!");
-                                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                                switch (inputChar){
-                                    case 'd':
-                                        if (possibleLosers.size() == 1){
-                                            System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                            myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
-                                        }
-                                        break label;
-                                    case 'c':
-                                        System.out.println("You put all cards under totem");
-                                        myGame.arrowsInMakeMove(whoPlayed);
-                                        break label;
-                                    default:
-                                        System.out.println("try again");
-                                }
-                            }while (true);
+                            catchTotemModeFlag = true;
+                        }else{
+                            multyDuelFlag = true;
                         }
-                        int looser = chooseOneOfPlayers(possibleLosers);
-                        myGame.afterDuelMakeMove(whoPlayed,looser);
-                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
                         break;
                     case ALL_CARDS_OPENED:
                         allOpenFlag = true;
@@ -175,6 +236,14 @@ class GraphicsView extends JFrame{
             yСoordinate = (int)((FRAME_SIZE/3.5) * Math.cos(angle*Math.PI/180) + FRAME_SIZE / 2.5);
 //            System.out.println(xСoordinate + '_'+ yСoordinate);
 
+        }
+        public boolean isIn(Point p){
+            if ((p.getX()<xСoordinate+cardsView.cardSize)&&(p.getX()>xСoordinate-cardsView.cardSize)){
+                if ((p.getY()<yСoordinate+cardsView.cardSize+40)&&(p.getY()>yСoordinate-40)){
+                    return true;
+                }
+            }
+            return false;
         }
     }
     ArrayList <PlayerView> playersView;
