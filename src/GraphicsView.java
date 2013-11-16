@@ -11,16 +11,37 @@ class GraphicsView extends JFrame{
     private Game myGame;
     private static int FRAME_SIZE;
     private char lastPressedKey;
-    private boolean isPressed;
-
+    private boolean allOpenFlag;
+    String directory = "data/";
     private class MyPanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
-            for (PlayerView playerView : playersView){
-                Image image = Toolkit.getDefaultToolkit().getImage("data/052.jpg");
-                g.drawImage(image, playerView.xСoordinate, playerView.yСoordinate, cardsView.cardSize, cardsView.cardSize, this);
-                g.fillRect(playerView.xСoordinate - (int)(1.1 * cardsView.cardSize), playerView.yСoordinate,
-                        cardsView.cardSize, cardsView.cardSize);
+            FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
+            (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+            cardsView.cardSize = FRAME_SIZE / 10;
+            for (int i=0; i<playersView.size(); i++){
+                PlayerView playerView = playersView.get(i);
+                playerView.xСoordinate = (int)((FRAME_SIZE/3.5) * Math.sin(playerView.angle*Math.PI/180) + FRAME_SIZE / 2.2);
+                playerView.yСoordinate = (int)((FRAME_SIZE/3.5) * Math.cos(playerView.angle*Math.PI/180) + FRAME_SIZE / 2.5);
+                g.drawChars(playerView.playerViewName.toCharArray(), 0, playerView.playerViewName.length(), playerView.xСoordinate-cardsView.cardSize/3, playerView.yСoordinate -20);
+                g.clearRect(playerView.xСoordinate-(int)(cardsView.cardSize*2.1), playerView.yСoordinate, (int)(2.1*cardsView.cardSize), cardsView.cardSize*2);
+                g.drawChars(new Integer(myGame.getPlayer(i).getOpenCardsCount()).toString().toCharArray(), 0,
+                        new Integer(myGame.getPlayer(i).getOpenCardsCount()).toString().length(), playerView.xСoordinate+10, playerView.yСoordinate+cardsView.cardSize+20);
+
+                if (myGame.getPlayer(i).getOpenCardsCount()!=0){
+                    Image image = Toolkit.getDefaultToolkit().getImage(directory+
+                            +myGame.getPlayer(i).getTopOpenedCard().getCardNumber()+".jpg");
+                    g.drawImage(image, playerView.xСoordinate, playerView.yСoordinate, cardsView.cardSize, cardsView.cardSize, this);
+                }
+                g.drawChars(new Integer(myGame.getPlayer(i).getCloseCardsCount()).toString().toCharArray(), 0,
+                        new Integer(myGame.getPlayer(i).getCloseCardsCount()).toString().length(), playerView.xСoordinate-cardsView.cardSize+10, playerView.yСoordinate+cardsView.cardSize+20);
+
+                if (myGame.getPlayer(i).getCloseCardsCount()!=0){
+                    g.fillRect(playerView.xСoordinate - (int)(1.1 * cardsView.cardSize), playerView.yСoordinate,
+                            cardsView.cardSize, cardsView.cardSize);
+
+                }
+
 //                g.drawImage(image)
                 //g.drawLine(playerView.xСoordinate, playerView.yСoordinate, playerView.xСoordinate+cardsView.cardSize, playerView.yСoordinate+10);
             }
@@ -28,12 +49,104 @@ class GraphicsView extends JFrame{
         }
     }
     private class MyKeyListener implements KeyListener{
+        @Override
         public void keyTyped(KeyEvent k) {}
         // нажатие клавиши
+        @Override
         public void keyPressed(KeyEvent k) {
-            lastPressedKey = k.getKeyChar();
-            isPressed = true;
-            return;
+            if (!allOpenFlag){
+                lastPressedKey = k.getKeyChar();
+                Character inputChar;
+                inputChar = lastPressedKey;
+                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                boolean suchKeyHere = false;
+                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+                int whoPlayed = 0;
+                for (int i = 0; i < myGame.getPlayersCount(); i++){
+                    if (playersView.get(i).openCardKey == inputChar){
+                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        suchKeyHere = true;
+                        whoPlayed = i;
+                        break;
+                    }
+                    if (playersView.get(i).catchTotemKey == inputChar){
+                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        suchKeyHere = true;
+                        whoPlayed = i;
+                        break;
+                    }
+                }
+                if (!(suchKeyHere)){
+                    System.out.println("Nobody have such key. Try again.\n");
+                }
+                switch (resultOfMakeMove){
+                    case INCORRECT:
+                        System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case TOTEM_WAS_CATCH_CORRECT:
+                        System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case TOTEM_WAS_CATCH_INCORRECT:
+                        System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case CARD_OPENED:
+                        System.out.printf("%s open next card\n",
+                                myGame.getPlayer(whoPlayed).getName());
+                        break;
+                    case NOT_DEFINED_CATCH:
+                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                        if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+                            label:
+                            do{
+                                inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
+                                        "want to use effect of won duel or of card? type (D/C)", "Try again!");
+                                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                                switch (inputChar){
+                                    case 'd':
+                                        if (possibleLosers.size() == 1){
+                                            System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
+                                            myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
+                                        }
+                                        break label;
+                                    case 'c':
+                                        System.out.println("You put all cards under totem");
+                                        myGame.arrowsInMakeMove(whoPlayed);
+                                        break label;
+                                    default:
+                                        System.out.println("try again");
+                                }
+                            }while (true);
+                        }
+                        int looser = chooseOneOfPlayers(possibleLosers);
+                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
+                        break;
+                    case ALL_CARDS_OPENED:
+                        allOpenFlag = true;
+                        System.out.println("All players will open top cards. To do this, press Enter");
+                        break;
+                    default:
+                        break;
+                }
+
+                for (int i = 0; i < myGame.getPlayersCount(); i++){
+                    if (myGame.getPlayer(i).getCardsCount() == 0){
+                        System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
+                    }
+                }
+                myPanel.repaint();
+            }else{
+
+                if (k.getKeyCode()==KeyEvent.VK_ENTER){
+                    myGame.openAllTopCards();
+                    allOpenFlag = false;
+                }
+
+            }
+            myPanel.repaint();
         }
         // отпускание нажатой клавиши
         public void keyReleased(KeyEvent k) {}
@@ -70,9 +183,9 @@ class GraphicsView extends JFrame{
         public int cardSize;
         private ArrayList <File> cards;
         public CardsView(){
-            File dir = new File("data/");
+            File dir = new File(directory);
             cards = new ArrayList<>(Arrays.asList(dir.listFiles()));
-            cardSize = FRAME_SIZE / 10;
+            cardSize = FRAME_SIZE / 6;
         }
         public ArrayList<Integer> getCardsNumbers(){
             ArrayList<Integer> rezult = new ArrayList<>();
@@ -139,7 +252,7 @@ class GraphicsView extends JFrame{
         inputCatchTotemKey = 'i';
         playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey,"Manya", 270.0));
         rezultStrings.add("Manya");
-        myPanel.repaint();
+//        myPanel.repaint();
     }
     private int setNumberOfPlayers(){
         int numberOfPeople;
@@ -186,11 +299,9 @@ class GraphicsView extends JFrame{
             do {
                 try{
                     System.out.printf("%s: insert key to open first card\n", inputS);
-  //                  inputString = scan.nextLine();
-//                    inputOpenCardKey = inputString.charAt(0);
-                    Character tmp;// = inputOpenCardKey;
-                    isPressed = false;
-                    while (!(isPressed)){}
+                    inputString = scan.nextLine();
+                    inputOpenCardKey = inputString.charAt(0);
+                    Character tmp = inputOpenCardKey;
                     tmp = lastPressedKey;
                     inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
                     for (PlayerView p : playersView){
@@ -212,8 +323,7 @@ class GraphicsView extends JFrame{
                     System.out.printf("%s: insert key to catch totem\n", inputS);
                     inputString = scan.nextLine();
                     inputCatchTotemKey = inputString.charAt(0);
-                    Character tmp;// = inputCatchTotemKey;
-                    while (!(isPressed)){}
+                    Character tmp = inputCatchTotemKey;
                     tmp = lastPressedKey;
                     inputCatchTotemKey = tmp.toString().toLowerCase().charAt(0);
                     if (inputCatchTotemKey == inputOpenCardKey){
@@ -338,129 +448,17 @@ class GraphicsView extends JFrame{
         return looser;
 
     }
-    public void run(){
-        while (!(myGame.isGameEnded())){
-            String inputString;
-            Scanner scan = new Scanner(System.in);
-            char inputChar;
-            //           myGame.isRoundEnded = false;
-            //          do{
-
-            printInformationAboutRound();
-            System.out.printf("insert key:\n");
-            try {
-                inputString = scan.nextLine();
-                //          ReadableByteChannel in = Channels.newChannel(System.in);
-
-                //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
-
-                //SelectionKey key = in.register
-                //              in.read(charBuffer);
-                //        charBuffer.rewind();
-                //                 inputChar = charBuffer.getChar(0);
-                isPressed = false;
-                while (!(isPressed)){}
-                inputChar = lastPressedKey;
-                //inputChar = inputString.charAt(0);
-                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-            }catch (StringIndexOutOfBoundsException e){
-                System.out.printf("You can't use empty string!\n");
-                continue;
-//                } catch (IOException e) {
-                //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-            boolean suchKeyHere = false;
-            Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
-            int whoPlayed = 0;
-            for (int i = 0; i < myGame.getPlayersCount(); i++){
-                if (playersView.get(i).openCardKey == inputChar){
-                    resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
-                    suchKeyHere = true;
-                    whoPlayed = i;
-                    break;
-                }
-                if (playersView.get(i).catchTotemKey == inputChar){
-                    resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
-                    suchKeyHere = true;
-                    whoPlayed = i;
-                    break;
-                }
-            }
-            if (!(suchKeyHere)){
-                System.out.println("Nobody have such key. Try again.\n");
-                continue;
-            }
-            switch (resultOfMakeMove){
-                case INCORRECT:
-                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case TOTEM_WAS_CATCH_CORRECT:
-                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case TOTEM_WAS_CATCH_INCORRECT:
-                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case CARD_OPENED:
-
-                    System.out.printf("%s open next card\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case NOT_DEFINED_CATCH:
-                    ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
-                    if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
-                        label:
-                        do{
-                            inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
-                                    "want to use effect of won duel or of card? type (D/C)", "Try again!");
-                            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                            switch (inputChar){
-                                case 'd':
-                                    if (possibleLosers.size() == 1){
-                                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                        myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
-                                    }
-                                    break label;
-                                case 'c':
-                                    System.out.println("You put all cards under totem");
-                                    myGame.arrowsInMakeMove(whoPlayed);
-                                    break label;
-                                default:
-                                    System.out.println("try again");
-                            }
-                        }while (true);
-                    }
-                    int looser = chooseOneOfPlayers(possibleLosers);
-                    myGame.afterDuelMakeMove(whoPlayed,looser);
-                    System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
-                    break;
-                case ALL_CARDS_OPENED:
-                    System.out.println("All players will open top cards. To do this, press Enter");
-                    scan.nextLine();
-                    myGame.openAllTopCards();
-                default:
-            }
-
-//            }while (!(myGame.isRoundEnded));
-        }
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            if (myGame.getPlayer(i).getCardsCount() == 0){
-                System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
-            }
-        }
-    }
     public GraphicsView(){
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
         (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
+        cardsView = new CardsView();
+        myGame = new Game(startView(), cardsView.getCardsNumbers());
+
         add(myPanel = new MyPanel());
         pack();
         addKeyListener(new MyKeyListener());
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        cardsView = new CardsView();
-        myGame = new Game(startView(), cardsView.getCardsNumbers());
     }
 }

@@ -8,14 +8,14 @@
 public class MainTotemGame {
     public static void main(String[] args){
         if (args.length ==0){
-            (new GraphicsView()).run();
+            new GraphicsView(); //.run();
         }else{
             switch (args[0].charAt(0)){
                 case '1':
                     (new View()).run();
                     break;
                 case '2':
-                    (new GraphicsView()).run();
+                    new GraphicsView();
                     break;
                 default:
                     (new View()).run();
