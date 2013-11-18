@@ -35,7 +35,7 @@ public class MyPanel extends JPanel {
                 Matcher numberMatcher = numberPattern.matcher(cardI.getName());
                 numberMatcher.find();
                 int num = Integer.parseInt(numberMatcher.group());
-                Image im = Toolkit.getDefaultToolkit().getImage(GraphicsView.DIRECTORY+num+".jpg");
+                Image im = Toolkit.getDefaultToolkit().getImage(cardI.toString());
                 image.set(num, im);
             }
         }
@@ -63,7 +63,7 @@ public class MyPanel extends JPanel {
         int yCoord;
         public void clearD(Graphics g){
             g.clearRect(xCoord-cardsView.cardSize/2-panel_size/10, yCoord-cardsView.cardSize/2-panel_size/20,
-                    (int)(cardsView.cardSize*1.8), cardsView.cardSize+panel_size/10);
+                    (int)(cardsView.cardSize*2.5), cardsView.cardSize+panel_size/10);
 
         }
         public void drawTotem(Graphics g){
@@ -109,7 +109,7 @@ public class MyPanel extends JPanel {
             return false;
         }
         public void clear(Graphics g){
-            g.clearRect(xСoordinate-(int)(cardsView.cardSize*2.1), yСoordinate, (int)(2.5*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
+            g.clearRect(xСoordinate-(int)(cardsView.cardSize*2.1), yСoordinate, (int)(3.1*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
         }
         public void drawPlayer(Graphics g){
             clear(g);
@@ -118,8 +118,6 @@ public class MyPanel extends JPanel {
             g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xСoordinate+panel_size/60, yСoordinate+cardsView.cardSize+panel_size/30);
 
             if (playerInfo.getOpenCardsCount()!=0){
-//                Image image = Toolkit.getDefaultToolkit().getImage(GraphicsView.DIRECTORY+
-  //                      +playerInfo.getTopOpenedCard().getCardNumber()+".jpg");
                 Image image = cardsView.image.get(playerInfo.getTopOpenedCard().getCardNumber());
                 g.drawImage(image, xСoordinate, yСoordinate, cardsView.cardSize, cardsView.cardSize, MyPanel.this);
             }

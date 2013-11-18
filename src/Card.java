@@ -10,6 +10,14 @@ class Card{
 //        HAND_IN,
 //        ARROWS_TO_NEXT;
     }
+    @Override
+    public String toString(){
+        int num = getCardNumber();
+        if (num<100){
+            return "0"+num;
+        }
+        return num+"";
+    }
     final private int color;
     final private int number;
     final private CardType cardType;

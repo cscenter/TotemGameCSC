@@ -248,7 +248,7 @@ class View{
         System.out.printf("\nlast open card:");
         for (int i = 0; i < myGame.getPlayersCount(); i++){
             if (myGame.getPlayer(i).getOpenCardsCount() > 0){
-                System.out.printf("%15d", myGame.getPlayer(i).getTopOpenedCard().getCardNumber());
+                System.out.printf("%15s", myGame.getPlayer(i).getTopOpenedCard());
             } else {
                 System.out.printf("              -");
 
