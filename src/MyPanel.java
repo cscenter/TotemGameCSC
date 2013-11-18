@@ -20,10 +20,24 @@ public class MyPanel extends JPanel {
     public class CardsView {
         public int cardSize;
         private ArrayList <File> cards;
+        ArrayList<Image> image;
+
         public CardsView(){
             File dir = new File(GraphicsView.DIRECTORY);
             cards = new ArrayList<>(Arrays.asList(dir.listFiles()));
             cardSize = panel_size / 6;
+            image = new ArrayList<>(168);
+            for (int i=0; i<400; i++){
+                image.add(null);
+            }
+            for (File cardI : cards){
+                Pattern numberPattern = Pattern.compile("[0-9]+");
+                Matcher numberMatcher = numberPattern.matcher(cardI.getName());
+                numberMatcher.find();
+                int num = Integer.parseInt(numberMatcher.group());
+                Image im = Toolkit.getDefaultToolkit().getImage(GraphicsView.DIRECTORY+num+".jpg");
+                image.set(num, im);
+            }
         }
         public ArrayList<Integer> getCardsNumbers(){
             ArrayList<Integer> rezult = new ArrayList<>();
@@ -104,8 +118,9 @@ public class MyPanel extends JPanel {
             g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xСoordinate+panel_size/60, yСoordinate+cardsView.cardSize+panel_size/30);
 
             if (playerInfo.getOpenCardsCount()!=0){
-                Image image = Toolkit.getDefaultToolkit().getImage(GraphicsView.DIRECTORY+
-                        +playerInfo.getTopOpenedCard().getCardNumber()+".jpg");
+//                Image image = Toolkit.getDefaultToolkit().getImage(GraphicsView.DIRECTORY+
+  //                      +playerInfo.getTopOpenedCard().getCardNumber()+".jpg");
+                Image image = cardsView.image.get(playerInfo.getTopOpenedCard().getCardNumber());
                 g.drawImage(image, xСoordinate, yСoordinate, cardsView.cardSize, cardsView.cardSize, MyPanel.this);
             }
             String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
@@ -145,9 +160,6 @@ public class MyPanel extends JPanel {
         //убрать с консоли всё
         //Поля в сеттеры-геттеры
         //result через s пишется
-        if (totemV == null){
-            return;
-        }
         reSize(g.getClipBounds().height);
         totemV.drawTotem(g);
         for (PlayerView player : playersView){
