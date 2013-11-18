@@ -58,6 +58,7 @@ public class MyPanel extends JPanel {
         cardsView = new CardsView();
     }
     private class TotemView{
+        Game.Totem totem;
         int totemRad;
         int xCoord;
         int yCoord;
@@ -68,9 +69,9 @@ public class MyPanel extends JPanel {
         }
         public void drawTotem(Graphics g){
             clearD(g);
-            String cardsCount = String.valueOf(myGame.getCardsUnderTotemCount());
+            String cardsCount = String.valueOf(totem.getCardsCount());
             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-cardsView.cardSize/2+panel_size/60, yCoord+cardsView.cardSize/2+panel_size/30);
-            if (myGame.getCardsUnderTotemCount()!=0){
+            if (totem.getCardsCount()!=0){
                 g.drawRect(xCoord-cardsView.cardSize/2, yCoord-cardsView.cardSize/2, cardsView.cardSize, cardsView.cardSize);
             }
             g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
@@ -184,6 +185,7 @@ public class MyPanel extends JPanel {
     }
     public void initTotemV(){
         totemV = new TotemView();
+        totemV.totem = myGame.totem;
     }
     public class MyMouseListener extends MouseAdapter {
 

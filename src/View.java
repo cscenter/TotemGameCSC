@@ -236,7 +236,7 @@ class View{
             System.out.printf("%15s", myGame.getPlayer(i).getCardsCount());
         }
 
-        System.out.printf("%15d\nclose cards    ", myGame.getCardsUnderTotemCount());
+        System.out.printf("%15d\nclose cards    ", myGame.totem.getCardsCount());
         for (int i = 0; i < myGame.getPlayersCount(); i++){
             System.out.printf("%15s", myGame.getPlayer(i).getCloseCardsCount());
         }

@@ -7,7 +7,29 @@ import java.util.*;
 class Game{
     private ArrayList<Player> players;
     private LinkedList<Card> allCards;
-    private LinkedList<Card> cardsUnderTotem;
+    public class Totem{
+        private LinkedList<Card> cards;
+            /**
+         * По правилам лишние карты (которые остаются от деления всех карт поровну)
+         * кладутся под тотем
+         * @param numberOfPlayers количество играющих людей
+         */
+        Totem (int numberOfPlayers){
+            cards = new LinkedList<>(allCards.subList( (NUMBER_OF_CARDS / numberOfPlayers) * numberOfPlayers,
+                    NUMBER_OF_CARDS));
+        }
+        public LinkedList<Card> pickUpAllCards(){
+            LinkedList<Card> result = new LinkedList<>(cards);
+            cards.clear();
+            return result;
+        }
+        public int getCardsCount(){
+            return cards.size();
+        }
+
+
+    }
+    Totem totem;
     public static int NUMBER_OF_CARDS;
     private int turnNumber;
     private int playerWhoWillGo;
@@ -35,7 +57,7 @@ class Game{
         generateAllCards(names);
         int numberOfPlayers = playersNames.size();
         generatePlayers(playersNames);
-        generateCardsUnderTotem(numberOfPlayers);
+        totem = new Totem(numberOfPlayers);
         gameMode = GameMode.NORMAL_MODE;
     }
 
@@ -73,15 +95,7 @@ class Game{
         }
     }
 
-    /**
-     * По правилам лишние карты (которые остаются от деления всех карт поровну)
-     * кладутся под тотем
-     * @param numberOfPlayers количество играющих людей
-     */
-    void generateCardsUnderTotem(int numberOfPlayers){
-        cardsUnderTotem = new LinkedList<>(allCards.subList( (NUMBER_OF_CARDS / numberOfPlayers) * numberOfPlayers,
-                NUMBER_OF_CARDS));
-    }
+
 
     /**
      * Конец блока генерирования
@@ -89,11 +103,6 @@ class Game{
 
     public int getTurnNumber(){
         return turnNumber;
-    }
-    public LinkedList<Card> pickUpAllCardsFromTotem(){
-        LinkedList<Card> result = new LinkedList<>(cardsUnderTotem);
-        cardsUnderTotem.clear();
-        return result;
     }
 
     public int getPlayerWhoWillGo(){
@@ -105,9 +114,6 @@ class Game{
     }
     
 
-    public int getCardsUnderTotemCount(){
-        return cardsUnderTotem.size();
-    }
     public boolean isGameEnded()
     {
         for (Player player : players)
@@ -154,7 +160,7 @@ class Game{
      * @param looser игрок, который берёт все открытые карты и карты под тотемом
      */
     private void takeAllCardsOnTheTable(Player looser){
-        looser.setCardsToPlayer(pickUpAllCardsFromTotem());
+        looser.setCardsToPlayer(totem.pickUpAllCards());
         for (Player player : players){
             looser.setCardsToPlayer(player.pickUpAllOpenedCards());
         }
@@ -222,11 +228,11 @@ class Game{
         return ResultOfMakeMove.CARD_OPENED;
     }
     public void arrowsInMakeMove(int winner){
-        cardsUnderTotem.addAll(players.get(winner).pickUpAllOpenedCards());
+        totem.cards.addAll(players.get(winner).pickUpAllOpenedCards());
         gameMode = GameMode.NORMAL_MODE;
     }
     public void afterDuelMakeMove(int winner, int looser){
-        players.get(looser).setCardsToPlayer(pickUpAllCardsFromTotem());
+        players.get(looser).setCardsToPlayer(totem.pickUpAllCards());
         players.get(looser).setCardsToPlayer(players.get(winner).pickUpAllOpenedCards());
         players.get(looser).setCardsToPlayer(players.get(looser).pickUpAllOpenedCards());
         playerWhoWillGo = looser;

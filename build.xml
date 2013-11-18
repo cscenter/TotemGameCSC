@@ -42,4 +42,7 @@
         <!-- Удаление файлов -->
         <delete dir="${build.classes}"/>
     </target>
+     <target name="run">
+        <java jar="Totem.jar" fork="true"/>
+    </target>
 </project>
