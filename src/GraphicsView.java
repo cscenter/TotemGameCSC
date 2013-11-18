@@ -4,18 +4,17 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
+
 /**
  * Класс, отвечающий за работу с игроками
+ * В графическом режиме
  */
 class GraphicsView extends JFrame{
     private Game myGame;
     private static int FRAME_SIZE;
     public static final String DIRECTORY = "data/";
     MyPanel myPanel;
-    /**
-     * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
-     */
-
+    
     /**
      * Поля, которые нужно знать View о игроках
      */
@@ -275,9 +274,9 @@ class GraphicsView extends JFrame{
         for (int i=0; i<myPanel.playersView.size(); i++){
             myPanel.playersView.get(i).connectWithInfo(myGame.getPlayer(i));
         }
+        myPanel.myGame = this.myGame;
         myPanel.initTotemV();
         add(myPanel);
-        myPanel.myGame = myGame;
         pack();
         addKeyListener(myPanel.initMyKeyListener());
         addMouseListener(myPanel.initMyMouseListener());

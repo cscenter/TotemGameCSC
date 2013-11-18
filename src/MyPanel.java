@@ -84,8 +84,8 @@ public class MyPanel extends JPanel {
     }
     public class PlayerView{
         private Player playerInfo;
-        public int xСoordinate;
-        public int yСoordinate;
+        public int xCoordinate;
+        public int yCoordinate;
         public double angle;
         public char openCardKey;
         public char catchTotemKey;
@@ -95,40 +95,42 @@ public class MyPanel extends JPanel {
             catchTotemKey = newCatchTotemKey;
             playerViewName = name;
             angle = a;
-            xСoordinate = (int)((panel_size/3.5) * Math.sin(angle*Math.PI/180) + panel_size / 2.2);
-            yСoordinate = (int)((panel_size/3.5) * Math.cos(angle*Math.PI/180) + panel_size / 2.5);
+            xCoordinate = (int)((panel_size/3.5) * Math.sin(angle*Math.PI/180) + panel_size / 2.2);
+            yCoordinate = (int)((panel_size/3.5) * Math.cos(angle*Math.PI/180) + panel_size / 2.5);
         }
         public void connectWithInfo(Player player){
             playerInfo = player;
         }
         public boolean isIn(Point p){
-            if ((p.getX()<xСoordinate+cardsView.cardSize)&&(p.getX()>xСoordinate-cardsView.cardSize)){
-                if ((p.getY()<yСoordinate+cardsView.cardSize+40)&&(p.getY()>yСoordinate-40)){
+            if ((p.getX()<xCoordinate+cardsView.cardSize)&&(p.getX()>xCoordinate-cardsView.cardSize)){
+                if ((p.getY()<yCoordinate+cardsView.cardSize+40)&&(p.getY()>yCoordinate-40)){
                     return true;
                 }
             }
             return false;
         }
         public void clear(Graphics g){
-            g.clearRect(xСoordinate-(int)(cardsView.cardSize*2.1), yСoordinate, (int)(3.1*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
+            g.clearRect(xCoordinate-(int)(cardsView.cardSize*2.1), yCoordinate, (int)(3.1*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
         }
         public void drawPlayer(Graphics g){
             clear(g);
-            g.drawChars(playerViewName.toCharArray(), 0, playerViewName.length(), xСoordinate - cardsView.cardSize / 3, yСoordinate - panel_size / 30);
+            g.drawChars(playerViewName.toCharArray(), 0, playerViewName.length(), xCoordinate - cardsView.cardSize / 3, yCoordinate - panel_size / 30);
             String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-            g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xСoordinate+panel_size/60, yСoordinate+cardsView.cardSize+panel_size/30);
+            g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+panel_size/60, yCoordinate+cardsView.cardSize+panel_size/30);
 
             if (playerInfo.getOpenCardsCount()!=0){
                 Image image = cardsView.image.get(playerInfo.getTopOpenedCard().getCardNumber());
-                g.drawImage(image, xСoordinate, yСoordinate, cardsView.cardSize, cardsView.cardSize, MyPanel.this);
+                g.drawImage(image, xCoordinate, yCoordinate, cardsView.cardSize, cardsView.cardSize, MyPanel.this);
             }
             String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-            g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xСoordinate-cardsView.cardSize+panel_size/60, yСoordinate+cardsView.cardSize+panel_size/30);
+            g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-cardsView.cardSize+panel_size/60, yCoordinate+cardsView.cardSize+panel_size/30);
 
             if (playerInfo.getCloseCardsCount()!=0){
-                g.fillRect(xСoordinate - (int)(1.1 * cardsView.cardSize), yСoordinate, cardsView.cardSize, cardsView.cardSize);
+                g.fillRect(xCoordinate - (int)(1.1 * cardsView.cardSize), yCoordinate, cardsView.cardSize, cardsView.cardSize);
 
             }
+            String catchKey=String.valueOf(openCardKey)+", "+String.valueOf(catchTotemKey);
+            g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(cardsView.cardSize*1.5), yCoordinate - panel_size/30);
 
         }
     }
@@ -141,8 +143,8 @@ public class MyPanel extends JPanel {
         totemV.totemRad = (int)(panel_size/50.5);
         totemV.xCoord = totemV.yCoord = (int)(panel_size/2.2);
         for (PlayerView player : playersView){
-            player.xСoordinate = (int)((panel_size/3.5) * Math.sin(player.angle*Math.PI/180) + panel_size / 2.2);
-            player.yСoordinate = (int)((panel_size/3.5) * Math.cos(player.angle*Math.PI/180) + panel_size / 2.5);
+            player.xCoordinate = (int)((panel_size/3.5) * Math.sin(player.angle*Math.PI/180) + panel_size / 2.2);
+            player.yCoordinate = (int)((panel_size/3.5) * Math.cos(player.angle*Math.PI/180) + panel_size / 2.5);
 
         }
 
@@ -176,6 +178,9 @@ public class MyPanel extends JPanel {
         }else{
             g.clearRect(20, panel_size-70, panel_size-30, 70);
         }
+        g.clearRect(0,0,panel_size, 20);
+        String whoPlayedMes = "It's "+playersView.get((whoPlayed+1)%playersView.size()).playerViewName+"'s turn!";
+        g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
     }
     public MyMouseListener initMyMouseListener(){
         return new MyMouseListener();
@@ -249,6 +254,7 @@ public class MyPanel extends JPanel {
                         whoPlayed = i;
                         break;
                     }
+                    repaint();
                 }
                 if (!(suchKeyHere)){
                     System.out.println("Nobody have such key. Try again.\n");
