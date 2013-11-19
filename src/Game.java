@@ -6,7 +6,16 @@ import java.util.*;
  */
 class Game{
     private ArrayList<Player> players;
-    public LinkedList<Card> allCards;
+    private LinkedList<Card> allCards;
+    private Totem totem;
+    private static int NUMBER_OF_CARDS;
+    private int turnNumber;
+    private int playerWhoWillGo;
+    private static int NUMBER_OF_PLAYERS;
+
+    public LinkedList<Card> getAllCards(){
+        return allCards;
+    }
     public class Totem{
         private LinkedList<Card> cards;
             /**
@@ -14,7 +23,7 @@ class Game{
          * кладутся под тотем
          * @param numberOfPlayers количество играющих людей
          */
-        Totem (int numberOfPlayers){
+        public Totem (int numberOfPlayers){
             cards = new LinkedList<>(allCards.subList( (NUMBER_OF_CARDS / numberOfPlayers) * numberOfPlayers,
                     NUMBER_OF_CARDS));
         }
@@ -26,13 +35,10 @@ class Game{
         public int getCardsCount(){
             return cards.size();
         }
-
-
     }
-    Totem totem;
-    public static int NUMBER_OF_CARDS;
-    private int turnNumber;
-    private int playerWhoWillGo;
+    public Totem getTotem(){
+        return totem;
+    }
     public enum GameMode{
         NORMAL_MODE,
         COLOR_MODE,

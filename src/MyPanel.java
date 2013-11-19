@@ -1,42 +1,39 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MyPanel extends JPanel {
-    Game myGame;
-    public int panel_size;
-    public char lastPressedKey;
-    public boolean allOpenFlag;
-    public boolean catchTotemModeFlag;
-    public boolean multyDuelFlag;
-    public int whoPlayed;
+    private Game myGame;
+    private int panel_size;
+    private boolean allOpenFlag;
+    private boolean catchTotemModeFlag;
+    private boolean multyDuelFlag;
+    private int whoPlayed;
 
-    public ArrayList<CardView> cardsView;
-    private class TotemView{
-        Game.Totem totem;
-        int totemRad;
-        int xCoord;
-        int yCoord;
+    private ArrayList<CardView> cardsView;
+    public class TotemView{
+        private Game.Totem totem;
+        private int totemRad;
+        private int xCoord;
+        private int yCoord;
         public TotemView (Game.Totem totem1){
             totem = totem1;
         }
         public void clearD(Graphics g){
-            g.clearRect(xCoord-CardView.cardSize/2-panel_size/10, yCoord-CardView.cardSize/2-panel_size/20,
-                    (int)(CardView.cardSize*2.5), CardView.cardSize+panel_size/10);
+            g.clearRect(xCoord-CardView.getCardSize()/2-panel_size/10, yCoord-CardView.getCardSize()/2-panel_size/20,
+                    (int)(CardView.getCardSize()*2.5), CardView.getCardSize()+panel_size/10);
 
         }
         public void drawTotem(Graphics g){
             clearD(g);
             String cardsCount = String.valueOf(totem.getCardsCount());
-            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.cardSize/2+panel_size/60, yCoord+CardView.cardSize/2+panel_size/30);
+            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
             if (totem.getCardsCount()!=0){
-                g.drawRect(xCoord-CardView.cardSize/2, yCoord-CardView.cardSize/2, CardView.cardSize, CardView.cardSize);
+                g.drawRect(xCoord-CardView.getCardSize()/2, yCoord-CardView.getCardSize()/2, CardView.getCardSize(), CardView.getCardSize());
             }
             g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
 
@@ -44,39 +41,27 @@ public class MyPanel extends JPanel {
         public boolean isIn(Point p){
             return (p.distance(xCoord, yCoord)<totemRad);
         }
+
+        public void resize(int haracteristicScale) {
+            totemV.totemRad = (int)(haracteristicScale/50.5);
+            totemV.xCoord = totemV.yCoord = (int)(haracteristicScale/2.2);
+        }
     }
-    TotemView totemV;
-    public PlayerView initPlayerView(char newOpenCardKey, char newCatchTotemKey, String name, double a){
-        return new PlayerView(newOpenCardKey, newCatchTotemKey, name, a);
-    }
-    ArrayList <PlayerView> playersView;
+    private TotemView totemV;
+    private ArrayList <PlayerView> playersView;
 
     private void reSize(int haracteristicScale){
         panel_size = haracteristicScale;
-//        setPreferredSize(new Dimension(panel_size, panel_size));
-        CardView.cardSize = panel_size / 10;
-        PlayerView.setScale(haracteristicScale);
-        totemV.totemRad = (int)(panel_size/50.5);
-        totemV.xCoord = totemV.yCoord = (int)(panel_size/2.2);
+        CardView.resize(haracteristicScale);
+        totemV.resize(haracteristicScale);
         for (PlayerView player : playersView){
-            player.xCoordinate = (int)((panel_size/3.5) * Math.sin(player.angle*Math.PI/180) + panel_size / 2.2);
-            player.yCoordinate = (int)((panel_size/3.5) * Math.cos(player.angle*Math.PI/180) + panel_size / 2.5);
-
+            player.resize(haracteristicScale);
         }
 
     }
     @Override
     protected void paintComponent(Graphics g) {
-        //get clip bounds
-        //отделить панель и все остальные
-        //sublime
-        //String.valueOf
-        //выделить переменные отдльно (name=player.getName()) etc.
-        //пихнуть создание Image в CardView
-        //class for TotemView
         //убрать с консоли всё
-        //Поля в сеттеры-геттеры
-        //result через s пишется
         reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
         totemV.drawTotem(g);
         for (PlayerView player : playersView){
@@ -95,7 +80,7 @@ public class MyPanel extends JPanel {
             g.clearRect(20, panel_size-70, panel_size-30, 75);
         }
         g.clearRect(0,0,panel_size, 20);
-        String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).playerViewName+"'s turn!";
+        String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).getPlayerName()+"'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
     }
     public MyMouseListener initMyMouseListener(){
@@ -104,11 +89,6 @@ public class MyPanel extends JPanel {
     public MyKeyListener initMyKeyListener(){
         return new MyKeyListener();
     }
-    public void initTotemV(){
-        totemV = new TotemView(myGame.totem);
-        totemV.totem = myGame.totem;
-    }
-
 
     public void initiation(Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
         myGame = game;
@@ -117,27 +97,23 @@ public class MyPanel extends JPanel {
         for (int i=0; i<400; i++){//Как сделать нормально?
             cardsView.add(null);
         }
-        for (File cardI : CardView.cardsFiles){
+        for (File cardI : CardView.getCardsFiles()){
             Pattern numberPattern = Pattern.compile("[0-9]+");
             Matcher numberMatcher = numberPattern.matcher(cardI.getName());
             numberMatcher.find();
             int num = Integer.parseInt(numberMatcher.group());
-            CardView cardView = new CardView();
-            for (Card card : myGame.allCards){
+            for (Card card : myGame.getAllCards()){
                 if (card.getCardNumber() == num){
-                    cardView.card = card;
-                    cardView.id = num;
-                    cardView.cardImage = Toolkit.getDefaultToolkit().getImage(cardI.toString());
-                    cardView.fileCard = cardI;
+                    CardView cardView = new CardView(card, cardI, Toolkit.getDefaultToolkit().getImage(cardI.toString()), num);
+                    cardsView.set(num, cardView);
                     break;
                 }
             }
-            cardsView.set(num, cardView);
         }
         for (int i=0; i<ktKeys.size(); i++){
             playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), myGame.getPlayer(i), angle.get(i)));
         }
-        totemV = new TotemView(game.totem);
+        totemV = new TotemView(game.getTotem());
     }
 
 
@@ -185,21 +161,19 @@ public class MyPanel extends JPanel {
         @Override
         public void keyPressed(KeyEvent k) {
             if (!allOpenFlag){
-                lastPressedKey = k.getKeyChar();
-                Character inputChar;
-                inputChar = lastPressedKey;
+                Character inputChar = k.getKeyChar();
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
                 boolean suchKeyHere = false;
                 Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
                 whoPlayed = 0;
                 for (int i = 0; i < myGame.getPlayersCount(); i++){
-                    if (playersView.get(i).openCardKey == inputChar){
+                    if (playersView.get(i).getOpenCardKey() == inputChar){
                         resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
                     }
-                    if (playersView.get(i).catchTotemKey == inputChar){
+                    if (playersView.get(i).getCatchTotemKey() == inputChar){
                         resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         suchKeyHere = true;
                         whoPlayed = i;
@@ -226,11 +200,11 @@ public class MyPanel extends JPanel {
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
                                 myGame.getPlayer(whoPlayed).getName());
-                        playersView.get(whoPlayed).topCardView = cardsView.get(playersView.get(whoPlayed).playerInfo.getTopOpenedCard().getCardNumber());
+                        playersView.get(whoPlayed).setTopCardView(cardsView);
 
                         break;
                     case NOT_DEFINED_CATCH:
-                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+//                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
                         if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
                             catchTotemModeFlag = true;
                         }else{
@@ -240,7 +214,7 @@ public class MyPanel extends JPanel {
                     case ALL_CARDS_OPENED:
                         allOpenFlag = true;
                         for (PlayerView player : playersView){
-                            player.topCardView = cardsView.get(player.playerInfo.getTopOpenedCard().getCardNumber());
+                            player.setTopCardView(cardsView);
                         }
                         MyPanel.this.repaint();
                         System.out.println("All players will open top cards. To do this, press Enter");
@@ -260,7 +234,7 @@ public class MyPanel extends JPanel {
                 if (k.getKeyCode()==KeyEvent.VK_ENTER){
                     myGame.openAllTopCards();
                     for (PlayerView player : playersView){
-                        player.topCardView = cardsView.get(player.playerInfo.getTopOpenedCard().getCardNumber());
+                        player.setTopCardView(cardsView);
                     }
                     allOpenFlag = false;
                 }

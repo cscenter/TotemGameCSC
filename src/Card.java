@@ -2,6 +2,9 @@
  * Класс - одна карта. У неё есть цвет, id и тип
 */
 public class Card{
+    final private int color;
+    final private int number;
+    final private CardType cardType;
     public enum CardType{
         NORMAL,
         ARROWS_OUT,
@@ -18,9 +21,6 @@ public class Card{
         }
         return num+"";
     }
-    final private int color;
-    final private int number;
-    final private CardType cardType;
     CardType getCardType(){
         return cardType;
     }

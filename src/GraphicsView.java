@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 
 /**
  * Класс, отвечающий за работу с игроками
@@ -12,8 +9,7 @@ import java.util.regex.*;
 class GraphicsView extends JFrame{
     private Game myGame;
     private static int FRAME_SIZE;
-    public static final String DIRECTORY = "data/";
-    MyPanel myPanel;
+    private MyPanel myPanel;
     
     /**
      * Поля, которые нужно знать View о игроках
@@ -98,7 +94,7 @@ class GraphicsView extends JFrame{
         String inputString;
         char inputCatchTotemKey;
         char inputOpenCardKey;
-        myPanel.playersView.ensureCapacity(numberOfPeople);
+//        myPanel.playersView.ensureCapacity(numberOfPeople);
         for (int i = 0; i < numberOfPeople; i++){
             String inputS;
             do {
@@ -118,15 +114,14 @@ class GraphicsView extends JFrame{
                     inputString = scan.nextLine();
                     inputOpenCardKey = inputString.charAt(0);
                     Character tmp = inputOpenCardKey;
-                    tmp = myPanel.lastPressedKey;
                     inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
-                    for (PlayerView p : myPanel.playersView){
-                        if ((inputOpenCardKey == p.catchTotemKey) || (inputOpenCardKey == p.openCardKey)){
-                            System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
+  /*                  for (PlayerView p : myPanel.playersView){
+                        if ((inputOpenCardKey == p.getCatchTotemKey()) || (inputOpenCardKey == p.getOpenCardKey())){
+                            System.out.printf("player %s already use this key. Try another one\n", p.getPlayerName());
                             continue label;
                         }
                     }
-                    break;
+*/                    break;
                 }catch (StringIndexOutOfBoundsException e){
                     System.out.printf("%s, you know, what you just did?? You may drop the game!" +
                             " Thing about your behaviour and try once more!\n", inputS);

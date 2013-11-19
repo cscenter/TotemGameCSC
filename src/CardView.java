@@ -6,42 +6,35 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CardView{
-    static ArrayList<File> cardsFiles;
-
-    public static int cardSize;
-    Card card;
-    File fileCard;
-    Image cardImage;
-    int id;
-    public CardView(File fc){
-        fileCard = fc;
+    public static final String DIRECTORY = "data/";
+    private static ArrayList<File> cardsFiles;
+    public static ArrayList<File> getCardsFiles(){
+        return cardsFiles;
     }
+    private static int cardSize;
+    public static int getCardSize(){
+        return cardSize;
+    }
+    public CardView(Card card, File fileCard, Image cardImage, int id){
+        this.card = card;
+        this.fileCard = fileCard;
+        this.cardImage = cardImage;
+        this.id = id;
+    }
+    private final Card card;
+    private final File fileCard;
+    private final Image cardImage;
+    private final int id;
 
-    public CardView(){
-        File dir = new File(GraphicsView.DIRECTORY);
-//        cards = new ArrayList<>();
-
-        cardsFiles = new ArrayList<>(Arrays.asList(dir.listFiles()));
-//        CardView.cardSize = size / 6;
-
-//        image = new ArrayList<>(168);
-//        for (int i=0; i<400; i++){
-        //          image.add(null);
-        //    }
-        for (File cardI : cardsFiles){
-            Pattern numberPattern = Pattern.compile("[0-9]+");
-            Matcher numberMatcher = numberPattern.matcher(cardI.getName());
-            numberMatcher.find();
-            int num = Integer.parseInt(numberMatcher.group());
-            Image im = Toolkit.getDefaultToolkit().getImage(cardI.toString());
-            CardView cardView = new CardView(cardI);
-
-//            image.set(num, im);
-        }
+    public Image getCardImage(){
+        return cardImage;
+    }
+    public int getId(){
+        return id;
     }
     public static ArrayList<Integer> getCardsNumbers(){
         ArrayList<Integer> result = new ArrayList<>();
-        File dir = new File(GraphicsView.DIRECTORY);
+        File dir = new File(DIRECTORY);
 
         cardsFiles = new ArrayList<>(Arrays.asList(dir.listFiles()));
 
@@ -50,11 +43,15 @@ public class CardView{
         }
         return result;
     }
-    public static int getCardNumber(int index){
+    private static int getCardNumber(int index){
         Pattern numberPattern = Pattern.compile("[0-9]+");
         Matcher numberMatcher = numberPattern.matcher(cardsFiles.get(index).getName());
         numberMatcher.find();
         return Integer.parseInt(numberMatcher.group());
+    }
+
+    public static void resize(int haracteristicScale) {
+        cardSize = haracteristicScale / 10;
     }
 //    public CardView getCardView(Card card){
 //      return

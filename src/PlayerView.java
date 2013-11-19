@@ -1,44 +1,46 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.ImageObserver;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PlayerView{
     private static int scale;
-//    private static int cardScale;
-    CardView topCardView;
-    public Player playerInfo;
-    public int xCoordinate;
-    public int yCoordinate;
-    public double angle;
-    public char openCardKey;
-    public char catchTotemKey;
+    private CardView topCardView;
+    private Player playerInfo;
+    private int xCoordinate;
+    private int yCoordinate;
+    private double angle;
+    private char openCardKey;
+    private char catchTotemKey;
+    public char getOpenCardKey(){
+        return openCardKey;
+    }
+    public char getCatchTotemKey(){
+        return catchTotemKey;
+    }
     public static void setScale(int size){
             scale = size;
 
     }
-    public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
+    public void setTopCardView(ArrayList<CardView> cardsView){
+        topCardView = cardsView.get(playerInfo.getTopOpenedCard().getCardNumber());
+    }
+    public void resize(int haracteristicScale){
+        xCoordinate = (int)((haracteristicScale/3.5) * Math.sin(angle*Math.PI/180) + haracteristicScale / 2.2);
+        yCoordinate = (int)((haracteristicScale/3.5) * Math.cos(angle*Math.PI/180) + haracteristicScale / 2.5);
+
+    }
     public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name, double a){
         openCardKey = newOpenCardKey;
         catchTotemKey = newCatchTotemKey;
-        playerViewName = name;
         angle = a;
         xCoordinate = (int)((scale/3.5) * Math.sin(angle*Math.PI/180) + scale / 2.2);
         yCoordinate = (int)((scale/3.5) * Math.cos(angle*Math.PI/180) + scale / 2.5);
     }
-    public void connectWithInfo(Player player){
-        playerInfo = player;
+    public String getPlayerName(){
+        return playerInfo.getName();
     }
-
     public PlayerView(char newOpenCardKey, char newCatchTotemKey, Player player, double a){
         openCardKey = newOpenCardKey;
         catchTotemKey = newCatchTotemKey;
-        playerViewName = player.getName();
         playerInfo = player;
         angle = a;
         xCoordinate = (int)((scale/3.5) * Math.sin(angle*Math.PI/180) + scale / 2.2);
@@ -47,32 +49,31 @@ public class PlayerView{
 
 
     public boolean isIn(Point p){
-        if ((p.getX()<xCoordinate+CardView.cardSize)&&(p.getX()>xCoordinate-CardView.cardSize)){
-            if ((p.getY()<yCoordinate+CardView.cardSize+40)&&(p.getY()>yCoordinate-40)){
+        if ((p.getX()<xCoordinate+CardView.getCardSize())&&(p.getX()>xCoordinate-CardView.getCardSize())){
+            if ((p.getY()<yCoordinate+CardView.getCardSize()+40)&&(p.getY()>yCoordinate-40)){
                 return true;
             }
         }
         return false;
     }
     public void clear(Graphics g){
-        g.clearRect(xCoordinate-(int)(CardView.cardSize*2.1), yCoordinate, (int)(3.1*CardView.cardSize), (int)(CardView.cardSize*2.5));
+        g.clearRect(xCoordinate-(int)(CardView.getCardSize()*2.1), yCoordinate, (int)(3.1*CardView.getCardSize()), (int)(CardView.getCardSize()*2.5));
     }
     public void drawPlayer(Graphics g, MyPanel panel){
         clear(g);
-        g.drawChars(playerViewName.toCharArray(), 0, playerViewName.length(), xCoordinate - CardView.cardSize / 3, yCoordinate - scale / 30);
+        g.drawChars(playerInfo.getName().toCharArray(), 0, playerInfo.getName().length(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
         String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-        g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+scale/60, yCoordinate+CardView.cardSize+scale/30);
+        g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+scale/60, yCoordinate+CardView.getCardSize()+scale/30);
         if (playerInfo.getOpenCardsCount()!=0){
-//            topCardView = playerInfo.getTopOpenedCard();
-            Image image = topCardView.cardImage;//.get(playerInfo.getTopOpenedCard().getCardNumber());
-            g.drawImage(image, xCoordinate, yCoordinate, CardView.cardSize, CardView.cardSize, panel);
+            Image image = topCardView.getCardImage();
+            g.drawImage(image, xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
         }
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-        g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-CardView.cardSize+scale/60, yCoordinate+CardView.cardSize+scale/30);
+        g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-CardView.getCardSize()+scale/60, yCoordinate+CardView.getCardSize()+scale/30);
         if (playerInfo.getCloseCardsCount()!=0){
-            g.fillRect(xCoordinate - (int)(1.1 * CardView.cardSize), yCoordinate, CardView.cardSize, CardView.cardSize);
+            g.fillRect(xCoordinate - (int)(1.1 * CardView.getCardSize()), yCoordinate, CardView.getCardSize(), CardView.getCardSize());
         }
         String catchKey=String.valueOf(openCardKey)+", "+String.valueOf(catchTotemKey);
-        g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(CardView.cardSize*1.5), yCoordinate - scale/30);
+        g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(CardView.getCardSize()*1.5), yCoordinate - scale/30);
     }
 }
