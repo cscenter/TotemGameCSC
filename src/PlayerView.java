@@ -28,13 +28,6 @@ public class PlayerView{
         yCoordinate = (int)((haracteristicScale/3.5) * Math.cos(angle*Math.PI/180) + haracteristicScale / 2.5);
 
     }
-    public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name, double a){
-        openCardKey = newOpenCardKey;
-        catchTotemKey = newCatchTotemKey;
-        angle = a;
-        xCoordinate = (int)((scale/3.5) * Math.sin(angle*Math.PI/180) + scale / 2.2);
-        yCoordinate = (int)((scale/3.5) * Math.cos(angle*Math.PI/180) + scale / 2.5);
-    }
     public String getPlayerName(){
         return playerInfo.getName();
     }

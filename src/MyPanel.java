@@ -52,6 +52,7 @@ public class MyPanel extends JPanel {
 
     private void reSize(int haracteristicScale){
         panel_size = haracteristicScale;
+        PlayerView.setScale(haracteristicScale);
         CardView.resize(haracteristicScale);
         totemV.resize(haracteristicScale);
         for (PlayerView player : playersView){
