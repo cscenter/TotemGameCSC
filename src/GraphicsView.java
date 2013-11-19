@@ -48,25 +48,25 @@ class GraphicsView extends JFrame{
         char inputOpenCardKey;
         char inputCatchTotemKey;
         int numberOfPeople = 4;
-        inputOpenCardKey = 'q';
-        inputCatchTotemKey = 'w';
-        myPanel.playersView.ensureCapacity(numberOfPeople);
-        myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya", 0.0));
+//        inputOpenCardKey = 'q';
+//        inputCatchTotemKey = 'w';
+//        myPanel.playersView.ensureCapacity(numberOfPeople);
+    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya", 0.0));
         rezultStrings.add("Vasya");
 
-        inputOpenCardKey = 'e';
-        inputCatchTotemKey = 'r';
-        myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya", 90.0));
+//        inputOpenCardKey = 'e';
+//        inputCatchTotemKey = 'r';
+  //      myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya", 90.0));
         rezultStrings.add("Petya");
 
-        inputOpenCardKey = 't';
-        inputCatchTotemKey = 'y';
-        myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha", 180.0));
+//        inputOpenCardKey = 't';
+  //      inputCatchTotemKey = 'y';
+    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha", 180.0));
         rezultStrings.add("Gosha");
 
-        inputOpenCardKey = 'u';
-        inputCatchTotemKey = 'i';
-        myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Manya", 270.0));
+//        inputOpenCardKey = 'u';
+  //      inputCatchTotemKey = 'i';
+    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Manya", 270.0));
         rezultStrings.add("Manya");
 //        myPanel.repaint();
     }
@@ -120,7 +120,7 @@ class GraphicsView extends JFrame{
                     Character tmp = inputOpenCardKey;
                     tmp = myPanel.lastPressedKey;
                     inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
-                    for (MyPanel.PlayerView p : myPanel.playersView){
+                    for (PlayerView p : myPanel.playersView){
                         if ((inputOpenCardKey == p.catchTotemKey) || (inputOpenCardKey == p.openCardKey)){
                             System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
                             continue label;
@@ -133,7 +133,7 @@ class GraphicsView extends JFrame{
                 }
 
             }while(true);
-            label:
+/*            label:
             do{
                 try {
                     System.out.printf("%s: insert key to catch totem\n", inputS);
@@ -146,7 +146,7 @@ class GraphicsView extends JFrame{
                         System.out.println("you already use this key for key that open last card! try another key");
                         continue;
                     }
-                    for (MyPanel.PlayerView p : myPanel.playersView){
+                    for (PlayerView p : myPanel.playersView){
                         if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
                             System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
                             continue label;
@@ -160,7 +160,7 @@ class GraphicsView extends JFrame{
 
             }while (true);
             myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, inputS,
-                    (360.0 / numberOfPeople) * (myPanel.playersView.size())));
+                    (360.0 / numberOfPeople) * (myPanel.playersView.size())));*/
         }
 
     }
@@ -170,7 +170,7 @@ class GraphicsView extends JFrame{
         int numberOfPeople = 4;
         do{
             Character inputChar;
-            myPanel.playersView = new ArrayList<>();
+//            myPanel.playersView = new ArrayList<>();
             inputChar = getNewChar("Use the default settings? (Y/N)", "No-No-NO, %username% ! Char means char, not empty string!");
             switch (inputChar.toString().toUpperCase().charAt(0)){ /* использовать параметры по умолчанию?*/
                 case 'Y':           /*да*/
@@ -189,47 +189,11 @@ class GraphicsView extends JFrame{
         /*показываем то, что получаем в итоге*/
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
-        for (MyPanel.PlayerView p : myPanel.playersView){
-            System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
-                    p.playerViewName, p.openCardKey, p.catchTotemKey);
-        }
+//        for (PlayerView p : myPanel.playersView){
+  //          System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
+    //                p.playerViewName, p.openCardKey, p.catchTotemKey);
+      //  }
         return rezultStrings;
-    }
-
-    void printInformationAboutRound(){
-        System.out.printf("name:            ");
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            System.out.printf("%15s", myGame.getPlayer(i).getName());
-        }
-        System.out.printf("    under totem: \nall cards:     ");
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            System.out.printf("%15s", myGame.getPlayer(i).getCardsCount());
-        }
-
-        System.out.printf("%15d\nclose cards    ", myGame.totem.getCardsCount());
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            System.out.printf("%15s", myGame.getPlayer(i).getCloseCardsCount());
-        }
-        System.out.printf("\nopen cards:    ");
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            System.out.printf("%15s", myGame.getPlayer(i).getOpenCardsCount());
-        }
-
-        System.out.printf("\nlast open card:");
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            if (myGame.getPlayer(i).getOpenCardsCount() > 0){
-                System.out.printf("%15d", myGame.getPlayer(i).getTopOpenedCard().getCardNumber());
-            } else {
-                System.out.printf("              -");
-
-            }
-        }
-
-        System.out.printf("\n\n");
-
-        System.out.printf("Round %d, it's %s's turn\n", myGame.getTurnNumber(),
-                myGame.getPlayer(myGame.getPlayerWhoWillGo()).getName());
-
     }
 
     int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
@@ -268,14 +232,29 @@ class GraphicsView extends JFrame{
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
         (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
+        myGame = new Game(startView(), CardView.getCardsNumbers());
         myPanel = new MyPanel();
-        myPanel.initCardsView();
-        myGame = new Game(startView(), myPanel.cardsView.getCardsNumbers());
-        for (int i=0; i<myPanel.playersView.size(); i++){
-            myPanel.playersView.get(i).connectWithInfo(myGame.getPlayer(i));
-        }
-        myPanel.myGame = this.myGame;
-        myPanel.initTotemV();
+        ArrayList<Character> kt = new ArrayList<>(4);
+        kt.add('w');
+        kt.add('r');
+        kt.add('y');
+        kt.add('i');
+        ArrayList<Character> oc = new ArrayList<>(4);
+        oc.add('q');
+        oc.add('e');
+        oc.add('t');
+        oc.add('u');
+        ArrayList<Double> an = new ArrayList<>(4);
+        an.add(0.0);
+        an.add(90.0);
+        an.add(180.0);
+        an.add(270.0);
+        myPanel.initiation(myGame, kt, oc, an);
+//        for (int i=0; i<myPanel.playersView.size(); i++){
+  //          myPanel.playersView.get(i).connectWithInfo(myGame.getPlayer(i));
+    //    }
+//        myPanel.myGame = this.myGame;
+      //  myPanel.initTotemV();
         add(myPanel);
         pack();
         addKeyListener(myPanel.initMyKeyListener());

@@ -73,6 +73,9 @@ class Player
     
     public Card getTopOpenedCard()
     {
+        if (getOpenCardsCount() == 0){
+            return null;
+        }
         return openedCards.getLast();
     }
 

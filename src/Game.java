@@ -6,7 +6,7 @@ import java.util.*;
  */
 class Game{
     private ArrayList<Player> players;
-    private LinkedList<Card> allCards;
+    public LinkedList<Card> allCards;
     public class Totem{
         private LinkedList<Card> cards;
             /**

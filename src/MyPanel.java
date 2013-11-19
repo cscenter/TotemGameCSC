@@ -17,129 +17,45 @@ public class MyPanel extends JPanel {
     public boolean multyDuelFlag;
     public int whoPlayed;
 
-    public class CardsView {
-        public int cardSize;
-        private ArrayList <File> cards;
-        ArrayList<Image> image;
-
-        public CardsView(){
-            File dir = new File(GraphicsView.DIRECTORY);
-            cards = new ArrayList<>(Arrays.asList(dir.listFiles()));
-            cardSize = panel_size / 6;
-            image = new ArrayList<>(168);
-            for (int i=0; i<400; i++){
-                image.add(null);
-            }
-            for (File cardI : cards){
-                Pattern numberPattern = Pattern.compile("[0-9]+");
-                Matcher numberMatcher = numberPattern.matcher(cardI.getName());
-                numberMatcher.find();
-                int num = Integer.parseInt(numberMatcher.group());
-                Image im = Toolkit.getDefaultToolkit().getImage(cardI.toString());
-                image.set(num, im);
-            }
-        }
-        public ArrayList<Integer> getCardsNumbers(){
-            ArrayList<Integer> rezult = new ArrayList<>();
-            for (int i = 0; i < cards.size(); i++){
-                rezult.add(getCardNumber(i));
-            }
-            return rezult;
-        }
-        public int getCardNumber(int index){
-            Pattern numberPattern = Pattern.compile("[0-9]+");
-            Matcher numberMatcher = numberPattern.matcher(cards.get(index).getName());
-            numberMatcher.find();
-            return Integer.parseInt(numberMatcher.group());
-        }
-    }
-    public CardsView cardsView;
-    public void initCardsView(){
-        cardsView = new CardsView();
-    }
+    public ArrayList<CardView> cardsView;
     private class TotemView{
         Game.Totem totem;
         int totemRad;
         int xCoord;
         int yCoord;
+        public TotemView (Game.Totem totem1){
+            totem = totem1;
+        }
         public void clearD(Graphics g){
-            g.clearRect(xCoord-cardsView.cardSize/2-panel_size/10, yCoord-cardsView.cardSize/2-panel_size/20,
-                    (int)(cardsView.cardSize*2.5), cardsView.cardSize+panel_size/10);
+            g.clearRect(xCoord-CardView.cardSize/2-panel_size/10, yCoord-CardView.cardSize/2-panel_size/20,
+                    (int)(CardView.cardSize*2.5), CardView.cardSize+panel_size/10);
 
         }
         public void drawTotem(Graphics g){
             clearD(g);
             String cardsCount = String.valueOf(totem.getCardsCount());
-            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-cardsView.cardSize/2+panel_size/60, yCoord+cardsView.cardSize/2+panel_size/30);
+            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.cardSize/2+panel_size/60, yCoord+CardView.cardSize/2+panel_size/30);
             if (totem.getCardsCount()!=0){
-                g.drawRect(xCoord-cardsView.cardSize/2, yCoord-cardsView.cardSize/2, cardsView.cardSize, cardsView.cardSize);
+                g.drawRect(xCoord-CardView.cardSize/2, yCoord-CardView.cardSize/2, CardView.cardSize, CardView.cardSize);
             }
             g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
 
+        }
+        public boolean isIn(Point p){
+            return (p.distance(xCoord, yCoord)<totemRad);
         }
     }
     TotemView totemV;
     public PlayerView initPlayerView(char newOpenCardKey, char newCatchTotemKey, String name, double a){
         return new PlayerView(newOpenCardKey, newCatchTotemKey, name, a);
     }
-    public class PlayerView{
-        private Player playerInfo;
-        public int xCoordinate;
-        public int yCoordinate;
-        public double angle;
-        public char openCardKey;
-        public char catchTotemKey;
-        public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
-        public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name, double a){
-            openCardKey = newOpenCardKey;
-            catchTotemKey = newCatchTotemKey;
-            playerViewName = name;
-            angle = a;
-            xCoordinate = (int)((panel_size/3.5) * Math.sin(angle*Math.PI/180) + panel_size / 2.2);
-            yCoordinate = (int)((panel_size/3.5) * Math.cos(angle*Math.PI/180) + panel_size / 2.5);
-        }
-        public void connectWithInfo(Player player){
-            playerInfo = player;
-        }
-        public boolean isIn(Point p){
-            if ((p.getX()<xCoordinate+cardsView.cardSize)&&(p.getX()>xCoordinate-cardsView.cardSize)){
-                if ((p.getY()<yCoordinate+cardsView.cardSize+40)&&(p.getY()>yCoordinate-40)){
-                    return true;
-                }
-            }
-            return false;
-        }
-        public void clear(Graphics g){
-            g.clearRect(xCoordinate-(int)(cardsView.cardSize*2.1), yCoordinate, (int)(3.1*cardsView.cardSize), (int)(cardsView.cardSize*2.5));
-        }
-        public void drawPlayer(Graphics g){
-            clear(g);
-            g.drawChars(playerViewName.toCharArray(), 0, playerViewName.length(), xCoordinate - cardsView.cardSize / 3, yCoordinate - panel_size / 30);
-            String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-            g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+panel_size/60, yCoordinate+cardsView.cardSize+panel_size/30);
-
-            if (playerInfo.getOpenCardsCount()!=0){
-                Image image = cardsView.image.get(playerInfo.getTopOpenedCard().getCardNumber());
-                g.drawImage(image, xCoordinate, yCoordinate, cardsView.cardSize, cardsView.cardSize, MyPanel.this);
-            }
-            String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-            g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-cardsView.cardSize+panel_size/60, yCoordinate+cardsView.cardSize+panel_size/30);
-
-            if (playerInfo.getCloseCardsCount()!=0){
-                g.fillRect(xCoordinate - (int)(1.1 * cardsView.cardSize), yCoordinate, cardsView.cardSize, cardsView.cardSize);
-
-            }
-            String catchKey=String.valueOf(openCardKey)+", "+String.valueOf(catchTotemKey);
-            g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(cardsView.cardSize*1.5), yCoordinate - panel_size/30);
-
-        }
-    }
     ArrayList <PlayerView> playersView;
 
     private void reSize(int haracteristicScale){
         panel_size = haracteristicScale;
 //        setPreferredSize(new Dimension(panel_size, panel_size));
-        cardsView.cardSize = panel_size / 10;
+        CardView.cardSize = panel_size / 10;
+        PlayerView.setScale(haracteristicScale);
         totemV.totemRad = (int)(panel_size/50.5);
         totemV.xCoord = totemV.yCoord = (int)(panel_size/2.2);
         for (PlayerView player : playersView){
@@ -161,10 +77,10 @@ public class MyPanel extends JPanel {
         //убрать с консоли всё
         //Поля в сеттеры-геттеры
         //result через s пишется
-        reSize(g.getClipBounds().height);
+        reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
         totemV.drawTotem(g);
         for (PlayerView player : playersView){
-            player.drawPlayer(g);
+            player.drawPlayer(g, this);
         }
         if (catchTotemModeFlag){
             g.drawChars(("Do you want to use effect of won duel or of Arrows-In card? Clicked on Totem/player").toCharArray(), 0,
@@ -176,10 +92,10 @@ public class MyPanel extends JPanel {
             g.drawChars("You one duel, here is several loosers. clicked to one of them".toCharArray(), 0, "You one duel, here is several loosers. clicked to one of them".length(),
                     30, panel_size-50);
         }else{
-            g.clearRect(20, panel_size-70, panel_size-30, 70);
+            g.clearRect(20, panel_size-70, panel_size-30, 75);
         }
         g.clearRect(0,0,panel_size, 20);
-        String whoPlayedMes = "It's "+playersView.get((whoPlayed+1)%playersView.size()).playerViewName+"'s turn!";
+        String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).playerViewName+"'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
     }
     public MyMouseListener initMyMouseListener(){
@@ -189,9 +105,42 @@ public class MyPanel extends JPanel {
         return new MyKeyListener();
     }
     public void initTotemV(){
-        totemV = new TotemView();
+        totemV = new TotemView(myGame.totem);
         totemV.totem = myGame.totem;
     }
+
+
+    public void initiation(Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
+        myGame = game;
+        playersView = new ArrayList<>(ktKeys.size());
+        cardsView = new ArrayList<>();
+        for (int i=0; i<400; i++){//Как сделать нормально?
+            cardsView.add(null);
+        }
+        for (File cardI : CardView.cardsFiles){
+            Pattern numberPattern = Pattern.compile("[0-9]+");
+            Matcher numberMatcher = numberPattern.matcher(cardI.getName());
+            numberMatcher.find();
+            int num = Integer.parseInt(numberMatcher.group());
+            CardView cardView = new CardView();
+            for (Card card : myGame.allCards){
+                if (card.getCardNumber() == num){
+                    cardView.card = card;
+                    cardView.id = num;
+                    cardView.cardImage = Toolkit.getDefaultToolkit().getImage(cardI.toString());
+                    cardView.fileCard = cardI;
+                    break;
+                }
+            }
+            cardsView.set(num, cardView);
+        }
+        for (int i=0; i<ktKeys.size(); i++){
+            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), myGame.getPlayer(i), angle.get(i)));
+        }
+        totemV = new TotemView(game.totem);
+    }
+
+
     public class MyMouseListener extends MouseAdapter {
 
         @Override
@@ -207,7 +156,7 @@ public class MyPanel extends JPanel {
                         break;
                     }
                 }
-                if (p.distance(panel_size/2.2,panel_size/2.2)<20){
+                if (totemV.isIn(p)){
                     catchTotemModeFlag = false;
                     myGame.arrowsInMakeMove(whoPlayed);
                     catchTotemModeFlag = false;
@@ -227,6 +176,8 @@ public class MyPanel extends JPanel {
             }
         }
     }
+
+
     public class MyKeyListener extends KeyAdapter {
         @Override
         public void keyTyped(KeyEvent k) {}
@@ -275,6 +226,8 @@ public class MyPanel extends JPanel {
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
                                 myGame.getPlayer(whoPlayed).getName());
+                        playersView.get(whoPlayed).topCardView = cardsView.get(playersView.get(whoPlayed).playerInfo.getTopOpenedCard().getCardNumber());
+
                         break;
                     case NOT_DEFINED_CATCH:
                         ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
@@ -286,6 +239,10 @@ public class MyPanel extends JPanel {
                         break;
                     case ALL_CARDS_OPENED:
                         allOpenFlag = true;
+                        for (PlayerView player : playersView){
+                            player.topCardView = cardsView.get(player.playerInfo.getTopOpenedCard().getCardNumber());
+                        }
+                        MyPanel.this.repaint();
                         System.out.println("All players will open top cards. To do this, press Enter");
                         break;
                     default:
@@ -302,6 +259,9 @@ public class MyPanel extends JPanel {
 
                 if (k.getKeyCode()==KeyEvent.VK_ENTER){
                     myGame.openAllTopCards();
+                    for (PlayerView player : playersView){
+                        player.topCardView = cardsView.get(player.playerInfo.getTopOpenedCard().getCardNumber());
+                    }
                     allOpenFlag = false;
                 }
 

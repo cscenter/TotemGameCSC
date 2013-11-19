@@ -1,7 +1,7 @@
 /**
  * Класс - одна карта. У неё есть цвет, id и тип
 */
-class Card{
+public class Card{
     public enum CardType{
         NORMAL,
         ARROWS_OUT,
