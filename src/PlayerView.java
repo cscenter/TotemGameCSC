@@ -1,5 +1,8 @@
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 
 public class PlayerView{
     private static int scale;
@@ -34,10 +37,11 @@ public class PlayerView{
     public PlayerView(char newOpenCardKey, char newCatchTotemKey, Player player, double a){
         openCardKey = newOpenCardKey;
         catchTotemKey = newCatchTotemKey;
-        playerInfo = player;
         angle = a;
         xCoordinate = (int)((scale/3.5) * Math.sin(angle*Math.PI/180) + scale / 2.2);
         yCoordinate = (int)((scale/3.5) * Math.cos(angle*Math.PI/180) + scale / 2.5);
+       // player.setCoordinate(xCoordinate, yCoordinate);
+        playerInfo = player;
     }
 
 
@@ -52,7 +56,7 @@ public class PlayerView{
     public void clear(Graphics g){
         g.clearRect(xCoordinate-(int)(CardView.getCardSize()*2.1), yCoordinate, (int)(3.1*CardView.getCardSize()), (int)(CardView.getCardSize()*2.5));
     }
-    public void drawPlayer(Graphics g, MyPanel panel){
+    public void drawPlayer(Graphics g, MyPanel panel) throws IOException{
         clear(g);
         g.drawChars(playerInfo.getName().toCharArray(), 0, playerInfo.getName().length(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
         String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
@@ -63,8 +67,10 @@ public class PlayerView{
         }
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
         g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-CardView.getCardSize()+scale/60, yCoordinate+CardView.getCardSize()+scale/30);
+        g.drawImage(ImageIO.read(new File("data/tboy.jpg")), xCoordinate-110, yCoordinate, panel);
+        playerInfo.setCoordinate(xCoordinate, yCoordinate);
         if (playerInfo.getCloseCardsCount()!=0){
-            g.fillRect(xCoordinate - (int)(1.1 * CardView.getCardSize()), yCoordinate, CardView.getCardSize(), CardView.getCardSize());
+            //g.fillRect(xCoordinate - (int)(1.1 * CardView.getCardSize()), yCoordinate, CardView.getCardSize(), CardView.getCardSize());
         }
         String catchKey=String.valueOf(openCardKey)+", "+String.valueOf(catchTotemKey);
         g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(CardView.getCardSize()*1.5), yCoordinate - scale/30);

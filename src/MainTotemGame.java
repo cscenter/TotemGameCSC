@@ -7,6 +7,7 @@
  */
 public class MainTotemGame {
     public static void main(String[] args){
+        System.out.print("!");
         if (args.length ==0){
             new GraphicsView(); //.run();
         }else{

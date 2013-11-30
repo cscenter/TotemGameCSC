@@ -37,9 +37,17 @@ public class CardView{
         File dir = new File(DIRECTORY);
 
         cardsFiles = new ArrayList<>(Arrays.asList(dir.listFiles()));
-
+        
         for (int i = 0; i < cardsFiles.size(); i++){
-            result.add(getCardNumber(i));
+           try{
+            if ((cardsFiles.get(i).getName().startsWith("t")) != true ) 
+            {
+                
+                result.add(getCardNumber(i));
+            }}
+           catch(Exception e){
+               System.out.print(cardsFiles.get(i).getName());
+           }
         }
         return result;
     }

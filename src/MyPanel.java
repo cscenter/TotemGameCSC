@@ -2,9 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 
 public class MyPanel extends JPanel {
     private Game myGame;
@@ -15,6 +19,7 @@ public class MyPanel extends JPanel {
     private int whoPlayed;
 
     private ArrayList<CardView> cardsView;
+    private Graphics g;
     public class TotemView{
         private Game.Totem totem;
         private int totemRad;
@@ -28,14 +33,34 @@ public class MyPanel extends JPanel {
                     (int)(CardView.getCardSize()*2.5), CardView.getCardSize()+panel_size/10);
 
         }
-        public void drawTotem(Graphics g){
+        public void drawTotem(Graphics g, int type) throws IOException{
             clearD(g);
+            
             String cardsCount = String.valueOf(totem.getCardsCount());
-            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
+          //  g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
             if (totem.getCardsCount()!=0){
-                g.drawRect(xCoord-CardView.getCardSize()/2, yCoord-CardView.getCardSize()/2, CardView.getCardSize(), CardView.getCardSize());
+                g.fill3DRect(10, 10, 10, 10, allOpenFlag);
+              if (type == 0)  g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+              if (type == 1)  g.drawImage(ImageIO.read(new File("data/totemW.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+              if (type == 2)  g.drawImage(ImageIO.read(new File("data/totemR.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+
+              /* String s = null;
+                s += xCoord - totemRad*4;
+                s += ' ';
+                s += yCoord - totemRad*2;
+                  
+                g.drawString(s, xCoord - totemRad*4,yCoord - totemRad*2 );*/
+               // printf("coord is %d #d\n", xCoord - totemRad*4, yCoord - totemRad*2);
+         //g.drawRect(xCoord-CardView.getCardSize()/2, yCoord-CardView.getCardSize()/2, CardView.getCardSize(), CardView.getCardSize());
             }
-            g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
+            else
+            // g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
+             //g.drawImage(ImageIO.read(new File("table.jpg")), 50, 50, null);
+
+             //g.drawImage(ImageIO.read(new File("table.jpg")), xCoord - totemRad*14, yCoord - totemRad*10, null);
+            g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+           // g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
+           // g.drawOval();
 
         }
         public boolean isIn(Point p){
@@ -62,11 +87,20 @@ public class MyPanel extends JPanel {
     }
     @Override
     protected void paintComponent(Graphics g) {
+        this.g = g;
         //убрать с консоли всё
         reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
-        totemV.drawTotem(g);
+      try {
+            totemV.drawTotem(g, 0);
+        } catch (IOException ex) {
+            Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (PlayerView player : playersView){
-            player.drawPlayer(g, this);
+            try {
+                player.drawPlayer(g, this);
+            } catch (IOException ex) {
+                Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         if (catchTotemModeFlag){
             g.drawChars(("Do you want to use effect of won duel or of Arrows-In card? Clicked on Totem/player").toCharArray(), 0,
@@ -83,7 +117,14 @@ public class MyPanel extends JPanel {
         g.clearRect(0,0,panel_size, 20);
         String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).getPlayerName()+"'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
-    }
+        try {
+            g.drawImage(ImageIO.read(new File("data/tboy_go1.jpg")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
+            //    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate()
+        } catch (IOException ex) {
+            Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }   
+       
     public MyMouseListener initMyMouseListener(){
         return new MyMouseListener();
     }
@@ -102,7 +143,19 @@ public class MyPanel extends JPanel {
             Pattern numberPattern = Pattern.compile("[0-9]+");
             Matcher numberMatcher = numberPattern.matcher(cardI.getName());
             numberMatcher.find();
-            int num = Integer.parseInt(numberMatcher.group());
+            int num  =0;
+            try{
+            if ((cardI.getName().startsWith("t")) != true ) 
+            {
+                
+                num = Integer.parseInt(numberMatcher.group());
+            }}
+           catch(Exception e){
+               System.out.print(cardI.getName());
+               
+           }
+        
+            
             for (Card card : myGame.getAllCards()){
                 if (card.getCardNumber() == num){
                     CardView cardView = new CardView(card, cardI, Toolkit.getDefaultToolkit().getImage(cardI.toString()), num);
@@ -197,6 +250,12 @@ public class MyPanel extends JPanel {
                     case TOTEM_WAS_CATCH_INCORRECT:
                         System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
                                 myGame.getPlayer(whoPlayed).getName());
+                        try {
+                            totemV.drawTotem(g, 1);
+                          } catch (IOException ex) {
+                             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                     //  g.drawImage(ImageIO.read(new File("totem.jpg")), 275, 303, null);
                         break;
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
