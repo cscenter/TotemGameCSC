@@ -323,28 +323,15 @@ class ServerView{
             String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
-            //           myGame.isRoundEnded = false;
-            //          do{
-
             printInformationAboutRound();
             System.out.printf("insert key:\n");
             try {
                 inputString = scan.nextLine();
-                //          ReadableByteChannel in = Channels.newChannel(System.in);
-
-                //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
-
-                //SelectionKey key = in.register
-                //              in.read(charBuffer);
-                //        charBuffer.rewind();
-                //                 inputChar = charBuffer.getChar(0);
                 inputChar = inputString.charAt(0);
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
             }catch (StringIndexOutOfBoundsException e){
                 System.out.printf("You can't use empty string!\n");
                 continue;
-//                } catch (IOException e) {
-                //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             boolean suchKeyHere = false;
             Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
