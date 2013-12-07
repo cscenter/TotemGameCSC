@@ -8,7 +8,7 @@ import java.nio.*;
 /**
  * Класс, отвечающий за работу с игроками
  */
-class View{
+class ServerView{
     private Game myGame;
     /**
      * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
@@ -17,20 +17,20 @@ class View{
     /**
      * Поля, которые нужно знать View о игроках
      */
-	private class PlayerView{
-		public char openCardKey;
-		public char catchTotemKey;
+    private class PlayerView{
+        public char openCardKey;
+        public char catchTotemKey;
         public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
         public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name){
             openCardKey = newOpenCardKey;
             catchTotemKey = newCatchTotemKey;
             playerViewName = name;
         }
-	}
-	ArrayList <PlayerView> playersView;
+    }
+    ArrayList <PlayerView> playersView;
 
     private class CardsView {
-//        private ArrayList <File> cards;
+        //        private ArrayList <File> cards;
         private ArrayList<String> cards;
         public CardsView(){
             cards = new ArrayList<>();
@@ -75,15 +75,15 @@ class View{
         }
     }
     private CardsView cardsView;
- /**
- * ввести число игроков, а так же кнопки управления
- * по умолчанию:
- * 4 игрока, клавиши
- * q, w
- * e, r
- * t, y
- * u, i
-*/
+    /**
+     * ввести число игроков, а так же кнопки управления
+     * по умолчанию:
+     * 4 игрока, клавиши
+     * q, w
+     * e, r
+     * t, y
+     * u, i
+     */
     private char getNewChar(String inputMessage, String errorOutputMessage){
         String inputString;
         char inputChar;
@@ -218,7 +218,7 @@ class View{
         }
 
     }
-	private ArrayList<String> startView(){
+    private ArrayList<String> startView(){
         ArrayList <String> rezultStrings = new ArrayList<>();
         boolean flag = true;
         int numberOfPeople = 4;
@@ -236,8 +236,8 @@ class View{
                     notDefaultSettings(rezultStrings);
                     break;
                 default:
-                        System.out.println("What are you doing?? Try once more!");
-                }
+                    System.out.println("What are you doing?? Try once more!");
+            }
         } while ((flag));
 
         /*показываем то, что получаем в итоге*/
@@ -247,8 +247,8 @@ class View{
             System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
                     p.playerViewName, p.openCardKey, p.catchTotemKey);
         }
-		return rezultStrings;
-	}
+        return rezultStrings;
+    }
 
     void printInformationAboutRound(){
         System.out.printf("name:            ");
@@ -323,102 +323,102 @@ class View{
             String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
- //           myGame.isRoundEnded = false;
-  //          do{
+            //           myGame.isRoundEnded = false;
+            //          do{
 
-                printInformationAboutRound();
-                System.out.printf("insert key:\n");
-                try {
-                    inputString = scan.nextLine();
-          //          ReadableByteChannel in = Channels.newChannel(System.in);
+            printInformationAboutRound();
+            System.out.printf("insert key:\n");
+            try {
+                inputString = scan.nextLine();
+                //          ReadableByteChannel in = Channels.newChannel(System.in);
 
-        //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
+                //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
 
-                    //SelectionKey key = in.register
-      //              in.read(charBuffer);
-            //        charBuffer.rewind();
-   //                 inputChar = charBuffer.getChar(0);
-                    inputChar = inputString.charAt(0);
-                    inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                }catch (StringIndexOutOfBoundsException e){
-                    System.out.printf("You can't use empty string!\n");
-                    continue;
+                //SelectionKey key = in.register
+                //              in.read(charBuffer);
+                //        charBuffer.rewind();
+                //                 inputChar = charBuffer.getChar(0);
+                inputChar = inputString.charAt(0);
+                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.printf("You can't use empty string!\n");
+                continue;
 //                } catch (IOException e) {
-  //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             boolean suchKeyHere = false;
-                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
-                int whoPlayed = 0;
-                for (int i = 0; i < myGame.getPlayersCount(); i++){
-                    if (playersView.get(i).openCardKey == inputChar){
-                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
-                        suchKeyHere = true;
-                        whoPlayed = i;
-                        break;
-                    }
-                    if (playersView.get(i).catchTotemKey == inputChar){
-                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
-                        suchKeyHere = true;
-                        whoPlayed = i;
-                        break;
-                    }
+            Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+            int whoPlayed = 0;
+            for (int i = 0; i < myGame.getPlayersCount(); i++){
+                if (playersView.get(i).openCardKey == inputChar){
+                    resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
                 }
-                if (!(suchKeyHere)){
-                    System.out.println("Nobody have such key. Try again.\n");
-                    continue;
+                if (playersView.get(i).catchTotemKey == inputChar){
+                    resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
                 }
-                switch (resultOfMakeMove){
-                    case INCORRECT:
-                        System.out.printf("It's not your turn, %s. Don't hurry!\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_CORRECT:
-                        System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_INCORRECT:
-                        System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case CARD_OPENED:
+            }
+            if (!(suchKeyHere)){
+                System.out.println("Nobody have such key. Try again.\n");
+                continue;
+            }
+            switch (resultOfMakeMove){
+                case INCORRECT:
+                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_CORRECT:
+                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_INCORRECT:
+                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case CARD_OPENED:
 
-                        System.out.printf("%s open next card\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case NOT_DEFINED_CATCH:
-                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
-                        if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
-                            label:
-                            do{
-                                inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
-                                        "want to use effect of won duel or of card? type (D/C)", "Try again!");
-                                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                                switch (inputChar){
-                                    case 'd':
-                                        if (possibleLosers.size() == 1){
-                                            System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                            myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
-                                        }
-                                        break label;
-                                    case 'c':
-                                        System.out.println("You put all cards under totem");
-                                        myGame.arrowsInMakeMove(whoPlayed);
-                                        break label;
-                                    default:
-                                        System.out.println("try again");
-                                }
-                            }while (true);
-                        }
-                        int looser = chooseOneOfPlayers(possibleLosers);
-                        myGame.afterDuelMakeMove(whoPlayed,looser);
-                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
-                        break;
-                    case ALL_CARDS_OPENED:
-                        System.out.println("All players will open top cards. To do this, press Enter");
-                        scan.nextLine();
-                        myGame.openAllTopCards();
-                    default:
-                }
+                    System.out.printf("%s open next card\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case NOT_DEFINED_CATCH:
+                    ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                    if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+                        label:
+                        do{
+                            inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
+                                    "want to use effect of won duel or of card? type (D/C)", "Try again!");
+                            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                            switch (inputChar){
+                                case 'd':
+                                    if (possibleLosers.size() == 1){
+                                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
+                                        myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
+                                    }
+                                    break label;
+                                case 'c':
+                                    System.out.println("You put all cards under totem");
+                                    myGame.arrowsInMakeMove(whoPlayed);
+                                    break label;
+                                default:
+                                    System.out.println("try again");
+                            }
+                        }while (true);
+                    }
+                    int looser = chooseOneOfPlayers(possibleLosers);
+                    myGame.afterDuelMakeMove(whoPlayed,looser);
+                    System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
+                    break;
+                case ALL_CARDS_OPENED:
+                    System.out.println("All players will open top cards. To do this, press Enter");
+                    scan.nextLine();
+                    myGame.openAllTopCards();
+                default:
+            }
 
 //            }while (!(myGame.isRoundEnded));
         }
@@ -427,8 +427,8 @@ class View{
                 System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
             }
         }
-	}
-    public View(){
+    }
+    public ServerView(){
         cardsView = new CardsView();
         myGame = new Game(startView(), cardsView.getCardsNumbers());
     }
