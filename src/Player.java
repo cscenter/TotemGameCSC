@@ -9,6 +9,8 @@ class Player
 {
     private LinkedList<Card> openedCards, closedCards;
     private String name;
+    private int xCoordinate;
+    private int yCoordinate;
 
     /**
      * конструктор.
@@ -85,5 +87,15 @@ class Player
         
         return result;
     }
+   public int getXCoordinate(){
+       return xCoordinate;
+   }
+   public int getYCoordinate(){
+       return yCoordinate;
+   }
+   public void setCoordinate(int x, int y){
+       xCoordinate = x;
+       yCoordinate = y;
+   } 
     
 }

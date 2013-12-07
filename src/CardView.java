@@ -64,6 +64,7 @@ public class CardView{
         String line;
         try {
             while ((line = input.readLine()) != null) {
+//                System.err.println(line);
                 cardsNames.add(DIRECTORY+line);
                 result.add(getCardNumber(line));
 
