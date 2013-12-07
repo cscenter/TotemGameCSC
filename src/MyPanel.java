@@ -98,14 +98,16 @@ public class MyPanel extends JPanel {
         for (int i=0; i<400; i++){//Как сделать нормально?
             cardsView.add(null);
         }
-        for (File cardI : CardView.getCardsFiles()){
+        for (String cardI : CardView.getCardsNames()){
             Pattern numberPattern = Pattern.compile("[0-9]+");
-            Matcher numberMatcher = numberPattern.matcher(cardI.getName());
+            Matcher numberMatcher = numberPattern.matcher(cardI);
             numberMatcher.find();
             int num = Integer.parseInt(numberMatcher.group());
             for (Card card : myGame.getAllCards()){
                 if (card.getCardNumber() == num){
-                    CardView cardView = new CardView(card, cardI, Toolkit.getDefaultToolkit().getImage(cardI.toString()), num);
+                    ClassLoader cl = MyPanel.class.getClassLoader();
+//                    Image image = (new ImageIcon(cl.getResource(cardI))).getImage();
+                    CardView cardView = new CardView(card, cardI, CardView.initImage(cardI), num);
                     cardsView.set(num, cardView);
                     break;
                 }
@@ -156,8 +158,6 @@ public class MyPanel extends JPanel {
 
 
     public class MyKeyListener extends KeyAdapter {
-        @Override
-        public void keyTyped(KeyEvent k) {}
         // нажатие клавиши
         @Override
         public void keyPressed(KeyEvent k) {
