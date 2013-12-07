@@ -1,7 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -41,7 +41,34 @@ public class CardView{
     public static ArrayList<Integer> getCardsNumbers(){
         ArrayList<Integer> result = new ArrayList<>();
         cardsNames = new ArrayList<>();
-        CodeSource src = CardView.class.getProtectionDomain().getCodeSource();
+        BufferedReader input;
+        String classJar =
+                CardView.class.getResource("/CardView.class").toString();
+        if (classJar.startsWith("jar:")) {
+            InputStream in;
+            in = CardView.class.getResourceAsStream(DIRECTORY+"listOfCards.txt");
+            input = new BufferedReader(new InputStreamReader(in));
+        }else {
+            try {
+                input = new BufferedReader(new FileReader(DIRECTORY+"listOfCards.txt"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("AAA");
+            }
+        }
+        String line;
+        try {
+            while ((line = input.readLine()) != null) {
+                cardsNames.add(DIRECTORY+line);
+                result.add(getCardNumber(line));
+                System.err.println(line);
+
+            }
+            input.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+/*        CodeSource src = CardView.class.getProtectionDomain().getCodeSource();
         if (src != null) {
             URL jar = src.getLocation();
             ZipInputStream zip = null;
@@ -75,7 +102,7 @@ public class CardView{
         for (int i = 0; i < cardsFiles.size(); i++){
             cardsNames.add(DIRECTORY+cardsFiles.get(i).getName());
             result.add(getCardNumber(i));
-        }
+        }*/
         return result;
     }
     private static int getCardNumber(int index){

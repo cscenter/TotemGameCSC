@@ -2,7 +2,7 @@
 <project default="build" basedir=".">
     <property name="name" value="Totem"/>
     <property name="src.dir" location="${basedir}/src"/>
-    <property name="build" location="${basedir}"/>
+    <property name="build" location="${basedir}/out"/>
     <property name="data.dir" location="${basedir}/data"/>
     <property name="build.classes" location="${build}/out/production/TotemGame"/>
 <!--    <path id="libs.dir">  -->
