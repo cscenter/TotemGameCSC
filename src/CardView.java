@@ -73,48 +73,7 @@ public class CardView{
             e.printStackTrace();
         }
 
-/*        CodeSource src = CardView.class.getProtectionDomain().getCodeSource();
-        if (src != null) {
-            URL jar = src.getLocation();
-            ZipInputStream zip = null;
-            try {
-                zip = new ZipInputStream(jar.openStream());
-                while(true) {
-                    ZipEntry e = zip.getNextEntry();
-                    if (e == null)
-                        break;
-                    String name = e.getName();
-
-                    System.err.println(name);
-                    if ((name.startsWith(DIRECTORY))&&(!name.equals(DIRECTORY))) {
-                        result.add(getCardNumber(name));
-
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-            if (result.size()>0){
-                return result;
-            }
-        }
-
-
-        File dir = new File(DIRECTORY);
-
-        ArrayList<File> cardsFiles = new ArrayList<>(Arrays.asList(dir.listFiles()));
-
-        for (int i = 0; i < cardsFiles.size(); i++){
-            cardsNames.add(DIRECTORY+cardsFiles.get(i).getName());
-            result.add(getCardNumber(i));
-        }*/
         return result;
-    }
-    private static int getCardNumber(int index){
-        Pattern numberPattern = Pattern.compile("[0-9]+");
-        Matcher numberMatcher = numberPattern.matcher(cardsNames.get(index));
-        numberMatcher.find();
-        return Integer.parseInt(numberMatcher.group());
     }
     private static int getCardNumber(String str){
 //        System.err.println(str);
