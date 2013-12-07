@@ -21,10 +21,16 @@ public class CardView{
     public static int getCardSize(){
         return cardSize;
     }
-    public CardView(Card card, String stringCard, Image cardImage, int id){
+    public CardView(ClassLoader cl, Card card, String imgName, int id){
         this.card = card;
 //        this.fileCard = fileCard;
-        this.cardImage = cardImage;
+        URL url = cl.getResource(imgName);
+
+        try {
+            this.cardImage = ImageIO.read(url);
+        } catch (IOException e) {
+            throw new RuntimeException("AAA");
+        }
         this.id = id;
     }
     private final Card card;
@@ -60,7 +66,6 @@ public class CardView{
             while ((line = input.readLine()) != null) {
                 cardsNames.add(DIRECTORY+line);
                 result.add(getCardNumber(line));
-                System.err.println(line);
 
             }
             input.close();

@@ -106,8 +106,9 @@ public class MyPanel extends JPanel {
             for (Card card : myGame.getAllCards()){
                 if (card.getCardNumber() == num){
                     ClassLoader cl = MyPanel.class.getClassLoader();
+
 //                    Image image = (new ImageIcon(cl.getResource(cardI))).getImage();
-                    CardView cardView = new CardView(card, cardI, CardView.initImage(cardI), num);
+                    CardView cardView = new CardView(cl, card, cardI, num);
                     cardsView.set(num, cardView);
                     break;
                 }
