@@ -10,6 +10,13 @@ import java.nio.*;
  */
 class ServerView{
     private Game myGame;
+    private TotemGameController tgController;
+    Runnable inputListener;
+    Runnable outputTalker;
+    synchronized boolean isGameEnded(){
+        return myGame.isGameEnded();
+    }
+
     /**
      * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
      */
@@ -250,7 +257,7 @@ class ServerView{
         return rezultStrings;
     }
 
-    void printInformationAboutRound(){
+    synchronized void printInformationAboutRound(){
         System.out.printf("name:            ");
         for (int i = 0; i < myGame.getPlayersCount(); i++){
             System.out.printf("%15s", myGame.getPlayer(i).getName());
@@ -323,15 +330,28 @@ class ServerView{
             String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
+            //           myGame.isRoundEnded = false;
+            //          do{
+
             printInformationAboutRound();
             System.out.printf("insert key:\n");
             try {
                 inputString = scan.nextLine();
+                //          ReadableByteChannel in = Channels.newChannel(System.in);
+
+                //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
+
+                //SelectionKey key = in.register
+                //              in.read(charBuffer);
+                //        charBuffer.rewind();
+                //                 inputChar = charBuffer.getChar(0);
                 inputChar = inputString.charAt(0);
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
             }catch (StringIndexOutOfBoundsException e){
                 System.out.printf("You can't use empty string!\n");
                 continue;
+//                } catch (IOException e) {
+                //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             boolean suchKeyHere = false;
             Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
@@ -415,8 +435,128 @@ class ServerView{
             }
         }
     }
+
+    void talkToController(){
+        while (!(isGameEnded())){
+            String inputString;
+            Scanner scan = new Scanner(System.in);
+            char inputChar;
+            printInformationAboutRound();
+            System.out.printf("insert key:\n");
+            try {
+                inputString = scan.nextLine();
+                inputChar = inputString.charAt(0);
+                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.printf("You can't use empty string!\n");
+                continue;
+            }
+            boolean suchKeyHere = false;
+            Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+            int whoPlayed = 0;
+            for (int i = 0; i < myGame.getPlayersCount(); i++){
+                if (playersView.get(i).openCardKey == inputChar){
+                    resultOfMakeMove = tgController.makeMoving(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
+                }
+                if (playersView.get(i).catchTotemKey == inputChar){
+                    resultOfMakeMove = tgController.makeMoving(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
+                }
+            }
+            if (!(suchKeyHere)){
+                System.out.println("Nobody have such key. Try again.\n");
+                continue;
+            }
+            switch (resultOfMakeMove){
+                case INCORRECT:
+                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_CORRECT:
+                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_INCORRECT:
+                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case CARD_OPENED:
+
+                    System.out.printf("%s open next card\n",
+                            myGame.getPlayer(whoPlayed).getName());
+                    break;
+                case NOT_DEFINED_CATCH:
+                    ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                    if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+                        label:
+                        do{
+                            inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
+                                    "want to use effect of won duel or of card? type (D/C)", "Try again!");
+                            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                            switch (inputChar){
+                                case 'd':
+                                    if (possibleLosers.size() == 1){
+                                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
+                                        myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
+                                    }
+                                    break label;
+                                case 'c':
+                                    System.out.println("You put all cards under totem");
+                                    myGame.arrowsInMakeMove(whoPlayed);
+                                    break label;
+                                default:
+                                    System.out.println("try again");
+                            }
+                        }while (true);
+                    }
+                    int looser = chooseOneOfPlayers(possibleLosers);
+                    myGame.afterDuelMakeMove(whoPlayed,looser);
+                    System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
+                    break;
+                case ALL_CARDS_OPENED:
+                    System.out.println("All players will open top cards. To do this, press Enter");
+                    scan.nextLine();
+                    myGame.openAllTopCards();
+                default:
+            }
+        }
+    }
+    void makePrinting(){
+        while (!(isGameEnded())){
+            if (tgController.isModified()){
+                printInformationAboutRound();
+            }
+        }
+    }
     public ServerView(){
         cardsView = new CardsView();
         myGame = new Game(startView(), cardsView.getCardsNumbers());
+        tgController = new BasicController(myGame,this);
+
+        inputListener = new Runnable() {
+            @Override
+            public void run() {
+               makePrinting();
+//                printInformationAboutRound();
+            }
+        };
+
+        outputTalker = new Runnable() {
+            @Override
+            public void run(){
+
+            talkToController();
+            }
+        };
+        Thread inputThread = new Thread(inputListener);
+        Thread outputThread = new Thread(outputTalker);
+        inputThread.start();
+        outputThread.start();
+
     }
 }

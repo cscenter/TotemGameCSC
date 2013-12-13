@@ -11,7 +11,7 @@ public class MainTotemGame {
         System.out.print("!");
         int i = 0;
         if (args.length ==0){
-            new GraphicsView(); //.run();
+            new ServerView(); //.run();
         }else{
             switch (args[0].charAt(0)){
                 case '1':

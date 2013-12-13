@@ -11,7 +11,6 @@ class Game{
     private static int NUMBER_OF_CARDS;
     private int turnNumber;
     private int playerWhoWillGo;
-    private static int NUMBER_OF_PLAYERS;
 
     public LinkedList<Card> getAllCards(){
         return allCards;
@@ -57,10 +56,10 @@ class Game{
      * говорим что пойдёт первый раунд
      * @param playersNames имена играющих людей
      */
-    public Game(ArrayList<String> playersNames, ArrayList<Integer> names){
+    public Game(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         turnNumber = 1;
         playerWhoWillGo = 0;
-        generateAllCards(names);
+        generateAllCards(cardNumbers);
         int numberOfPlayers = playersNames.size();
         generatePlayers(playersNames);
         totem = new Totem(numberOfPlayers);
