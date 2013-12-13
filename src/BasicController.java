@@ -16,10 +16,18 @@ public class BasicController implements TotemGameController {
         return wasModified;
     }
 
-    public Game.ResultOfMakeMove makeMoving(int n, Game.WhatPlayerDid whatPlayerDid){
+    synchronized public void afterDuelMoving(int winner, int looser){
+        setModified(true);
+        myGame.afterDuelMakeMove(winner, looser);
+    }
+    synchronized public Game.ResultOfMakeMove makeMoving(int n, Game.WhatPlayerDid whatPlayerDid){
         Game.ResultOfMakeMove resultOfMakeMove = myGame.makeMove(n, whatPlayerDid);
         setModified(true);
         return resultOfMakeMove;
 
+    }
+    synchronized public void openCards(){
+        setModified(true);
+        myGame.openAllTopCards();
     }
 }

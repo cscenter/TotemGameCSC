@@ -8,4 +8,6 @@
 public interface TotemGameController {
     public Game.ResultOfMakeMove makeMoving(int n, Game.WhatPlayerDid whatPlayerDid);
     public boolean isModified();
+    public void afterDuelMoving(int winner, int looser);
+    public void openCards();
 }

@@ -325,7 +325,7 @@ class ServerView{
         return looser;
 
     }
-    public void run(){
+/*    public void run(){
         while (!(myGame.isGameEnded())){
             String inputString;
             Scanner scan = new Scanner(System.in);
@@ -435,7 +435,7 @@ class ServerView{
             }
         }
     }
-
+  */
     void talkToController(){
         while (!(isGameEnded())){
             String inputString;
@@ -502,7 +502,7 @@ class ServerView{
                                 case 'd':
                                     if (possibleLosers.size() == 1){
                                         System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                        myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
+                                        tgController.afterDuelMoving(whoPlayed, possibleLosers.get(0));
                                     }
                                     break label;
                                 case 'c':
@@ -515,13 +515,13 @@ class ServerView{
                         }while (true);
                     }
                     int looser = chooseOneOfPlayers(possibleLosers);
-                    myGame.afterDuelMakeMove(whoPlayed,looser);
+                    tgController.afterDuelMoving(whoPlayed,looser);
                     System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
                     break;
                 case ALL_CARDS_OPENED:
                     System.out.println("All players will open top cards. To do this, press Enter");
                     scan.nextLine();
-                    myGame.openAllTopCards();
+                    tgController.openCards();
                 default:
             }
         }
@@ -557,6 +557,17 @@ class ServerView{
         Thread outputThread = new Thread(outputTalker);
         inputThread.start();
         outputThread.start();
+        try {
+            inputThread.join();
+            outputThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < myGame.getPlayersCount(); i++){
+            if (myGame.getPlayer(i).getCardsCount() == 0){
+                System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
+            }
+        }
 
     }
 }

@@ -21,7 +21,7 @@ public class MainTotemGame {
                     new GraphicsView();
                     break;
                 case '3':
-                    (new ServerView()).run();
+                    new ServerView();
                 default:
                     (new View()).run();
             }
