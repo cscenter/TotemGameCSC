@@ -7,7 +7,7 @@ public class BasicController implements TotemGameController {
         myView = view;
     }
     boolean modified;
-    synchronized private void setModified(boolean newC){
+    synchronized public void setModified(boolean newC){
         modified = newC;
     }
     synchronized public boolean isModified(){

@@ -257,7 +257,7 @@ class ServerView{
         return rezultStrings;
     }
 
-    synchronized void printInformationAboutRound(){
+    void printInformationAboutRound(){
         System.out.printf("name:            ");
         for (int i = 0; i < myGame.getPlayersCount(); i++){
             System.out.printf("%15s", myGame.getPlayer(i).getName());
@@ -441,7 +441,7 @@ class ServerView{
             String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
-            printInformationAboutRound();
+//            printInformationAboutRound();
             System.out.printf("insert key:\n");
             try {
                 inputString = scan.nextLine();
@@ -529,6 +529,11 @@ class ServerView{
     void makePrinting(){
         while (!(isGameEnded())){
             if (tgController.isModified()){
+//                if ((new Random()).nextInt(100)<50){
+  //                  System.err.println("surprize!");
+                    ((BasicController)tgController).setModified(true);
+    //            }
+
                 printInformationAboutRound();
             }
         }
