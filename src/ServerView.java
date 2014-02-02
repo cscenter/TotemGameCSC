@@ -27,7 +27,7 @@ class ServerView{
     private class PlayerView{
         public char openCardKey;
         public char catchTotemKey;
-        public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
+        public String playerViewName;
         public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name){
             openCardKey = newOpenCardKey;
             catchTotemKey = newCatchTotemKey;

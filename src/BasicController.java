@@ -15,7 +15,7 @@ public class BasicController implements TotemGameController {
         modified = false;
         return wasModified;
     }
-
+    @Override
     synchronized public void afterDuelMoving(int winner, int looser){
         setModified(true);
         myGame.afterDuelMakeMove(winner, looser);
