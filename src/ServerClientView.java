@@ -32,6 +32,10 @@ public class ServerClientView {
         void playerClient(String ip, int port){
             try(Socket socket = new Socket(ip, port)){
                 canWrite = false;
+                InputStream inputStream = socket.getInputStream();
+                KeyboardReader kbReader = new KeyboardReader();
+                kbReader.socket = socket;
+                kbReader.start();
             }catch(UnknownHostException e){e.printStackTrace();}
             catch(IOException e){e.printStackTrace();}
         }
@@ -64,6 +68,28 @@ public class ServerClientView {
                         System.out.println("you have already moved at this turn");
                     }
                 }
+            }
+
+        }
+        private class FromServerReader extends Thread{
+            InputStream stream;
+            @Override
+            public void run(){
+                int whoGoes;
+                char whatDoes;
+                byte[] requestBytes = new byte[4];
+                for (int i=0; i<4; i++){
+                    int res= 0;
+                    try {
+                        res = stream.read();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    requestBytes[i]=(byte)(res);
+                }
+                whatDoes=(char)requestBytes[0];
+                whoGoes=requestBytes[3]+requestBytes[2]*8+requestBytes[1]*16;
+
             }
         }
     }
