@@ -66,6 +66,16 @@ class Game{
         gameMode = GameMode.NORMAL_MODE;
     }
 
+    public Game(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed){
+        turnNumber = 1;
+        playerWhoWillGo = firstPerson;
+        generateAllCards(cardNumbers, cardSeed);
+        int numberOfPlayers = playersNames.size();
+        generatePlayers(playersNames);
+        totem = new Totem(numberOfPlayers);
+        gameMode = GameMode.NORMAL_MODE;
+    }
+
     /**
      * генерирование карт произходит следующим образом:
      * сначала создаётся последовательность в прямом порядке с картами
@@ -80,6 +90,15 @@ class Game{
             allCards.add(new Card(names.get(i)));
         }
         Collections.shuffle(allCards);
+    }
+
+    void generateAllCards(ArrayList<Integer> names, int cardSeed){
+        allCards = new LinkedList<>();
+        NUMBER_OF_CARDS = names.size();
+        for (int i = 0; i < NUMBER_OF_CARDS; i++){
+            allCards.add(new Card(names.get(i)));
+        }
+        Collections.shuffle(allCards, new Random(cardSeed));
     }
 
     /**

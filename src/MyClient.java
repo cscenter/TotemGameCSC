@@ -1,16 +1,28 @@
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-public class ServerClientView {
-    /**
-     * Класс, отвечающий за работу с игроками
-     */
+
+public class MyClient {
+    public MyClient(String ip){
+        int port = MyServer.port;
+        try(Socket socket = new Socket(ip, port)){
+            InputStream inputStream = socket.getInputStream();
+            String outputStr;
+            int firstPlayer = inputStream.read();
+            int cardSeed = inputStream.read();
+            cardsView = new CardsView();
+            myGame = new Game(startView(), cardsView.getCardsNumbers(), firstPlayer, cardSeed);
+        }catch(UnknownHostException e){e.printStackTrace();}
+        catch(IOException e){e.printStackTrace();}
+        run();
+    }
+
+
     private Game myGame;
     /**
      * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
@@ -20,7 +32,6 @@ public class ServerClientView {
      * Поля, которые нужно знать View о игроках
      */
     private class PlayerView{
-        private int id;
         public char openCardKey;
         public char catchTotemKey;
         public String playerViewName; //что делать с дублированием имени в PlayerView и Player?
@@ -29,148 +40,9 @@ public class ServerClientView {
             catchTotemKey = newCatchTotemKey;
             playerViewName = name;
         }
-        void playerClient(String ip, int port){
-            try(Socket socket = new Socket(ip, port)){
-                canWrite = false;
-                InputStream inputStream = socket.getInputStream();
-                KeyboardReader kbReader = new KeyboardReader();
-                FromServerReader fsReader = new FromServerReader();
-                fsReader.stream = inputStream;
-                kbReader.socket = socket;
-                kbReader.start();
-                fsReader.start();
-            }catch(UnknownHostException e){e.printStackTrace();}
-            catch(IOException e){e.printStackTrace();}
-        }
-        private boolean canWrite;
-        private class KeyboardReader extends Thread{
-            Socket socket;
-            @Override
-            public void run(){
-                while (true){
-                    if (canWrite){
-                        printInformationAboutRound();
-                        char pressedKey = getNewChar("press a key", "you don't press anything!");
-                        if ((pressedKey != openCardKey)&&(pressedKey != catchTotemKey)){
-                            System.out.println("you press wrong key. Try again");
-                            continue;
-                        }
-                        canWrite = false;
-                        OutputStream os = null;
-                        try {
-                            os = socket.getOutputStream();
-                            byte[] requestBytes = intToByteArray(id);
-                            if (pressedKey == openCardKey){
-                                requestBytes[0]=0;
-                            }else{
-                                requestBytes[0]=1;
-                            }
-                            os.write(requestBytes);
-                            os.flush();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    }else{
-                        System.out.println("you have already moved at this turn");
-                    }
-                }
-            }
-
-        }
-        private class FromServerReader extends Thread{
-            InputStream stream;
-            @Override
-            public void run(){
-                int whoGoes;
-                byte whatDoes;
-                byte[] requestBytes = new byte[4];
-                for (int i=0; i<4; i++){
-                    int res= 0;
-                    try {
-                        res = stream.read();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    requestBytes[i]=(byte)(res);
-                }
-                whatDoes = requestBytes[0];
-                whoGoes=requestBytes[3]+requestBytes[2]*8+requestBytes[1]*16;
-
-                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
-                int whoPlayed = whoGoes;
-                    if (whatDoes==0){
-                        resultOfMakeMove = myGame.makeMove(whoPlayed, Game.WhatPlayerDid.OPEN_NEW_CARD);
-                    }else{
-                        resultOfMakeMove = myGame.makeMove(whoPlayed, Game.WhatPlayerDid.TOOK_TOTEM);
-                    }
-                switch (resultOfMakeMove){
-                    case INCORRECT:
-                        System.out.printf("Player %s goes. But it wasn't his turn!\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_CORRECT:
-                        System.out.printf("%s Won duel! All his open cards and all cards under totem go to his opponent\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_INCORRECT:
-                        System.out.printf("%s took totem but he shoodn't! So he took all open cards!\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case CARD_OPENED:
-                            System.out.printf("%s open next card\n",
-                                myGame.getPlayer(whoPlayed).getName());
-                        break;
-                    case NOT_DEFINED_CATCH:
-                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
-                        if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
-                            label:
-                            do{
-                                if (id == whoGoes){
-                                char inputChar = getNewChar(myGame.getPlayer(whoPlayed).getName()+
-                                        ", you catch totem while there were a duel with you AND card 'arrows in'. Do you" +
-                                        "want to use effect of won duel or of card? type (D/C)", "Try again!");
-                                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                                switch (inputChar){
-                                    case 'd':
-                                        if (possibleLosers.size() == 1){
-                                            System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                            myGame.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
-                                        }
-                                        break label;
-                                    case 'c':
-                                        System.out.println("You put all cards under totem");
-                                        myGame.arrowsInMakeMove(whoPlayed);
-                                        break label;
-                                    default:
-                                        System.out.println("try again");
-                                }
-                                }
-                            }while (true);
-                        }
-                        int looser = chooseOneOfPlayers(possibleLosers);
-                        myGame.afterDuelMakeMove(whoPlayed,looser);
-                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
-                        break;
-                    case ALL_CARDS_OPENED:
-                        System.out.println("All players will open top cards. To do this, press Enter");
-                        (new Scanner(System.in)).nextLine();
-                        myGame.openAllTopCards();
-                    default:
-                }
-
-            }
-        }
     }
+    ArrayList <PlayerView> playersView;
 
-    ArrayList<PlayerView> playersView;
-    public static final byte[] intToByteArray(int value) {
-        return new byte[] {
-                (byte)(value >>> 24),
-                (byte)(value >>> 16),
-                (byte)(value >>> 8),
-                (byte)value};
-    }
     private class CardsView {
         //        private ArrayList <File> cards;
         private ArrayList<String> cards;
@@ -381,9 +253,7 @@ public class ServerClientView {
                     System.out.println("What are you doing?? Try once more!");
             }
         } while ((flag));
-        for (int i=0; i<playersView.size();i++){
-            playersView.get(i).id=i;
-        }
+
         /*показываем то, что получаем в итоге*/
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
@@ -474,11 +344,21 @@ public class ServerClientView {
             System.out.printf("insert key:\n");
             try {
                 inputString = scan.nextLine();
+                //          ReadableByteChannel in = Channels.newChannel(System.in);
+
+                //            ByteBuffer charBuffer = ByteBuffer.allocate(512);
+
+                //SelectionKey key = in.register
+                //              in.read(charBuffer);
+                //        charBuffer.rewind();
+                //                 inputChar = charBuffer.getChar(0);
                 inputChar = inputString.charAt(0);
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
             }catch (StringIndexOutOfBoundsException e){
                 System.out.printf("You can't use empty string!\n");
                 continue;
+//                } catch (IOException e) {
+                //                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             boolean suchKeyHere = false;
             Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
@@ -562,8 +442,5 @@ public class ServerClientView {
             }
         }
     }
-    public ServerClientView(){
-        cardsView = new CardsView();
-        myGame = new Game(startView(), cardsView.getCardsNumbers());
-    }
+
 }
