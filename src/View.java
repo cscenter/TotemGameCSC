@@ -102,29 +102,41 @@ class View{
         return inputChar;
     }
     private void defaultSettings(ArrayList <String> rezultStrings){
-        char inputOpenCardKey;
-        char inputCatchTotemKey;
-        int numberOfPeople = 4;
-        inputOpenCardKey = 'q';
-        inputCatchTotemKey = 'w';
-        playersView.ensureCapacity(numberOfPeople);
-        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya"));
-        rezultStrings.add("Vasya");
 
-        inputOpenCardKey = 'e';
-        inputCatchTotemKey = 'r';
-        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya"));
-        rezultStrings.add("Petya");
+        //считываются станартные настройки из txt файла
+        BufferedReader input;
+        String classJar =
+                View.class.getResource("/View.class").toString();
+        if (classJar.startsWith("jar:")) {
+            InputStream in;
+            in = CardView.class.getResourceAsStream("data/"+"standardSettings.txt");
+            input = new BufferedReader(new InputStreamReader(in));
+        }else {
+            try {
+                input = new BufferedReader(new FileReader("data/"+"standardSettings.txt"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("AAA");
+            }
+        }
+        String line;
+        try {
+            line = input.readLine();
+            int numberOfPeople = Integer.parseInt(line);
+            playersView.ensureCapacity(numberOfPeople);
+            for (int i = 0; i < numberOfPeople; i++){
+                String name = input.readLine();
+                char inputOpenCardKey=input.readLine().charAt(0);
+                char inputCatchTotemKey=input.readLine().charAt(0);
+                playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, name));
+                rezultStrings.add(name);
 
-        inputOpenCardKey = 't';
-        inputCatchTotemKey = 'y';
-        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha"));
-        rezultStrings.add("Gosha");
+            }
+            input.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
 
-        inputOpenCardKey = 'u';
-        inputCatchTotemKey = 'i';
-        playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey,"Manya"));
-        rezultStrings.add("Manya");
+
 
     }
     private int setNumberOfPlayers(){
