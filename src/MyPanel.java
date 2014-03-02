@@ -17,6 +17,7 @@ public class MyPanel extends JPanel {
     private boolean catchTotemModeFlag;
     private boolean multyDuelFlag;
     private int whoPlayed;
+    private DataDownloader dataDownloader;
 
     private ArrayList<CardView> cardsView;
     private Graphics g;
@@ -132,14 +133,16 @@ public class MyPanel extends JPanel {
         return new MyKeyListener();
     }
 
-    public void initiation(Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
+    //вместо конструктора
+    public void initiation(DataDownloader dd, Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
         myGame = game;
+        dataDownloader = dd;
         playersView = new ArrayList<>(ktKeys.size());
         cardsView = new ArrayList<>();
         for (int i=0; i<400; i++){//Как сделать нормально?
             cardsView.add(null);
         }
-        for (String cardI : CardView.getCardsNames()){
+        for (String cardI : dataDownloader.getCardsNames()){
             Pattern numberPattern = Pattern.compile("[0-9]+");
             Matcher numberMatcher = numberPattern.matcher(cardI);
             numberMatcher.find();
@@ -152,7 +155,7 @@ public class MyPanel extends JPanel {
                     ClassLoader cl = MyPanel.class.getClassLoader();
 
 //                    Image image = (new ImageIcon(cl.getResource(cardI))).getImage();
-                    CardView cardView = new CardView(cl, card, cardI, num);
+                    CardView cardView = new CardView(cl, card, dataDownloader.getImage(cardI), num);
                     cardsView.set(num, cardView);
                     break;
                 }

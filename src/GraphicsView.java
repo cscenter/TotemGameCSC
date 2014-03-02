@@ -227,7 +227,8 @@ class GraphicsView extends JFrame{
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
         (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
-        myGame = new Game(startView(), CardView.getCardsNumbers());
+        DataDownloader dataDownloader = new DataDownloader();
+        myGame = new Game(startView(), CardView.getCardsNumbers(dataDownloader));
         myPanel = new MyPanel();
         ArrayList<Character> kt = new ArrayList<>(4);
         kt.add('w');
@@ -244,7 +245,7 @@ class GraphicsView extends JFrame{
         an.add(90.0);
         an.add(180.0);
         an.add(270.0);
-        myPanel.initiation(myGame, kt, oc, an);
+        myPanel.initiation(dataDownloader, myGame, kt, oc, an);
 //        for (int i=0; i<myPanel.playersView.size(); i++){
   //          myPanel.playersView.get(i).connectWithInfo(myGame.getPlayer(i));
     //    }
