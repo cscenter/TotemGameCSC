@@ -18,6 +18,9 @@ public class MyPanel extends JPanel {
     private boolean multyDuelFlag;
     private int whoPlayed;
     private DataDownloader dataDownloader;
+    private String message;
+    private int mesOk;
+    private int typeTotem;
 
     private ArrayList<CardView> cardsView;
     private Graphics g;
@@ -30,38 +33,37 @@ public class MyPanel extends JPanel {
             totem = totem1;
         }
         public void clearD(Graphics g){
-            g.clearRect(xCoord-CardView.getCardSize()/2-panel_size/10, yCoord-CardView.getCardSize()/2-panel_size/20,
-                    (int)(CardView.getCardSize()*2.5), CardView.getCardSize()+panel_size/10);
+             g.clearRect(xCoord-CardView.getCardSize()/2-panel_size/10 - 45, yCoord-CardView.getCardSize()/2-panel_size/20,
+                  (int)(CardView.getCardSize()*2.5) + 45, CardView.getCardSize()+panel_size/10 + 120);
 
         }
-        public void drawTotem(Graphics g, int type) throws IOException{
+        public void drawTotem(Graphics g) throws IOException{
             clearD(g);
-            
-            String cardsCount = String.valueOf(totem.getCardsCount());
-          //  g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
-            if (totem.getCardsCount()!=0){
-                g.fill3DRect(10, 10, 10, 10, allOpenFlag);
-              if (type == 0)  g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
-              if (type == 1)  g.drawImage(ImageIO.read(new File("data/totemW.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
-              if (type == 2)  g.drawImage(ImageIO.read(new File("data/totemR.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
-
-              /* String s = null;
-                s += xCoord - totemRad*4;
-                s += ' ';
-                s += yCoord - totemRad*2;
-                  
-                g.drawString(s, xCoord - totemRad*4,yCoord - totemRad*2 );*/
-               // printf("coord is %d #d\n", xCoord - totemRad*4, yCoord - totemRad*2);
-         //g.drawRect(xCoord-CardView.getCardSize()/2, yCoord-CardView.getCardSize()/2, CardView.getCardSize(), CardView.getCardSize());
+            if (mesOk == 1){
+                g.clearRect(10, panel_size/30 , 500, 30);
+               g.setColor(Color.red);
+               g.drawChars(message.toCharArray(), 0, message.length(), 20, panel_size/30 + 20); 
+               mesOk = 0;
+               g.setColor(Color.BLACK);
+            } 
+            else{
+                g.clearRect(10, panel_size/30 , 500, 30);
             }
-            else
-            // g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
-             //g.drawImage(ImageIO.read(new File("table.jpg")), 50, 50, null);
+            String cardsCount = String.valueOf(totem.getCardsCount());
+          // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
+            
+              g.fill3DRect(10, 10, 10, 10, allOpenFlag);
+              if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+              if (typeTotem == 1){
+                  g.drawImage(ImageIO.read(new File("data/totemW.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+                  typeTotem = 0;
+              }
+              if (typeTotem == 2){
+                  g.drawImage(ImageIO.read(new File("data/totemR.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+                  typeTotem = 0;
+              }
 
-             //g.drawImage(ImageIO.read(new File("table.jpg")), xCoord - totemRad*14, yCoord - totemRad*10, null);
-            g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
-           // g.drawOval(xCoord-totemRad, yCoord-totemRad,2*totemRad,2*totemRad);
-           // g.drawOval();
+             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 - 3, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
 
         }
         public boolean isIn(Point p){
@@ -92,7 +94,7 @@ public class MyPanel extends JPanel {
         //убрать с консоли всё
         reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
       try {
-            totemV.drawTotem(g, 0);
+            totemV.drawTotem(g);
         } catch (IOException ex) {
             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -231,26 +233,34 @@ public class MyPanel extends JPanel {
                     repaint();
                 }
                 if (!(suchKeyHere)){
+                    mesOk = 1;
+                    message = "Nobody have such key. Try again.";
                     System.out.println("Nobody have such key. Try again.\n");
+                    MyPanel.this.repaint();
                 }
                 switch (resultOfMakeMove){
                     case INCORRECT:
+                         mesOk = 1;
+                         message = "It's not your turn, " + myGame.getPlayer(whoPlayed).getName() + " Don't hurry!";
+                         MyPanel.this.repaint();
                         System.out.printf("It's not your turn, %s. Don't hurry!\n",
                                 myGame.getPlayer(whoPlayed).getName());
                         break;
                     case TOTEM_WAS_CATCH_CORRECT:
+                         mesOk = 1;
+                         message = "You won duel, " + myGame.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
+                         typeTotem = 2;
+                         MyPanel.this.repaint();
                         System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
                                 myGame.getPlayer(whoPlayed).getName());
                         break;
                     case TOTEM_WAS_CATCH_INCORRECT:
+                         mesOk = 1;
+                         message = "You mustn't take totem, " + myGame.getPlayer(whoPlayed).getName() + " So you took all open cards!";
+                         typeTotem = 1;
+                         MyPanel.this.repaint();
                         System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
                                 myGame.getPlayer(whoPlayed).getName());
-                        try {
-                            totemV.drawTotem(g, 1);
-                          } catch (IOException ex) {
-                             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                     //  g.drawImage(ImageIO.read(new File("totem.jpg")), 275, 303, null);
                         break;
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
@@ -271,7 +281,11 @@ public class MyPanel extends JPanel {
                         for (PlayerView player : playersView){
                             player.setTopCardView(cardsView);
                         }
+                        
+                         mesOk = 1;
+                         message = "All players will open top cards. To do this, press Enter";
                         MyPanel.this.repaint();
+                        
                         System.out.println("All players will open top cards. To do this, press Enter");
                         break;
                     default:
@@ -280,6 +294,9 @@ public class MyPanel extends JPanel {
 
                 for (int i = 0; i < myGame.getPlayersCount(); i++){
                     if (myGame.getPlayer(i).getCardsCount() == 0){
+                         mesOk = 1;
+                         message = "Player %s won! It's very good :)\n" + myGame.getPlayer(i).getName();
+                         MyPanel.this.repaint();
                         System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
                     }
                 }

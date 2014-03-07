@@ -60,20 +60,22 @@ public class PlayerView{
     }
     public void drawPlayer(Graphics g, MyPanel panel) throws IOException{
         clear(g);
+        g.drawImage(ImageIO.read(new File("data/tboy.jpg")), xCoordinate-110, yCoordinate, panel);
         g.drawChars(playerInfo.getName().toCharArray(), 0, playerInfo.getName().length(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
         String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-        g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+scale/60, yCoordinate+CardView.getCardSize()+scale/30);
+        g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+scale/60 + 30, yCoordinate+CardView.getCardSize()+scale/30);
         if (playerInfo.getOpenCardsCount()!=0){
             Image image = topCardView.getCardImage();
             g.drawImage(image, xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
         }
+        else
+            if (playerInfo.getCloseCardsCount() != 0 )
+            g.drawImage(ImageIO.read(new File("data/tback.jpg")), xCoordinate, yCoordinate, 70, 70, panel);
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-        g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate-CardView.getCardSize()+scale/60, yCoordinate+CardView.getCardSize()+scale/30);
-        g.drawImage(ImageIO.read(new File("data/tboy.jpg")), xCoordinate-110, yCoordinate, panel);
+        g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate + scale/60, yCoordinate+CardView.getCardSize()+scale/30);
+        
         playerInfo.setCoordinate(xCoordinate, yCoordinate);
-        if (playerInfo.getCloseCardsCount()!=0){
-            //g.fillRect(xCoordinate - (int)(1.1 * CardView.getCardSize()), yCoordinate, CardView.getCardSize(), CardView.getCardSize());
-        }
+        
         String catchKey=String.valueOf(openCardKey)+", "+String.valueOf(catchTotemKey);
         g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int)(CardView.getCardSize()*1.5), yCoordinate - scale/30);
     }
