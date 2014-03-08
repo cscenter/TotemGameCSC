@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Thread.sleep;
 
 public class MyServer {
     public int whoDidThis;
@@ -42,14 +41,13 @@ public class MyServer {
             //генерим кто первый ходит и зерно для случайного набора карт
             byte firstPlayer = (byte)(((new Random()).nextInt())%numberOfPl);
             byte cardSeed = (byte)((new Random()).nextInt());
-            System.err.println("HEre");
+
             //пересылаем это всем
             for (OutputStream os : clientOutput){
                 os.write(firstPlayer);
                 os.write(cardSeed);
                 os.flush();
             }
-            System.err.println("HEre");
 
             for (Socket socket : clients){
                 socket.close();
