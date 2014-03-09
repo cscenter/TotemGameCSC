@@ -1,18 +1,9 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
-import java.io.*;
-import java.net.URL;
-import java.security.CodeSource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class CardView{
-    public static final String DIRECTORY = "data/";
     private static int cardSize;
     public static int getCardSize(){
         return cardSize;
@@ -34,7 +25,7 @@ public class CardView{
     public int getId(){
         return id;
     }
-    public static ArrayList<Integer> getCardsNumbers(DataDownloader dd){
+    public static ArrayList<Integer> getCardsNumbers(Gallery dd){
         ArrayList<Integer> result = new ArrayList<>();
         ArrayList<String> cardsNames = dd.getCardsNames();
         for (String cardName : cardsNames){

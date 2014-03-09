@@ -8,7 +8,6 @@
 
 public class MainTotemGame {
     public static void main(String[] args){
-     //   System.out.print("!");
         int i = 0;
         if (args.length ==0){
             new GraphicsView(); //.run();
@@ -27,7 +26,7 @@ public class MainTotemGame {
                     new MyServer();
                     break;
                 case '5':
-                    new MyClient("127.0.0.1");
+                    new MyClient(Configuration.getServerIp());
                     break;
                 default:
                     (new View()).run();

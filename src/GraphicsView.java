@@ -43,44 +43,12 @@ class GraphicsView extends JFrame{
     }
     private void defaultSettings(ArrayList <String> names, ArrayList <Character> openKeys, ArrayList<Character> catchKeys,
                                  ArrayList<Double> angles){
-        //считываются станартные настройки из txt файла
-        BufferedReader input;
-        String classJar =
-                View.class.getResource("/View.class").toString();
-        if (classJar.startsWith("jar:")) {
-            InputStream in;
-            in = CardView.class.getResourceAsStream("data/"+"standardSettings.txt");
-            input = new BufferedReader(new InputStreamReader(in));
-        }else {
-            try {
-                input = new BufferedReader(new FileReader("data/"+"standardSettings.txt"));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException("AAA");
-            }
-        }
-        String line;
-        try {
-            line = input.readLine();
-            int numberOfPeople = Integer.parseInt(line);
-            names.ensureCapacity(numberOfPeople);
-            openKeys.ensureCapacity(numberOfPeople);
-            catchKeys.ensureCapacity(numberOfPeople);
-            angles.ensureCapacity(numberOfPeople);
-            for (int i = 0; i < numberOfPeople; i++){
-                String name = input.readLine();
-                char inputOpenCardKey=input.readLine().charAt(0);
-                char inputCatchTotemKey=input.readLine().charAt(0);
-                names.add(name);
-                openKeys.add(inputOpenCardKey);
-                catchKeys.add(inputCatchTotemKey);
-                angles.add(360.0*i/numberOfPeople);
-           }
-            input.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-
+        for (int i=0; i< Configuration.getNumberOfPlayers(); i++){
+            names.add(Configuration.getPeopleNames().get(i));
+            openKeys.add(Configuration.getPeopleOpenKeys().get(i));
+            catchKeys.add(Configuration.getPeopleCatchKeys().get(i));
+            angles.add(360.0*i/Configuration.getNumberOfPlayers());
+                    }
     }
 
 
@@ -249,15 +217,14 @@ class GraphicsView extends JFrame{
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
         (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
-        DataDownloader dataDownloader = new DataDownloader();
 
         //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу
         ArrayList<String> names = new ArrayList<>();
         defaultSettings(names, openKeys, catchKeys, angles);
-        myGame = new Game(names, CardView.getCardsNumbers(dataDownloader));
-        //myGame = new Game(startView(openKeys, catchKeys, angles), CardView.getCardsNumbers(dataDownloader));
+        myGame = new Game(names, CardView.getCardsNumbers(Configuration.getGallery()));
+        //myGame = new Game(startView(openKeys, catchKeys, angles), CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();
-        myPanel.initiation(dataDownloader, myGame, catchKeys, openKeys, angles);
+        myPanel.initiation(myGame, catchKeys, openKeys, angles);
         add(myPanel);
         pack();
         addKeyListener(myPanel.initMyKeyListener());

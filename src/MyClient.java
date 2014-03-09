@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class MyClient {
     public MyClient(String ip){
-        int port = MyServer.port;
+        int port = Configuration.getPort();
         try(Socket socket = new Socket(ip, port)){
             InputStream inputStream = socket.getInputStream();
             String outputStr;
@@ -330,7 +330,6 @@ public class MyClient {
             }
         } while(true);
         return looser;
-
     }
     public void run(){
         while (!(myGame.isGameEnded())){

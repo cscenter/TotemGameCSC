@@ -33,8 +33,9 @@ class View{
 //        private ArrayList <File> cards;
         private ArrayList<String> cards;
         public CardsView(){
-            cards = new ArrayList<>();
-            BufferedReader input;
+            cards = Configuration.getGallery().getCardsNames();
+//            cards = new ArrayList<>();
+/*            BufferedReader input;
             String classJar =
                     CardView.class.getResource("/CardView.class").toString();
             if (classJar.startsWith("jar:")) {
@@ -57,7 +58,7 @@ class View{
                 input.close();
             }catch (IOException e){
                 e.printStackTrace();
-            }
+            }*/
         }
         public ArrayList<Integer> getCardsNumbers(){
             ArrayList<Integer> rezult = new ArrayList<>();
@@ -101,43 +102,13 @@ class View{
         }while(true);
         return inputChar;
     }
-    private void defaultSettings(ArrayList <String> rezultStrings){
-
-        //считываются станартные настройки из txt файла
-        BufferedReader input;
-        String classJar =
-                View.class.getResource("/View.class").toString();
-        if (classJar.startsWith("jar:")) {
-            InputStream in;
-            in = CardView.class.getResourceAsStream("data/"+"standardSettings.txt");
-            input = new BufferedReader(new InputStreamReader(in));
-        }else {
-            try {
-                input = new BufferedReader(new FileReader("data/"+"standardSettings.txt"));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException("AAA");
-            }
+    private void defaultSettings(ArrayList <String> names){
+        for (int i=0; i< Configuration.getNumberOfPlayers(); i++){
+            names.add(Configuration.getPeopleNames().get(i));
+            playersView.add(new PlayerView(Configuration.getPeopleOpenKeys().get(i),
+                    Configuration.getPeopleCatchKeys().get(i),
+                    Configuration.getPeopleNames().get(i)));
         }
-        String line;
-        try {
-            line = input.readLine();
-            int numberOfPeople = Integer.parseInt(line);
-            playersView.ensureCapacity(numberOfPeople);
-            for (int i = 0; i < numberOfPeople; i++){
-                String name = input.readLine();
-                char inputOpenCardKey=input.readLine().charAt(0);
-                char inputCatchTotemKey=input.readLine().charAt(0);
-                playersView.add(new PlayerView(inputOpenCardKey, inputCatchTotemKey, name));
-                rezultStrings.add(name);
-
-            }
-            input.close();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-
-
     }
     private int setNumberOfPlayers(){
         int numberOfPeople;

@@ -3,27 +3,26 @@ import java.net.Socket.*;
 import java.net.*;
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class MyServer {
-    public int whoDidThis;
-    public int whatHeDid;
-    int numberOfPl = 1;
-    LinkedList<Socket> clients;
-    LinkedList<InputStream> clientInput;
-    LinkedList<OutputStream> clientOutput;
-    Queue<Integer> comands;
-    public static final int port = 6923;
-
+    private int whoDidThis;
+    private int whatHeDid;
+    private int numberOfPl = 1;
+    private LinkedList<Socket> clients;
+    private LinkedList<InputStream> clientInput;
+    private LinkedList<OutputStream> clientOutput;
+    private Queue<Integer> comands;
     public MyServer(){
         clientOutput = new LinkedList<>();
         clients = new LinkedList<>();
         clientInput = new LinkedList<>();
-        comands = new ArrayDeque<>(100);
+        comands = new SynchronousQueue<>();
 
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
             for (int i=0; i<numberOfPl; i++){
                 try {
