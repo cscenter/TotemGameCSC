@@ -1,16 +1,13 @@
 import java.io.*;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.SelectionKey;
 import java.util.*;
 import java.util.regex.*;
-import java.nio.*;
+
 /**
  * Класс, отвечающий за работу с игроками
  */
 class ServerView{
     private Game myGame;
-    private TotemGameController tgController;
+    private TotemClient tgController;
     Runnable inputListener;
     Runnable outputTalker;
     synchronized boolean isGameEnded(){
@@ -531,7 +528,7 @@ class ServerView{
             if (tgController.isModified()){
 //                if ((new Random()).nextInt(100)<50){
   //                  System.err.println("surprize!");
-                    ((BasicController)tgController).setModified(true);
+                    ((BasicClient)tgController).setModified(true);
     //            }
 
                 printInformationAboutRound();
@@ -541,7 +538,7 @@ class ServerView{
     public ServerView(){
         cardsView = new CardsView();
         myGame = new Game(startView(), cardsView.getCardsNumbers());
-        tgController = new BasicController(myGame,this);
+        tgController = new BasicClient(myGame,this);
 
         inputListener = new Runnable() {
             @Override
