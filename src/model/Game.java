@@ -1,10 +1,11 @@
+package model;
 import java.util.*;
 
 /**
  * Главный класс модели. В нём содержится список игроков, список всех карт и карт под тотемом
  * а так же функции выполняемые во время хода
  */
-class Game{
+public class Game{
     private ArrayList<Player> players;
     private LinkedList<Card> allCards;
     private Totem totem;
@@ -209,6 +210,7 @@ class Game{
                     if (result == null){
                         arrowsInMakeMove(playerIndex);
 //                        takeAllCardsOnTheTable(players.get(playerIndex));
+                        gameMode = GameMode.NORMAL_MODE;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
                     }else{
                         return ResultOfMakeMove.NOT_DEFINED_CATCH;
@@ -216,9 +218,11 @@ class Game{
                 }else{
                     if (result == null){
                         takeAllCardsOnTheTable(players.get(playerIndex));
+                        gameMode = GameMode.NORMAL_MODE;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_INCORRECT;
                     }else if (result.size() == 1){
                         afterDuelMakeMove(playerIndex,result.get(0));
+                        gameMode = GameMode.NORMAL_MODE;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
                     }else{
                         return ResultOfMakeMove.NOT_DEFINED_CATCH;
@@ -227,6 +231,11 @@ class Game{
             case OPEN_NEW_CARD:
                 if (playerIndex == playerWhoWillGo){
                     turnNumber++;
+
+                    if ((players.get(playerWhoWillGo).getOpenCardsCount() > 0) &&
+                            (players.get(playerWhoWillGo).getTopOpenedCard().getCardType() == Card.CardType.ARROWS_COLORED)){
+                        gameMode = GameMode.NORMAL_MODE;
+                    }
                     switch (players.get(playerWhoWillGo).openNextCard().getCardType()){
                         case ARROWS_COLORED:
                             gameMode = GameMode.COLOR_MODE;

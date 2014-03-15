@@ -1,13 +1,18 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import model.*;
+import utils.*;
 
 /**
  * Класс, отвечающий за работу с игроками
  * В графическом режиме
  */
-class GraphicsView extends JFrame{
+public class GraphicsView extends JFrame{
     private Game myGame;
     private static int FRAME_SIZE;
     private MyPanel myPanel;
@@ -101,7 +106,7 @@ class GraphicsView extends JFrame{
                     inputOpenCardKey = inputString.charAt(0);
                     Character tmp = inputOpenCardKey;
                     inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
-  /*                  for (PlayerView p : myPanel.playersView){
+  /*                  for (graphics.PlayerView p : myPanel.playersView){
                         if ((inputOpenCardKey == p.getCatchTotemKey()) || (inputOpenCardKey == p.getOpenCardKey())){
                             System.out.printf("player %s already use this key. Try another one\n", p.getPlayerName());
                             continue label;
@@ -127,7 +132,7 @@ class GraphicsView extends JFrame{
                         System.out.println("you already use this key for key that open last card! try another key");
                         continue;
                     }
-                    for (PlayerView p : myPanel.playersView){
+                    for (graphics.PlayerView p : myPanel.playersView){
                         if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
                             System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
                             continue label;
@@ -171,7 +176,7 @@ class GraphicsView extends JFrame{
         /*показываем то, что получаем в итоге*/
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
-//        for (PlayerView p : myPanel.playersView){
+//        for (graphics.PlayerView p : myPanel.playersView){
   //          System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
     //                p.playerViewName, p.openCardKey, p.catchTotemKey);
       //  }
@@ -221,8 +226,8 @@ class GraphicsView extends JFrame{
         //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу
         ArrayList<String> names = new ArrayList<>();
         defaultSettings(names, openKeys, catchKeys, angles);
-        myGame = new Game(names, CardView.getCardsNumbers(Configuration.getGallery()));
-        //myGame = new Game(startView(openKeys, catchKeys, angles), CardView.getCardsNumbers(gallery));
+        myGame = new Game(names, CardView.getCardsNumbers());
+        //myGame = new Game(startView(openKeys, catchKeys, angles), graphics.CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();
         myPanel.initiation(myGame, catchKeys, openKeys, angles);
         add(myPanel);

@@ -1,7 +1,11 @@
+package view;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import model.Card;
+import utils.*;
 
 public class CardView{
     private static int cardSize;
@@ -25,9 +29,9 @@ public class CardView{
     public int getId(){
         return id;
     }
-    public static ArrayList<Integer> getCardsNumbers(Gallery dd){
+    public static ArrayList<Integer> getCardsNumbers(){
         ArrayList<Integer> result = new ArrayList<>();
-        ArrayList<String> cardsNames = dd.getCardsNames();
+        ArrayList<String> cardsNames = Configuration.getGallery().getCardsNames();
         for (String cardName : cardsNames){
             result.add(getCardNumber(cardName));
         }
@@ -43,7 +47,7 @@ public class CardView{
     public static void resize(int haracteristicScale) {
         cardSize = haracteristicScale / 10;
     }
-//    public CardView getCardView(Card card){
+//    public graphics.CardView getCardView(Card card){
 //      return
 //}
 }

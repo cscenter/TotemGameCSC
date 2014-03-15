@@ -1,19 +1,34 @@
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+package controller;
 
-/**
- * Класс, отвечающий за работу с игроками
- */
-class ServerView{
-    private Game myGame;
-    private TotemClient tgController;
-    Runnable inputListener;
-    Runnable outputTalker;
-    synchronized boolean isGameEnded(){
-        return myGame.isGameEnded();
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import utils.*;
+import model.*;
+import view.*;
+
+public class MyClient {
+    public MyClient(String ip){
+        int port = Configuration.getPort();
+        try(Socket socket = new Socket(ip, port)){
+            InputStream inputStream = socket.getInputStream();
+            String outputStr;
+            int firstPlayer = inputStream.read();
+            int cardSeed = inputStream.read();
+            cardsView = new CardsView();
+            myGame = new Game(startView(), cardsView.getCardsNumbers(), firstPlayer, cardSeed);
+        }catch(UnknownHostException e){e.printStackTrace();}
+        catch(IOException e){e.printStackTrace();}
+        run();
     }
 
+
+    private Game myGame;
     /**
      * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
      */
@@ -24,7 +39,7 @@ class ServerView{
     private class PlayerView{
         public char openCardKey;
         public char catchTotemKey;
-        public String playerViewName;
+        public String playerViewName; //что делать с дублированием имени в graphics.PlayerView и Player?
         public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name){
             openCardKey = newOpenCardKey;
             catchTotemKey = newCatchTotemKey;
@@ -40,7 +55,7 @@ class ServerView{
             cards = new ArrayList<>();
             BufferedReader input;
             String classJar =
-                    CardView.class.getResource("/CardView.class").toString();
+                    CardView.class.getResource("/view.CardView.class").toString();
             if (classJar.startsWith("jar:")) {
                 InputStream in;
                 in = CardView.class.getResourceAsStream("data/"+"listOfCards.txt");
@@ -320,9 +335,8 @@ class ServerView{
             }
         } while(true);
         return looser;
-
     }
-/*    public void run(){
+    public void run(){
         while (!(myGame.isGameEnded())){
             String inputString;
             Scanner scan = new Scanner(System.in);
@@ -432,144 +446,5 @@ class ServerView{
             }
         }
     }
-  */
-    void talkToController(){
-        while (!(isGameEnded())){
-            String inputString;
-            Scanner scan = new Scanner(System.in);
-            char inputChar;
-//            printInformationAboutRound();
-            System.out.printf("insert key:\n");
-            try {
-                inputString = scan.nextLine();
-                inputChar = inputString.charAt(0);
-                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-            }catch (StringIndexOutOfBoundsException e){
-                System.out.printf("You can't use empty string!\n");
-                continue;
-            }
-            boolean suchKeyHere = false;
-            Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
-            int whoPlayed = 0;
-            for (int i = 0; i < myGame.getPlayersCount(); i++){
-                if (playersView.get(i).openCardKey == inputChar){
-                    resultOfMakeMove = tgController.makeMoving(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
-                    suchKeyHere = true;
-                    whoPlayed = i;
-                    break;
-                }
-                if (playersView.get(i).catchTotemKey == inputChar){
-                    resultOfMakeMove = tgController.makeMoving(i, Game.WhatPlayerDid.TOOK_TOTEM);
-                    suchKeyHere = true;
-                    whoPlayed = i;
-                    break;
-                }
-            }
-            if (!(suchKeyHere)){
-                System.out.println("Nobody have such key. Try again.\n");
-                continue;
-            }
-            switch (resultOfMakeMove){
-                case INCORRECT:
-                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case TOTEM_WAS_CATCH_CORRECT:
-                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case TOTEM_WAS_CATCH_INCORRECT:
-                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case CARD_OPENED:
 
-                    System.out.printf("%s open next card\n",
-                            myGame.getPlayer(whoPlayed).getName());
-                    break;
-                case NOT_DEFINED_CATCH:
-                    ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
-                    if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
-                        label:
-                        do{
-                            inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
-                                    "want to use effect of won duel or of card? type (D/C)", "Try again!");
-                            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                            switch (inputChar){
-                                case 'd':
-                                    if (possibleLosers.size() == 1){
-                                        System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(possibleLosers.get(0)));
-                                        tgController.afterDuelMoving(whoPlayed, possibleLosers.get(0));
-                                    }
-                                    break label;
-                                case 'c':
-                                    System.out.println("You put all cards under totem");
-                                    myGame.arrowsInMakeMove(whoPlayed);
-                                    break label;
-                                default:
-                                    System.out.println("try again");
-                            }
-                        }while (true);
-                    }
-                    int looser = chooseOneOfPlayers(possibleLosers);
-                    tgController.afterDuelMoving(whoPlayed,looser);
-                    System.out.printf("All cards go to your opponent, %s\n", myGame.getPlayer(looser).getName());
-                    break;
-                case ALL_CARDS_OPENED:
-                    System.out.println("All players will open top cards. To do this, press Enter");
-                    scan.nextLine();
-                    tgController.openCards();
-                default:
-            }
-        }
-    }
-    void makePrinting(){
-        while (!(isGameEnded())){
-            if (tgController.isModified()){
-//                if ((new Random()).nextInt(100)<50){
-  //                  System.err.println("surprize!");
-                    ((BasicClient)tgController).setModified(true);
-    //            }
-
-                printInformationAboutRound();
-            }
-        }
-    }
-    public ServerView(){
-        cardsView = new CardsView();
-        myGame = new Game(startView(), cardsView.getCardsNumbers());
-        tgController = new BasicClient(myGame,this);
-
-        inputListener = new Runnable() {
-            @Override
-            public void run() {
-               makePrinting();
-//                printInformationAboutRound();
-            }
-        };
-
-        outputTalker = new Runnable() {
-            @Override
-            public void run(){
-
-            talkToController();
-            }
-        };
-        Thread inputThread = new Thread(inputListener);
-        Thread outputThread = new Thread(outputTalker);
-        inputThread.start();
-        outputThread.start();
-        try {
-            inputThread.join();
-            outputThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < myGame.getPlayersCount(); i++){
-            if (myGame.getPlayer(i).getCardsCount() == 0){
-                System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
-            }
-        }
-
-    }
 }

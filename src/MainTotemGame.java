@@ -1,3 +1,8 @@
+import controller.MyClient;
+import view.*;
+import net.MyServer;
+import utils.Configuration;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anton
@@ -15,12 +20,6 @@ public class MainTotemGame {
             switch (args[0].charAt(0)){
                 case '1':
                     (new View()).run();
-                    break;
-                case '2':
-                    new GraphicsView();
-                    break;
-                case '3':
-                    new ServerView();
                     break;
                 case '4':
                     new MyServer();

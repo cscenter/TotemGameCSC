@@ -1,3 +1,6 @@
+package view;
+import model.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,9 +12,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
+import utils.*;
 
 public class MyPanel extends JPanel {
-    private Game myGame;
+    private model.Game myGame;
     private int panel_size;
     private boolean allOpenFlag;
     private boolean catchTotemModeFlag;
@@ -24,15 +28,15 @@ public class MyPanel extends JPanel {
     private ArrayList<CardView> cardsView;
     private Graphics g;
     public class TotemView{
-        private Game.Totem totem;
+        private model.Game.Totem totem;
         private int totemRad;
         private int xCoord;
         private int yCoord;
-        public TotemView (Game.Totem totem1){
+        public TotemView (model.Game.Totem totem1){
             totem = totem1;
         }
         public void clearD(Graphics g){
-             g.clearRect(xCoord-CardView.getCardSize()/2-panel_size/10 - 45, yCoord-CardView.getCardSize()/2-panel_size/20,
+             g.clearRect(xCoord- CardView.getCardSize()/2-panel_size/10 - 45, yCoord- CardView.getCardSize()/2-panel_size/20,
                   (int)(CardView.getCardSize()*2.5) + 45, CardView.getCardSize()+panel_size/10 + 120);
 
         }
@@ -49,7 +53,7 @@ public class MyPanel extends JPanel {
                 g.clearRect(10, panel_size/30 , 500, 30);
             }
             String cardsCount = String.valueOf(totem.getCardsCount());
-          // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
+          // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-graphics.CardView.getCardSize()/2+panel_size/60, yCoord+graphics.CardView.getCardSize()/2+panel_size/30);
             
               g.fill3DRect(10, 10, 10, 10, allOpenFlag);
               if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
@@ -62,7 +66,7 @@ public class MyPanel extends JPanel {
                   typeTotem = 0;
               }
 
-             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 - 3, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
+             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord- CardView.getCardSize()/2+panel_size/60 - 3, yCoord+ CardView.getCardSize()/2+panel_size/30 + 40);
 
         }
         public boolean isIn(Point p){

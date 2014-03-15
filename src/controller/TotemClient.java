@@ -1,5 +1,7 @@
-import java.util.ArrayList;
+package controller;
 
+import java.util.ArrayList;
+import model.*;
 /**
  * Created with IntelliJ IDEA.
  * User: lavton
@@ -20,8 +22,8 @@ public interface TotemClient {
     public void afterDuelMakeMove(int winner, int looser);
     public void arrowsInMakeMove(int winner);
     public void openAllTopCards();
-//    public TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
-  //  public TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
+//    public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
+  //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
 
 
     }

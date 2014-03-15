@@ -1,6 +1,7 @@
+package utils;
+
 import java.io.*;
 import java.util.ArrayList;
-
 /**
  * Created by lavton on 09.03.14.
  */
@@ -58,10 +59,10 @@ public class Configuration {
         //считываются станартные настройки из txt файла
         BufferedReader input;
         String classJar =
-                Configuration.class.getResource("/Configuration.class").toString();
+                Configuration.class.getResource("/MainTotemGame.class").toString();
         if (classJar.startsWith("jar:")) {
             InputStream in;
-            in = CardView.class.getResourceAsStream(DIRECTORY+"standardSettings.txt");
+            in = Configuration.class.getResourceAsStream(DIRECTORY+"standardSettings.txt");
             input = new BufferedReader(new InputStreamReader(in));
         }else {
             try {

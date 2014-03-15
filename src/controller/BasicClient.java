@@ -1,4 +1,7 @@
+package controller;
+
 import java.util.ArrayList;
+import model.*;
 
 public class BasicClient implements TotemClient {
     private Game myGame;
