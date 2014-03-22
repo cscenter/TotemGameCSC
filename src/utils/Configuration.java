@@ -68,7 +68,7 @@ public class Configuration {
         BufferedReader input;
         String classJar =
                 Configuration.class.getResource("/MainTotemGame.class").toString();
-        System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         System.err.println(classJar);
         if (classJar.startsWith("jar:")) {
             InputStream in;
