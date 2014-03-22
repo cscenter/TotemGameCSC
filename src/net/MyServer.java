@@ -23,7 +23,9 @@ public class MyServer {
         clients = new LinkedList<>();
         clientInput = new LinkedList<>();
         comands = new SynchronousQueue<>();
-
+        initServer();
+    }
+    private void initServer(){
         try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
             for (int i=0; i<numberOfPl; i++){
@@ -56,5 +58,6 @@ public class MyServer {
         }catch (Exception e){
             e.printStackTrace();
         }
+
     }
 }

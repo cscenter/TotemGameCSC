@@ -24,12 +24,16 @@ public class Configuration {
     private static final int PORT = 6923;
     private static final String DIRECTORY = "data/";
     private static final String SERVER_IP = "127.0.0.1";
+    private static int timeToWait=1000;
     private static int numberOfPlayers;
     private static Gallery gallery;
     private static ArrayList<String> peopleNames;
     private static ArrayList<Character> peopleOpenKeys;
     private static ArrayList<Character> peopleCatchKeys;
 
+    public static int getTimeToWait(){
+        return getInstance().timeToWait;
+    }
     public static int getPort(){
         return getInstance().PORT;
     }
@@ -60,17 +64,26 @@ public class Configuration {
         BufferedReader input;
         String classJar =
                 Configuration.class.getResource("/MainTotemGame.class").toString();
+
         if (classJar.startsWith("jar:")) {
             InputStream in;
+            System.err.println("Here"+classJar);
+
             in = Configuration.class.getResourceAsStream(DIRECTORY+"standardSettings.txt");
+            System.err.println("Here");
+
             input = new BufferedReader(new InputStreamReader(in));
+            System.err.println("Here");
+
         }else {
             try {
                 input = new BufferedReader(new FileReader(DIRECTORY+"standardSettings.txt"));
             } catch (FileNotFoundException e) {
+                System.err.println("Can't read standard settings. Life is pain(");
                 throw new RuntimeException("Can't read standard settings. Life is pain(");
             }
         }
+
         String line;
         try {
             line = input.readLine();

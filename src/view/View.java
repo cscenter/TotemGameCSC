@@ -1,6 +1,7 @@
 package view;
 
 import controller.BasicClient;
+import controller.MyClient;
 import controller.TotemClient;
 import utils.Configuration;
 
@@ -418,6 +419,6 @@ public class View{
 	}
     public View(){
         cardsView = new CardsView();
-        client = new BasicClient(startView(), cardsView.getCardsNumbers());
+        client = new MyClient(startView(), cardsView.getCardsNumbers());
     }
 }
