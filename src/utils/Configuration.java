@@ -22,7 +22,7 @@ public class Configuration {
         return localInstance;
     }
     private static final int PORT = 6923;
-    private static final String DIRECTORY = "data/";
+    private static String DIRECTORY = "data/";
     private static final String SERVER_IP = "127.0.0.1";
     private static final int MAX_NUMBER_OF_PLAYERS=15;
     private static int timeToWait=1000;
@@ -32,6 +32,9 @@ public class Configuration {
     private static ArrayList<Character> peopleOpenKeys;
     private static ArrayList<Character> peopleCatchKeys;
 
+    public static void ChangeDir(String newDir){
+        DIRECTORY = newDir;
+    }
     public static int getMaxNumberOfPlayers(){
         return MAX_NUMBER_OF_PLAYERS;
     }
@@ -68,17 +71,12 @@ public class Configuration {
         BufferedReader input;
         String classJar =
                 Configuration.class.getResource("/MainTotemGame.class").toString();
-        System.err.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        System.err.println(classJar);
         if (classJar.startsWith("jar:")) {
             InputStream in;
-            System.err.println("Here"+classJar);
 
             in = Configuration.class.getResourceAsStream(DIRECTORY+"standardSettings.txt");
-            System.err.println("Here");
 
             input = new BufferedReader(new InputStreamReader(in));
-            System.err.println("Here");
 
         }else {
             try {

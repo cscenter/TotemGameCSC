@@ -15,7 +15,7 @@ public class MainTotemGame {
     public static void main(String[] args){
         int i = 0;
         if (args.length ==0){
-            new MyServer(); //GraphicsView(); //.run();
+            new GraphicsView(); //.run();
         }else{
             switch (args[0].charAt(0)){
                 case '1':
@@ -24,8 +24,16 @@ public class MainTotemGame {
                 case '4':
                     new MyServer();
                     break;
+                case '0':
+                    new GraphicsView();
+                    break;
+
                 default:
+
                     (new View()).run();
+            }
+            if (args.length==2){
+                Configuration.ChangeDir(args[1]);
             }
         }
     }
