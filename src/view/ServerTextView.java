@@ -1,21 +1,25 @@
 package view;
 
-import controller.BasicClient;
 import controller.MyClient;
 import controller.TotemClient;
+import model.Game;
 import utils.Configuration;
 
-import java.util.*;
-import java.util.regex.*;
-
-import model.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Класс, отвечающий за работу с игроками
+ * Created by lavton on 22.03.14.
  */
-public class View{
-//    private Game myGame;
+public class ServerTextView {
+    //    private Game myGame;
     private TotemClient client;
+    Object lock;
+    Game.WhatPlayerDid lastAction;
+    int thisPlayer;
     /**
      * во время запуска инициализируем playersView, потом game а потом уже запускаем саму игру
      */
@@ -23,20 +27,20 @@ public class View{
     /**
      * Поля, которые нужно знать graphics.View о игроках
      */
-	private class PlayerView{
-		public char openCardKey;
-		public char catchTotemKey;
+    private class PlayerView{
+        public char openCardKey;
+        public char catchTotemKey;
         public String playerViewName; //что делать с дублированием имени в graphics.PlayerView и Player?
         public PlayerView(char newOpenCardKey, char newCatchTotemKey, String name){
             openCardKey = newOpenCardKey;
             catchTotemKey = newCatchTotemKey;
             playerViewName = name;
         }
-	}
-	ArrayList <PlayerView> playersView;
+    }
+    ArrayList<PlayerView> playersView;
 
     private class CardsView {
-//        private ArrayList <File> cards;
+        //        private ArrayList <File> cards;
         private ArrayList<String> cards;
         public CardsView(){
             cards = Configuration.getGallery().getCardsNames();
@@ -57,15 +61,15 @@ public class View{
         }
     }
     private CardsView cardsView;
- /**
- * ввести число игроков, а так же кнопки управления
- * по умолчанию:
- * 4 игрока, клавиши
- * q, w
- * e, r
- * t, y
- * u, i
-*/
+    /**
+     * ввести число игроков, а так же кнопки управления
+     * по умолчанию:
+     * 4 игрока, клавиши
+     * q, w
+     * e, r
+     * t, y
+     * u, i
+     */
     private char getNewChar(String inputMessage, String errorOutputMessage){
         String inputString;
         char inputChar;
@@ -182,7 +186,7 @@ public class View{
         }
 
     }
-	private ArrayList<String> startView(){
+    private ArrayList<String> startView(){
         ArrayList <String> rezultStrings = new ArrayList<>();
         boolean flag = true;
         int numberOfPeople = 4;
@@ -200,8 +204,8 @@ public class View{
                     notDefaultSettings(rezultStrings);
                     break;
                 default:
-                        System.out.println("What are you doing?? Try once more!");
-                }
+                    System.out.println("What are you doing?? Try once more!");
+            }
         } while ((flag));
 
         /*показываем то, что получаем в итоге*/
@@ -211,8 +215,8 @@ public class View{
             System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
                     p.playerViewName, p.openCardKey, p.catchTotemKey);
         }
-		return rezultStrings;
-	}
+        return rezultStrings;
+    }
 
     void printInformationAboutRound(){
         System.out.printf("name:            ");
@@ -287,6 +291,105 @@ public class View{
             String inputString;
             Scanner scan = new Scanner(System.in);
             char inputChar;
+            printInformationAboutRound();
+            System.out.printf("insert key:\n");
+            try {
+                inputString = scan.nextLine();
+                inputChar = inputString.charAt(0);
+                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.printf("You can't use empty string!\n");
+                continue;
+            }
+            boolean suchKeyHere = false;
+            Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+            int whoPlayed = 0;
+            for (int i = 0; i < client.getPlayersCount(); i++){
+                if (playersView.get(i).openCardKey == inputChar){
+                    resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
+                }
+                if (playersView.get(i).catchTotemKey == inputChar){
+                    resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                    suchKeyHere = true;
+                    whoPlayed = i;
+                    break;
+                }
+            }
+            if (!(suchKeyHere)){
+                System.out.println("Nobody have such key. Try again.\n");
+                continue;
+            }
+            switch (resultOfMakeMove){
+                case INCORRECT:
+                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_CORRECT:
+                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_INCORRECT:
+                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case CARD_OPENED:
+
+                    System.out.printf("%s open next card\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case NOT_DEFINED_CATCH:
+                    ArrayList <Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
+                    if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+                        label:
+                        do{
+                            inputChar = getNewChar("You catch totem while there were a duel with you AND card 'arrows in'. Do you" +
+                                    "want to use effect of won duel or of card? type (D/C)", "Try again!");
+                            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+                            switch (inputChar){
+                                case 'd':
+                                    if (possibleLosers.size() == 1){
+                                        System.out.printf("All cards go to your opponent, %s\n", client.getPlayer(possibleLosers.get(0)));
+                                        client.afterDuelMakeMove(whoPlayed, possibleLosers.get(0));
+                                    }
+                                    break label;
+                                case 'c':
+                                    System.out.println("You put all cards under totem");
+                                    client.arrowsInMakeMove(whoPlayed);
+                                    break label;
+                                default:
+                                    System.out.println("try again");
+                            }
+                        }while (true);
+                    }
+                    int looser = chooseOneOfPlayers(possibleLosers);
+                    client.afterDuelMakeMove(whoPlayed,looser);
+                    System.out.printf("All cards go to your opponent, %s\n", client.getPlayer(looser).getName());
+                    break;
+                case ALL_CARDS_OPENED:
+                    System.out.println("All players will open top cards. To do this, press Enter");
+                    scan.nextLine();
+                    client.openAllTopCards();
+                default:
+            }
+
+//            }while (!(myGame.isRoundEnded));
+        }
+        for (int i = 0; i < client.getPlayersCount(); i++){
+            if (client.getPlayer(i).getCardsCount() == 0){
+                System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
+            }
+        }
+    }
+    private class ToServer extends Thread{
+        @Override
+        public void run(){
+            while (!(client.isGameEnded())){
+                String inputString;
+                Scanner scan = new Scanner(System.in);
+                char inputChar;
                 printInformationAboutRound();
                 System.out.printf("insert key:\n");
                 try {
@@ -297,18 +400,20 @@ public class View{
                     System.out.printf("You can't use empty string!\n");
                     continue;
                 }
-            boolean suchKeyHere = false;
+                boolean suchKeyHere = false;
                 Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
                 int whoPlayed = 0;
                 for (int i = 0; i < client.getPlayersCount(); i++){
                     if (playersView.get(i).openCardKey == inputChar){
-                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        lastAction = Game.WhatPlayerDid.OPEN_NEW_CARD;
+                        client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
                     }
                     if (playersView.get(i).catchTotemKey == inputChar){
-                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        lastAction = Game.WhatPlayerDid.TOOK_TOTEM;
+                        client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
@@ -318,6 +423,25 @@ public class View{
                     System.out.println("Nobody have such key. Try again.\n");
                     continue;
                 }
+
+//            }while (!(myGame.isRoundEnded));
+            }
+            for (int i = 0; i < client.getPlayersCount(); i++){
+                if (client.getPlayer(i).getCardsCount() == 0){
+                    System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
+                }
+            }
+
+        }
+    }
+
+    private class FromServer extends Thread{
+        @Override
+        public void run(){
+            while (!(client.isGameEnded())){
+                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+                int whoPlayed = thisPlayer;
+                char inputChar = 0;
                 switch (resultOfMakeMove){
                     case INCORRECT:
                         System.out.printf("It's not your turn, %s. Don't hurry!\n",
@@ -366,21 +490,26 @@ public class View{
                         break;
                     case ALL_CARDS_OPENED:
                         System.out.println("All players will open top cards. To do this, press Enter");
+                        Scanner scan = new Scanner(System.in);
                         scan.nextLine();
                         client.openAllTopCards();
                     default:
                 }
 
 //            }while (!(myGame.isRoundEnded));
-        }
-        for (int i = 0; i < client.getPlayersCount(); i++){
-            if (client.getPlayer(i).getCardsCount() == 0){
-                System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
             }
+            for (int i = 0; i < client.getPlayersCount(); i++){
+                if (client.getPlayer(i).getCardsCount() == 0){
+                    System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
+                }
+            }
+
         }
-	}
-   public View(){
+    }
+    public ServerTextView(){
         cardsView = new CardsView();
         client = new MyClient(startView(), cardsView.getCardsNumbers());
+        thisPlayer = ((MyClient) client).getWhatPlayer();
     }
+
 }

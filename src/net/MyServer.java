@@ -17,7 +17,7 @@ public class MyServer {
     private LinkedList<Socket> clients;
     private LinkedList<InputStream> clientInput;
     private LinkedList<OutputStream> clientOutput;
-    private Queue<Integer> comands;
+    private Queue<Byte> comands;
     public MyServer(){
         clientOutput = new LinkedList<>();
         clients = new LinkedList<>();
@@ -46,15 +46,21 @@ public class MyServer {
             byte cardSeed = (byte)((new Random()).nextInt());
 
             //пересылаем это всем
-            for (OutputStream os : clientOutput){
+            //+ кто каким ходит??
+            for (byte i = 0; i < clientOutput.size(); i++){
+                OutputStream os = clientOutput.get(i);
+                os.write(firstPlayer);
+                os.write(cardSeed);
+                os.write(i);
+                os.flush();
+
+            }
+/*            for (OutputStream os : clientOutput){
                 os.write(firstPlayer);
                 os.write(cardSeed);
                 os.flush();
-            }
+            }*/
 
-            for (Socket socket : clients){
-                socket.close();
-            }
         }catch (Exception e){
             e.printStackTrace();
         }

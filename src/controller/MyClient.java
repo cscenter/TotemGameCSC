@@ -5,7 +5,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import utils.*;
@@ -13,12 +15,22 @@ import model.*;
 import view.*;
 
 public class MyClient implements  TotemClient{
-    Game myGame;
-    Socket socket;
-    InputStream inputStream;
-    OutputStream outputStream;
+    private Game myGame;
+    private Socket socket;
+    private InputStream inputStream;
+    private OutputStream outputStream;
+    private boolean isHasServerAnswer;
+    private Queue<Byte> comands;
+    private Queue<Integer> whoDid;
+    private Queue<Game.WhatPlayerDid> whatDid;
+
+    private int whatPlayer;
+    public int getWhatPlayer(){
+        return whatPlayer;
+    }
     public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         String ip = Configuration.getServerIp();
+        comands = new SynchronousQueue<>();
         int port = Configuration.getPort();
         try{
             socket= new Socket(ip, port);
@@ -27,6 +39,7 @@ public class MyClient implements  TotemClient{
             String outputStr;
             int firstPlayer = inputStream.read();
             int cardSeed = inputStream.read();
+            whatPlayer = inputStream.read();
             myGame = new Game(playersNames,cardNumbers, firstPlayer, cardSeed);
         }catch(UnknownHostException e){e.printStackTrace();}
         catch(IOException e){e.printStackTrace();}
@@ -43,6 +56,11 @@ public class MyClient implements  TotemClient{
     @Override
     public Player getPlayer(int i) {
         return myGame.getPlayer(i);
+    }
+
+    @Override
+    public boolean haveWeGotAnswer() {
+        return isHasServerAnswer;
     }
 
     @Override
@@ -80,7 +98,6 @@ public class MyClient implements  TotemClient{
     public Game.GameMode getGameMode() {
         return myGame.getGameMode();
     }
-
     @Override
     public void afterDuelMakeMove(int winner, int looser) {
         myGame.afterDuelMakeMove(winner, looser);
@@ -94,5 +111,49 @@ public class MyClient implements  TotemClient{
     @Override
     public void openAllTopCards() {
         myGame.openAllTopCards();
+    }
+    private class ToServer extends Thread{
+        @Override
+        public void run(){
+
+        }
+    }
+    private class ToClient extends Thread{
+        public void getInformationFromServer(){
+            try{
+                String outputStr;
+                int length;
+                int res;
+                boolean isReading=false;
+                while (true){
+                    length = (inputStream.read());
+                    for (int i=0; i<length; i++){
+                        res=inputStream.read();
+                        comands.add((byte)(res));
+                    }
+                }
+            }catch(UnknownHostException e){e.printStackTrace();}
+            catch(IOException e){e.printStackTrace();}
+            decodeCommands();
+}
+
+        @Override
+        public void run(){
+
+
+        }
+    }
+    private void decodeCommands(){
+        whoDid.clear();
+        whatDid.clear();
+        while (!comands.isEmpty()){
+            byte current=comands.remove();
+            whoDid.add(current/2);
+            if (current-(current/2)*2==0){
+                whatDid.add(Game.WhatPlayerDid.TOOK_TOTEM);
+            }else {
+                whatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
+            }
+        }
     }
 }

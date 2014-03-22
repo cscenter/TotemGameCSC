@@ -12,6 +12,7 @@ import model.*;
 public interface TotemClient {
     public int getPlayersCount();
     public Player getPlayer(int i);
+    public boolean haveWeGotAnswer();
     public Game.Totem getTotem();
     public int getPlayerWhoWillGo();
     public int getTurnNumber();
