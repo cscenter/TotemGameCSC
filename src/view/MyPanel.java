@@ -1,3 +1,6 @@
+package view;
+import model.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,15 +13,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
+import utils.*;
 
 public class MyPanel extends JPanel {
-    private Game myGame;
+    private model.Game myGame;
     private int panel_size;
     private boolean allOpenFlag;
     private boolean catchTotemModeFlag;
     private boolean multyDuelFlag;
     private int whoPlayed;
-    private DataDownloader dataDownloader;
     private String message;
     private int mesOk;
     private int typeTotem;
@@ -29,15 +32,15 @@ public class MyPanel extends JPanel {
     private ArrayList<CardView> cardsView;
     private Graphics g;
     public class TotemView{
-        private Game.Totem totem;
+        private model.Game.Totem totem;
         private int totemRad;
         private int xCoord;
         private int yCoord;
-        public TotemView (Game.Totem totem1){
+        public TotemView (model.Game.Totem totem1){
             totem = totem1;
         }
         public void clearD(Graphics g){
-             g.clearRect(xCoord-CardView.getCardSize()/2-panel_size/10 - 45, yCoord-CardView.getCardSize()/2-panel_size/20,
+             g.clearRect(xCoord- CardView.getCardSize()/2-panel_size/10 - 45, yCoord- CardView.getCardSize()/2-panel_size/20,
                   (int)(CardView.getCardSize()*2.5) + 45, CardView.getCardSize()+panel_size/10 + 120);
 
         }
@@ -59,7 +62,7 @@ public class MyPanel extends JPanel {
                 g.clearRect(0, panel_size/30 , 800, 30);
             }
             String cardsCount = String.valueOf(totem.getCardsCount());
-          // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
+          // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-graphics.CardView.getCardSize()/2+panel_size/60, yCoord+graphics.CardView.getCardSize()/2+panel_size/30);
             
               g.fill3DRect(10, 10, 10, 10, allOpenFlag);
               if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.png")), xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
@@ -71,9 +74,14 @@ public class MyPanel extends JPanel {
                   g.drawImage(ImageIO.read(new File("data/totemR.png")), xCoord - totemRad*4 + 20, yCoord - totemRad*2, null);
                   typeTotem = 0;
               }
+<<<<<<< HEAD:src/MyPanel.java
               Font font = new Font("Tahoma", Font.BOLD, 15);
               g.setFont(font);
              g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 +10, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
+=======
+
+             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord- CardView.getCardSize()/2+panel_size/60 - 3, yCoord+ CardView.getCardSize()/2+panel_size/30 + 40);
+>>>>>>> bdd3c5892466fada983112f7c32f41e44b334e15:src/view/MyPanel.java
 
         }
         public boolean isIn(Point p){
@@ -195,15 +203,14 @@ public class MyPanel extends JPanel {
     }
 
     //вместо конструктора
-    public void initiation(DataDownloader dd, Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
+    public void initiation(Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
         myGame = game;
-        dataDownloader = dd;
         playersView = new ArrayList<>(ktKeys.size());
         cardsView = new ArrayList<>();
         for (int i=0; i<400; i++){//Как сделать нормально?
             cardsView.add(null);
         }
-        for (String cardI : dataDownloader.getCardsNames()){
+        for (String cardI : Configuration.getGallery().getCardsNames()){
             Pattern numberPattern = Pattern.compile("[0-9]+");
             Matcher numberMatcher = numberPattern.matcher(cardI);
             numberMatcher.find();
@@ -216,7 +223,7 @@ public class MyPanel extends JPanel {
                     ClassLoader cl = MyPanel.class.getClassLoader();
 
 //                    Image image = (new ImageIcon(cl.getResource(cardI))).getImage();
-                    CardView cardView = new CardView(cl, card, dataDownloader.getImage(cardI), num);
+                    CardView cardView = new CardView(cl, card, Configuration.getGallery().getImage(cardI), num);
                     cardsView.set(num, cardView);
                     break;
                 }

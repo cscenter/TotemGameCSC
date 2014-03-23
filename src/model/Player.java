@@ -1,3 +1,4 @@
+package model;
 import java.util.*;
 
 /**
@@ -5,7 +6,7 @@ import java.util.*;
  * у него есть имя.
  * и открытые и закрытые карты
  */
-class Player
+public class Player
 {
     private LinkedList<Card> openedCards, closedCards;
     private String name;

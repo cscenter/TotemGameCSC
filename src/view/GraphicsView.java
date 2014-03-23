@@ -1,12 +1,18 @@
+package view;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import model.*;
+import utils.*;
 
 /**
  * Класс, отвечающий за работу с игроками
  * В графическом режиме
  */
-class GraphicsView extends JFrame{
+public class GraphicsView extends JFrame{
     private Game myGame;
     private static int FRAME_SIZE;
     private MyPanel myPanel;
@@ -40,32 +46,17 @@ class GraphicsView extends JFrame{
         }while(true);
         return inputChar;
     }
-    private void defaultSettings(ArrayList <String> rezultStrings){
-        char inputOpenCardKey;
-        char inputCatchTotemKey;
-        int numberOfPeople = 4;
-//        inputOpenCardKey = 'q';
-//        inputCatchTotemKey = 'w';
-//        myPanel.playersView.ensureCapacity(numberOfPeople);
-    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Vasya", 0.0));
-        rezultStrings.add("Vasya");
-
-//        inputOpenCardKey = 'e';
-//        inputCatchTotemKey = 'r';
-  //      myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Petya", 90.0));
-        rezultStrings.add("Petya");
-
-//        inputOpenCardKey = 't';
-  //      inputCatchTotemKey = 'y';
-    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Gosha", 180.0));
-        rezultStrings.add("Gosha");
-
-//        inputOpenCardKey = 'u';
-  //      inputCatchTotemKey = 'i';
-    //    myPanel.playersView.add(myPanel.initPlayerView(inputOpenCardKey, inputCatchTotemKey, "Manya", 270.0));
-        rezultStrings.add("Manya");
-//        myPanel.repaint();
+    private void defaultSettings(ArrayList <String> names, ArrayList <Character> openKeys, ArrayList<Character> catchKeys,
+                                 ArrayList<Double> angles){
+        for (int i=0; i< Configuration.getNumberOfPlayers(); i++){
+            names.add(Configuration.getPeopleNames().get(i));
+            openKeys.add(Configuration.getPeopleOpenKeys().get(i));
+            catchKeys.add(Configuration.getPeopleCatchKeys().get(i));
+            angles.add(360.0*i/Configuration.getNumberOfPlayers());
+                    }
     }
+
+
     private int setNumberOfPlayers(){
         int numberOfPeople;
         Scanner scan = new Scanner(System.in);
@@ -115,7 +106,7 @@ class GraphicsView extends JFrame{
                     inputOpenCardKey = inputString.charAt(0);
                     Character tmp = inputOpenCardKey;
                     inputOpenCardKey = tmp.toString().toLowerCase().charAt(0);
-  /*                  for (PlayerView p : myPanel.playersView){
+  /*                  for (graphics.PlayerView p : myPanel.playersView){
                         if ((inputOpenCardKey == p.getCatchTotemKey()) || (inputOpenCardKey == p.getOpenCardKey())){
                             System.out.printf("player %s already use this key. Try another one\n", p.getPlayerName());
                             continue label;
@@ -141,7 +132,7 @@ class GraphicsView extends JFrame{
                         System.out.println("you already use this key for key that open last card! try another key");
                         continue;
                     }
-                    for (PlayerView p : myPanel.playersView){
+                    for (graphics.PlayerView p : myPanel.playersView){
                         if ((inputCatchTotemKey == p.catchTotemKey) || (inputCatchTotemKey == p.openCardKey)){
                             System.out.printf("player %s already use this key. Try another one\n", p.playerViewName);
                             continue label;
@@ -159,8 +150,9 @@ class GraphicsView extends JFrame{
         }
 
     }
-    private ArrayList<String> startView(){
-        ArrayList <String> rezultStrings = new ArrayList<>();
+    private ArrayList<String> startView(ArrayList <Character> openKeys, ArrayList<Character> catchKeys,
+                                        ArrayList<Double> angles){
+        ArrayList <String> names = new ArrayList<>();
         boolean flag = true;
         int numberOfPeople = 4;
         do{
@@ -170,11 +162,11 @@ class GraphicsView extends JFrame{
             switch (inputChar.toString().toUpperCase().charAt(0)){ /* использовать параметры по умолчанию?*/
                 case 'Y':           /*да*/
                     flag = false;
-                    defaultSettings(rezultStrings);
+                    defaultSettings(names,openKeys, catchKeys, angles);
                     break;
                 case 'N':               /*нет*/
                     flag = false;
-                    notDefaultSettings(rezultStrings);
+                    notDefaultSettings(names);
                     break;
                 default:
                     System.out.println("What are you doing?? Try once more!");
@@ -184,11 +176,11 @@ class GraphicsView extends JFrame{
         /*показываем то, что получаем в итоге*/
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
-//        for (PlayerView p : myPanel.playersView){
+//        for (graphics.PlayerView p : myPanel.playersView){
   //          System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
     //                p.playerViewName, p.openCardKey, p.catchTotemKey);
       //  }
-        return rezultStrings;
+        return names;
     }
 
     int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
@@ -224,33 +216,20 @@ class GraphicsView extends JFrame{
 
     }
     public GraphicsView(){
+        ArrayList <Character> openKeys = new ArrayList<>();
+        ArrayList<Character> catchKeys = new ArrayList<>();
+        ArrayList<Double> angles = new ArrayList<>();
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
         (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
-        DataDownloader dataDownloader = new DataDownloader();
-        myGame = new Game(startView(), CardView.getCardsNumbers(dataDownloader));
+
+        //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу
+        ArrayList<String> names = new ArrayList<>();
+        defaultSettings(names, openKeys, catchKeys, angles);
+        myGame = new Game(names, CardView.getCardsNumbers());
+        //myGame = new Game(startView(openKeys, catchKeys, angles), graphics.CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();
-        ArrayList<Character> kt = new ArrayList<>(4);
-        kt.add('w');
-        kt.add('r');
-        kt.add('y');
-        kt.add('i');
-        ArrayList<Character> oc = new ArrayList<>(4);
-        oc.add('q');
-        oc.add('e');
-        oc.add('t');
-        oc.add('u');
-        ArrayList<Double> an = new ArrayList<>(4);
-        an.add(0.0);
-        an.add(90.0);
-        an.add(180.0);
-        an.add(270.0);
-        myPanel.initiation(dataDownloader, myGame, kt, oc, an);
-//        for (int i=0; i<myPanel.playersView.size(); i++){
-  //          myPanel.playersView.get(i).connectWithInfo(myGame.getPlayer(i));
-    //    }
-//        myPanel.myGame = this.myGame;
-      //  myPanel.initTotemV();
+        myPanel.initiation(myGame, catchKeys, openKeys, angles);
         add(myPanel);
         pack();
         addKeyListener(myPanel.initMyKeyListener());

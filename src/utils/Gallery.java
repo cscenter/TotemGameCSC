@@ -1,3 +1,5 @@
+package utils;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.*;
@@ -10,18 +12,17 @@ import java.util.regex.Pattern;
 /**
  * Created by lavton on 02.03.14.
  */
-public class DataDownloader {
-    public static final String DIRECTORY = "data/";
+public class Gallery {
     private ArrayList<String> cardsNames;
     private HashMap<String, Image> resources;
 
     public Image getImage(String name){
         return  resources.get(name);
     }
-    public DataDownloader(){
+    public Gallery(){
         resources = new HashMap<>(100);
         cardsNames = new ArrayList<>(100);
-        ClassLoader cl = DataDownloader.class.getClassLoader();
+        ClassLoader cl = Gallery.class.getClassLoader();
         ArrayList<String> imgNames = getCardsNames();
         for (String imgName : imgNames){
             Image image;
@@ -29,34 +30,33 @@ public class DataDownloader {
             try {
                 image = ImageIO.read(url);
             } catch (IOException e) {
-                throw new RuntimeException("AAA");
+                throw new RuntimeException("can't read images!");
             }
             resources.put(imgName, image);
         }
     }
 
     public ArrayList<String> getCardsNames(){
-
         if (cardsNames.isEmpty()){
             BufferedReader input;
             String classJar =
-                    DataDownloader.class.getResource("/DataDownloader.class").toString();
+                    Gallery.class.getResource("/MainTotemGame.class").toString();
             if (classJar.startsWith("jar:")) {
                 InputStream in;
-                in = DataDownloader.class.getResourceAsStream(DIRECTORY+"listOfCards.txt");
+                in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfCards.txt");
                 input = new BufferedReader(new InputStreamReader(in));
             }else {
                 try {
-                    input = new BufferedReader(new FileReader(DIRECTORY+"listOfCards.txt"));
+                    input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfCards.txt"));
                 } catch (FileNotFoundException e) {
-                    throw new RuntimeException("AAA");
+                    throw new RuntimeException("can't read names of images");
                 }
             }
             String line;
             try {
                 while ((line = input.readLine()) != null) {
     //                System.err.println(line);
-                    cardsNames.add(DIRECTORY+line);
+                    cardsNames.add(Configuration.getDirectory()+line);
       //              result.add(getCardNumber(line));
 
                 }

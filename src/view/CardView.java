@@ -1,18 +1,13 @@
-import javax.imageio.ImageIO;
+package view;
+
 import java.awt.*;
-import java.io.File;
-import java.io.*;
-import java.net.URL;
-import java.security.CodeSource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import model.Card;
+import utils.*;
 
 public class CardView{
-    public static final String DIRECTORY = "data/";
     private static int cardSize;
     public static int getCardSize(){
         return cardSize;
@@ -34,9 +29,9 @@ public class CardView{
     public int getId(){
         return id;
     }
-    public static ArrayList<Integer> getCardsNumbers(DataDownloader dd){
+    public static ArrayList<Integer> getCardsNumbers(){
         ArrayList<Integer> result = new ArrayList<>();
-        ArrayList<String> cardsNames = dd.getCardsNames();
+        ArrayList<String> cardsNames = Configuration.getGallery().getCardsNames();
         for (String cardName : cardsNames){
             result.add(getCardNumber(cardName));
         }
@@ -52,7 +47,7 @@ public class CardView{
     public static void resize(int haracteristicScale) {
         cardSize = haracteristicScale / 10;
     }
-//    public CardView getCardView(Card card){
+//    public graphics.CardView getCardView(Card card){
 //      return
 //}
 }

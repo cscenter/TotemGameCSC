@@ -1,3 +1,8 @@
+import controller.MyClient;
+import view.*;
+import net.MyServer;
+import utils.Configuration;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anton
@@ -8,7 +13,6 @@
 
 public class MainTotemGame {
     public static void main(String[] args){
-        System.out.print("!");
         int i = 0;
         if (args.length ==0){
             new GraphicsView(); //.run();
@@ -17,20 +21,19 @@ public class MainTotemGame {
                 case '1':
                     (new View()).run();
                     break;
-                case '2':
-                    new GraphicsView();
-                    break;
-                case '3':
-                    new ServerView();
-                    break;
                 case '4':
                     new MyServer();
                     break;
-                case '5':
-                    new MyClient("127.0.0.1");
+                case '0':
+                    new GraphicsView();
                     break;
+
                 default:
+
                     (new View()).run();
+            }
+            if (args.length==2){
+                Configuration.ChangeDir(args[1]);
             }
         }
     }

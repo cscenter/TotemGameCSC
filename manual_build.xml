@@ -5,6 +5,7 @@
     <property name="build" location="${basedir}/out"/>
     <property name="data.dir" location="${basedir}/data"/>
     <property name="build.classes" location="${basedir}/out/production/TotemGame"/>
+    <property name="delete.dir" location="${basedir}/out"/>
 <!--    <path id="libs.dir">  -->
 <!--        <fileset dir="lib" includes="**/*.jar"/>  -->
 <!--    </path>  -->
@@ -40,7 +41,7 @@
     <!-- Очистка -->
     <target name="clean" description="Removes all temporary files">
         <!-- Удаление файлов -->
-        <delete dir="${build.classes}"/>
+        <delete dir="${delete.dir}"/>
     </target>
      <target name="run">
         <java jar="Totem.jar" fork="true"/>

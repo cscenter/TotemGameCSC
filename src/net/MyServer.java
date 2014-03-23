@@ -1,30 +1,41 @@
+package net;
+
 import java.net.ServerSocket.*;
 import java.net.Socket.*;
 import java.net.*;
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import utils.*;
 
 public class MyServer {
-    public int whoDidThis;
-    public int whatHeDid;
-    int numberOfPl = 1;
-    LinkedList<Socket> clients;
-    LinkedList<InputStream> clientInput;
-    LinkedList<OutputStream> clientOutput;
-    Queue<Integer> comands;
-    public static final int port = 6923;
-
+    private int whoDidThis;
+    private int whatHeDid;
+    private int numberOfPl = 1;
+    private LinkedList<Socket> clients;
+    private LinkedList<InputStream> clientInput;
+    private LinkedList<OutputStream> clientOutput;
+    private Queue<Byte> comands;
     public MyServer(){
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        clientOutput = new LinkedList<>();
+        clients = new LinkedList<>();
+        clientInput = new LinkedList<>();
+        comands = new SynchronousQueue<>();
+        initServer();
+    }
+    private void initServer(){
+        try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
             for (int i=0; i<numberOfPl; i++){
-                try (Socket socket = serverSocket.accept()) {
+                try {
+                    Socket socket = serverSocket.accept();
                     clients.add(socket);
                     InputStream inputStream = socket.getInputStream();
                     clientInput.add(inputStream);
                     clientOutput.add(socket.getOutputStream());
+
                 }catch (Exception e){
                     throw e;
                 }
@@ -35,13 +46,24 @@ public class MyServer {
             byte cardSeed = (byte)((new Random()).nextInt());
 
             //пересылаем это всем
-            for (OutputStream os : clientOutput){
+            //+ кто каким ходит??
+            for (byte i = 0; i < clientOutput.size(); i++){
+                OutputStream os = clientOutput.get(i);
+                os.write(firstPlayer);
+                os.write(cardSeed);
+                os.write(i);
+                os.flush();
+
+            }
+/*            for (OutputStream os : clientOutput){
                 os.write(firstPlayer);
                 os.write(cardSeed);
                 os.flush();
-            }
+            }*/
+
         }catch (Exception e){
             e.printStackTrace();
         }
+
     }
 }

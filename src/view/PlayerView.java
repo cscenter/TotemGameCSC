@@ -1,3 +1,7 @@
+package view;
+import model.*;
+import utils.*;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +52,7 @@ public class PlayerView{
 
 
     public boolean isIn(Point p){
-        if ((p.getX()<xCoordinate+CardView.getCardSize())&&(p.getX()>xCoordinate-CardView.getCardSize())){
+        if ((p.getX()<xCoordinate+CardView.getCardSize())&&(p.getX()>xCoordinate- CardView.getCardSize())){
             if ((p.getY()<yCoordinate+CardView.getCardSize()+40)&&(p.getY()>yCoordinate-40)){
                 return true;
             }
