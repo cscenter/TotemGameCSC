@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -21,6 +22,9 @@ public class MyPanel extends JPanel {
     private String message;
     private int mesOk;
     private int typeTotem;
+    private int xMes;
+    private int pos;
+    private Timer timer;
 
     private ArrayList<CardView> cardsView;
     private Graphics g;
@@ -38,32 +42,38 @@ public class MyPanel extends JPanel {
 
         }
         public void drawTotem(Graphics g) throws IOException{
-            clearD(g);
+            //clearD(g);
             if (mesOk == 1){
-                g.clearRect(10, panel_size/30 , 500, 30);
+               g.clearRect(0, panel_size/30 , 800, 30);
+                Font font = new Font("Arial", Font.BOLD, 15);
+                Font oldFont = g.getFont();
                g.setColor(Color.red);
-               g.drawChars(message.toCharArray(), 0, message.length(), 20, panel_size/30 + 20); 
+               g.setFont(font);
+               message += xMes;
+               g.drawChars(message.toCharArray(), 0, message.length(), 20 + xMes, panel_size/30 + 15 ); 
                mesOk = 0;
+               g.setFont(oldFont);
                g.setColor(Color.BLACK);
             } 
             else{
-                g.clearRect(10, panel_size/30 , 500, 30);
+                g.clearRect(0, panel_size/30 , 800, 30);
             }
             String cardsCount = String.valueOf(totem.getCardsCount());
           // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60, yCoord+CardView.getCardSize()/2+panel_size/30);
             
               g.fill3DRect(10, 10, 10, 10, allOpenFlag);
-              if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+              if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.png")), xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
               if (typeTotem == 1){
-                  g.drawImage(ImageIO.read(new File("data/totemW.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+                  g.drawImage(ImageIO.read(new File("data/totemW.png")), xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
                   typeTotem = 0;
               }
               if (typeTotem == 2){
-                  g.drawImage(ImageIO.read(new File("data/totemR.jpg")), xCoord - totemRad*4, yCoord - totemRad*2, null);
+                  g.drawImage(ImageIO.read(new File("data/totemR.png")), xCoord - totemRad*4 + 20, yCoord - totemRad*2, null);
                   typeTotem = 0;
               }
-
-             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 - 3, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
+              Font font = new Font("Tahoma", Font.BOLD, 15);
+              g.setFont(font);
+             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 +10, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
 
         }
         public boolean isIn(Point p){
@@ -72,7 +82,8 @@ public class MyPanel extends JPanel {
 
         public void resize(int haracteristicScale) {
             totemV.totemRad = (int)(haracteristicScale/50.5);
-            totemV.xCoord = totemV.yCoord = (int)(haracteristicScale/2.2);
+            totemV.yCoord = (int)(haracteristicScale/2.2);
+            totemV.xCoord = totemV.yCoord + 50;
         }
     }
     private TotemView totemV;
@@ -93,6 +104,13 @@ public class MyPanel extends JPanel {
         this.g = g;
         //убрать с консоли всё
         reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
+        
+        try {
+            g.drawImage(ImageIO.read(new File("data/b1.png")), 0, 0, panel_size+25, panel_size, null);//MyPanel.HEIGHT, MyPanel.WIDTH, null );
+           // g.draw
+        } catch (IOException ex) {
+            Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
       try {
             totemV.drawTotem(g);
         } catch (IOException ex) {
@@ -120,12 +138,53 @@ public class MyPanel extends JPanel {
         g.clearRect(0,0,panel_size, 20);
         String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).getPlayerName()+"'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
+        int all = myGame.getPlayersCount();
+        int x1 = myGame.getPlayer((all - 1 + myGame.getPlayerWhoWillGo())%all).getXCoordinate(),
+            y1 = myGame.getPlayer((all - 1 + myGame.getPlayerWhoWillGo())%all).getYCoordinate(), 
+            x2 = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate(),
+            y2 = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(); 
+       float t = (float)2./5;
+        float x,y;
+        while(t<(float)3./5){
+           x = t*x1 + (1-t)*x2;
+           y = t*y1 + (1-t)*y2;
+           g.setColor(Color.red);
+          // g.fillRect((int)x, (int)y, 20, 20);
+            /*try {
+                //g.drawString(g.getClip()+"", 10, 30);
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
+           
+            //MyPanel.this.repaint(100);
+           //g.clearRect((int)x, (int)y, 20, 20);
+           t = t + (float)(1./20);
+        }       
+        int plWhoGo = 0;
+        for (int i =0; i < myGame.getPlayersCount(); i++){
+            if (myGame.getPlayer(i).isGO()) plWhoGo = i;
+            myGame.getPlayer(i).setGo(false);
+            
+        }   
+        myGame.getPlayer(myGame.getPlayerWhoWillGo()).setGo(true);
         try {
-            g.drawImage(ImageIO.read(new File("data/tboy_go1.jpg")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
+           /* if(plWhoGo%4 == 1)
+                g.drawImage(ImageIO.read(new File("data/arrow_u.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()+150, 100, 200, null);
+            if(plWhoGo%4 == 2)
+                g.drawImage(ImageIO.read(new File("data/arrow_u.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() + 100, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), 100, 200, null);
+            if(plWhoGo%4 == 3)
+                g.drawImage(ImageIO.read(new File("data/arrow_d.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() , myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-200, 100, 200, null);
+            if(plWhoGo%4 == 0)
+                g.drawImage(ImageIO.read(new File("data/arrow_d.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -250, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-90, 100, 200, null);
+           
+           */
+            g.drawImage(ImageIO.read(new File("data/tboy-go1.png")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
             //    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate()
         } catch (IOException ex) {
             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+       // myGame.getPlayer(myGame.getPlayerWhoWillGo()).setGo(false);
     }   
        
     public MyMouseListener initMyMouseListener(){
@@ -240,9 +299,21 @@ public class MyPanel extends JPanel {
                 }
                 switch (resultOfMakeMove){
                     case INCORRECT:
-                         mesOk = 1;
-                         message = "It's not your turn, " + myGame.getPlayer(whoPlayed).getName() + " Don't hurry!";
-                         MyPanel.this.repaint();
+                         java.util.Timer timer = new java.util.Timer();
+                         TimerTask task = new TimerTask() {
+                             
+                          public void run()
+                            {
+                            xMes += 10;
+                            mesOk = 1;
+                            message = "It's not your turn, " + myGame.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
+                             MyPanel.this.repaint();
+                            }
+                          };
+                         //while(xMes<100){
+                          timer.schedule( task, 1000,100);
+                         if (xMes > 90) timer.cancel();
+                        xMes = 0;
                         System.out.printf("It's not your turn, %s. Don't hurry!\n",
                                 myGame.getPlayer(whoPlayed).getName());
                         break;
@@ -312,7 +383,9 @@ public class MyPanel extends JPanel {
                 }
 
             }
+            
             MyPanel.this.repaint();
+            
         }
     }
 

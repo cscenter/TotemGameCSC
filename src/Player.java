@@ -11,6 +11,7 @@ class Player
     private String name;
     private int xCoordinate;
     private int yCoordinate;
+    private boolean isgo = false;
 
     /**
      * конструктор.
@@ -97,5 +98,11 @@ class Player
        xCoordinate = x;
        yCoordinate = y;
    } 
+   public void setGo(boolean ok){
+       isgo = ok;
+   }
+   public boolean isGO(){
+       return isgo;
+   }
     
 }
