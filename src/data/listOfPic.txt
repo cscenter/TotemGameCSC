@@ -1,6 +1,9 @@
-table.jpg
-tboy.jpg
-tboy_go1.jpg
-totem.jpg
-totemR.jpg
-totemW.jpg
+tboy.png
+tboy-go1.png
+totem.png
+totemR.png
+totemW.png
+arrow_d.png
+arrow_u.png
+b1.png
+tback.jpg

@@ -34,6 +34,42 @@ public class Gallery {
             }
             resources.put(imgName, image);
         }
+        
+      BufferedReader input;
+            String classJar =
+                    Gallery.class.getResource("/MainTotemGame.class").toString();
+            if (classJar.startsWith("jar:")) {
+                InputStream in;
+                in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfPic.txt");
+                input = new BufferedReader(new InputStreamReader(in));
+            }else {
+                try {
+                    //System.out.print(Configuration.getDirectory());
+                    input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfPic.txt"));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException("can't read names of images!");
+                }
+            }
+            String line;
+            try {
+                while ((line = input.readLine()) != null) {
+                    String imgName = Configuration.getDirectory()+line;
+                    System.out.print(imgName + ' ');
+                    Image image;
+                    URL url = cl.getResource(imgName);
+                   //  System.out.print(url);
+                    try {
+                         image = ImageIO.read(url);
+                    } catch (IOException e) {
+                     throw new RuntimeException("can't read images!");
+                    }
+                    resources.put(imgName, image);
+
+                }
+                input.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
     }
 
     public ArrayList<String> getCardsNames(){

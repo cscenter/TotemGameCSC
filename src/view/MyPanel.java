@@ -65,23 +65,27 @@ public class MyPanel extends JPanel {
           // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-graphics.CardView.getCardSize()/2+panel_size/60, yCoord+graphics.CardView.getCardSize()/2+panel_size/30);
             
               g.fill3DRect(10, 10, 10, 10, allOpenFlag);
-              if (typeTotem == 0)  g.drawImage(ImageIO.read(new File("data/totem.png")), xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
+              
+              if (typeTotem == 0)  {
+                  Image img = Configuration.getGallery().getImage("data/totem.png");
+                  g.drawImage(img, xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
+              }
+              
               if (typeTotem == 1){
-                  g.drawImage(ImageIO.read(new File("data/totemW.png")), xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
+                  Image img = Configuration.getGallery().getImage("data/totemW.png");
+                  g.drawImage(img, xCoord - totemRad*4 +20, yCoord - totemRad*2, null);
                   typeTotem = 0;
               }
               if (typeTotem == 2){
-                  g.drawImage(ImageIO.read(new File("data/totemR.png")), xCoord - totemRad*4 + 20, yCoord - totemRad*2, null);
+                  Image img = Configuration.getGallery().getImage("data/totemR.png");
+                  g.drawImage(img, xCoord - totemRad*4 + 20, yCoord - totemRad*2, null);
                   typeTotem = 0;
               }
-<<<<<<< HEAD:src/MyPanel.java
+
               Font font = new Font("Tahoma", Font.BOLD, 15);
               g.setFont(font);
              g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-CardView.getCardSize()/2+panel_size/60 +10, yCoord+CardView.getCardSize()/2+panel_size/30 + 40);
-=======
 
-             g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord- CardView.getCardSize()/2+panel_size/60 - 3, yCoord+ CardView.getCardSize()/2+panel_size/30 + 40);
->>>>>>> bdd3c5892466fada983112f7c32f41e44b334e15:src/view/MyPanel.java
 
         }
         public boolean isIn(Point p){
@@ -113,12 +117,10 @@ public class MyPanel extends JPanel {
         //убрать с консоли всё
         reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
         
-        try {
-            g.drawImage(ImageIO.read(new File("data/b1.png")), 0, 0, panel_size+25, panel_size, null);//MyPanel.HEIGHT, MyPanel.WIDTH, null );
+        Image img = Configuration.getGallery().getImage("data/b1.png");
+        g.drawImage(img, 0, 0, panel_size+25, panel_size, null);//MyPanel.HEIGHT, MyPanel.WIDTH, null );
            // g.draw
-        } catch (IOException ex) {
-            Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
       try {
             totemV.drawTotem(g);
         } catch (IOException ex) {
@@ -177,16 +179,21 @@ public class MyPanel extends JPanel {
         }   
         myGame.getPlayer(myGame.getPlayerWhoWillGo()).setGo(true);
         try {
-           /* if(plWhoGo%4 == 1)
-                g.drawImage(ImageIO.read(new File("data/arrow_u.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()+150, 100, 200, null);
-            if(plWhoGo%4 == 2)
-                g.drawImage(ImageIO.read(new File("data/arrow_u.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() + 100, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), 100, 200, null);
-            if(plWhoGo%4 == 3)
-                g.drawImage(ImageIO.read(new File("data/arrow_d.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() , myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-200, 100, 200, null);
-            if(plWhoGo%4 == 0)
-                g.drawImage(ImageIO.read(new File("data/arrow_d.png")), myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -250, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-90, 100, 200, null);
+            Image imgU = Configuration.getGallery().getImage("data/arrow_u.png");
+            Image imgD = Configuration.getGallery().getImage("data/arrow_d.png");
+            if(plWhoGo%4 == 1){
+                g.drawImage(imgU, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()+150, 100, 250, null);
+            }
+            if(plWhoGo%4 == 2){
+                g.drawImage(imgU, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() + 150, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), 100, 250, null);
+            }
+            if(plWhoGo%4 == 3){
+                g.drawImage(imgD, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60 , myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-250, 100, 250, null);
+            }
+            if(plWhoGo%4 == 0){
+                g.drawImage(imgD, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -300, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-120, 100, 250, null);
+            }
            
-           */
             g.drawImage(ImageIO.read(new File("data/tboy-go1.png")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
             //    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate()
         } catch (IOException ex) {
