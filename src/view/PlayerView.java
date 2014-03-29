@@ -64,12 +64,13 @@ public class PlayerView{
     }
     public void drawPlayer(Graphics g, MyPanel panel) throws IOException{
         //clear(g);
-        if (playerInfo.isGO() == false)
-            g.drawImage(ImageIO.read(new File("data/tboy.png")), xCoordinate-110, yCoordinate, panel);
+        //if (playerInfo.isGO() == false)
+        
+    	g.drawImage(ImageIO.read(new File("data/tboy.png")), xCoordinate-110, yCoordinate, panel);
         Font font = new Font("Tahoma", Font.BOLD, 20);
         Font oldFont = g.getFont();
         g.setFont(font);
-        g.drawChars(playerInfo.getName().toCharArray(), 0, playerInfo.getName().length(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
+        g.drawString(playerInfo.getName(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
       
         font = new Font("Tahoma", Font.BOLD, 15);
         g.setFont(font);
@@ -78,6 +79,7 @@ public class PlayerView{
         Color newColor = new Color(0, 0, 0);
         g.setColor(newColor);
         g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(),xCoordinate+scale/60 + 70, yCoordinate+CardView.getCardSize()+scale/30);
+        
         if (playerInfo.getOpenCardsCount()!=0){
             Image image = topCardView.getCardImage();
             g.drawImage(image, xCoordinate, yCoordinate + CardView.getCardSize(), CardView.getCardSize(), CardView.getCardSize(), panel);
@@ -85,7 +87,8 @@ public class PlayerView{
         }
         else
             if (playerInfo.getCloseCardsCount() != 0 )
-            g.drawImage(ImageIO.read(new File("data/tback.jpg")), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
+            	g.drawImage(ImageIO.read(new File("data/tback.jpg")), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
+      
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
         g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate + scale/60 + 70, yCoordinate+CardView.getCardSize()+scale/30 - CardView.getCardSize());
         g.setColor(oldColor);

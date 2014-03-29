@@ -44,12 +44,12 @@ public class MyPanel extends JPanel {
                   (int)(CardView.getCardSize()*2.5) + 45, CardView.getCardSize()+panel_size/10 + 120);
 
         }
-        public void drawTotem(Graphics g) throws IOException{
+        public void drawTotem(Graphics g) throws IOException {
             //clearD(g);
             if (mesOk == 1){
-               g.clearRect(0, panel_size/30 , 800, 30);
-                Font font = new Font("Arial", Font.BOLD, 15);
-                Font oldFont = g.getFont();
+               //g.clearRect(0, panel_size/30 , 800, 30);
+				Font font = new Font("Arial", Font.BOLD, 15);
+				Font oldFont = g.getFont();
                g.setColor(Color.red);
                g.setFont(font);
                message += xMes;
@@ -59,7 +59,8 @@ public class MyPanel extends JPanel {
                g.setColor(Color.BLACK);
             } 
             else{
-                g.clearRect(0, panel_size/30 , 800, 30);
+              //  g.clearRect(0, panel_size/30 , 800, 30);
+            	message = "";
             }
             String cardsCount = String.valueOf(totem.getCardsCount());
           // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-graphics.CardView.getCardSize()/2+panel_size/60, yCoord+graphics.CardView.getCardSize()/2+panel_size/30);
@@ -181,17 +182,21 @@ public class MyPanel extends JPanel {
         try {
             Image imgU = Configuration.getGallery().getImage("data/arrow_u.png");
             Image imgD = Configuration.getGallery().getImage("data/arrow_d.png");
+            
+            int playerX = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate();
+            int playerY = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate();
+            
             if(plWhoGo%4 == 1){
-                g.drawImage(imgU, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()+150, 100, 250, null);
+                g.drawImage(imgU, playerX - 60, playerY + 150, 100, 250, null);
             }
             if(plWhoGo%4 == 2){
-                g.drawImage(imgU, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() + 150, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), 100, 250, null);
+                g.drawImage(imgU, playerX + 150, playerY, 100, 250, null);
             }
             if(plWhoGo%4 == 3){
-                g.drawImage(imgD, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -60 , myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-250, 100, 250, null);
+                g.drawImage(imgD, playerX - 60 ,  playerY - 250, 100, 250, null);
             }
             if(plWhoGo%4 == 0){
-                g.drawImage(imgD, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -300, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate()-120, 100, 250, null);
+                g.drawImage(imgD, playerX - 300,  playerY - 120, 100, 250, null);
             }
            
             g.drawImage(ImageIO.read(new File("data/tboy-go1.png")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
