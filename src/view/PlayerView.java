@@ -66,7 +66,7 @@ public class PlayerView{
         //clear(g);
         //if (playerInfo.isGO() == false)
         
-    	g.drawImage(ImageIO.read(new File("data/tboy.png")), xCoordinate-110, yCoordinate, panel);
+    	g.drawImage(Configuration.getGallery().getImage("data/tboy.png"), xCoordinate-110, yCoordinate, panel);
         Font font = new Font("Tahoma", Font.BOLD, 20);
         Font oldFont = g.getFont();
         g.setFont(font);
@@ -83,11 +83,11 @@ public class PlayerView{
         if (playerInfo.getOpenCardsCount()!=0){
             Image image = topCardView.getCardImage();
             g.drawImage(image, xCoordinate, yCoordinate + CardView.getCardSize(), CardView.getCardSize(), CardView.getCardSize(), panel);
-            g.drawImage(ImageIO.read(new File("data/tback.jpg")), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
+            g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
         }
         else
             if (playerInfo.getCloseCardsCount() != 0 )
-            	g.drawImage(ImageIO.read(new File("data/tback.jpg")), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
+            	g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
       
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
         g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(),  xCoordinate + scale/60 + 70, yCoordinate+CardView.getCardSize()+scale/30 - CardView.getCardSize());

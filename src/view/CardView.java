@@ -39,10 +39,15 @@ public class CardView{
     }
     private static int getCardNumber(String str){
 //        System.err.println(str);
+        try{
         Pattern numberPattern = Pattern.compile("[0-9]+");
         Matcher numberMatcher = numberPattern.matcher(str);
         numberMatcher.find();
         return Integer.parseInt(numberMatcher.group());
+        }catch(IllegalStateException e){
+            System.err.println(str);
+            throw new RuntimeException();
+        }
     }
     public static void resize(int haracteristicScale) {
         cardSize = haracteristicScale / 10;

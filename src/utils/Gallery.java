@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  */
 public class Gallery {
     private ArrayList<String> cardsNames;
+    private ArrayList<String> otherNames;
     private HashMap<String, Image> resources;
 
     public Image getImage(String name){
@@ -22,8 +23,11 @@ public class Gallery {
     public Gallery(){
         resources = new HashMap<>(100);
         cardsNames = new ArrayList<>(100);
+        otherNames = new ArrayList<>();
         ClassLoader cl = Gallery.class.getClassLoader();
         ArrayList<String> imgNames = getCardsNames();
+        getOtherPicturesNames();
+//        imgNames.addAll(getOtherPicturesNames());       /* почему так не получается???*/
         for (String imgName : imgNames){
             Image image;
             URL url = cl.getResource(imgName);
@@ -34,42 +38,46 @@ public class Gallery {
             }
             resources.put(imgName, image);
         }
-        
-      BufferedReader input;
-            String classJar =
-                    Gallery.class.getResource("/MainTotemGame.class").toString();
-            if (classJar.startsWith("jar:")) {
-                InputStream in;
-                in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfPic.txt");
-                input = new BufferedReader(new InputStreamReader(in));
-            }else {
-                try {
-                    //System.out.print(Configuration.getDirectory());
-                    input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfPic.txt"));
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException("can't read names of images!");
-                }
-            }
-            String line;
+        for (String name : otherNames){
+            Image image;
+            URL url = cl.getResource(name);
             try {
-                while ((line = input.readLine()) != null) {
-                    String imgName = Configuration.getDirectory()+line;
-                    System.out.print(imgName + ' ');
-                    Image image;
-                    URL url = cl.getResource(imgName);
-                   //  System.out.print(url);
-                    try {
-                         image = ImageIO.read(url);
-                    } catch (IOException e) {
-                     throw new RuntimeException("can't read images!");
-                    }
-                    resources.put(imgName, image);
-
-                }
-                input.close();
-            }catch (IOException e){
-                e.printStackTrace();
+                image = ImageIO.read(url);
+            } catch (IOException e) {
+                throw new RuntimeException("can't read images!");
             }
+            resources.put(name, image);
+
+        }
+    }
+
+    private ArrayList<String> getOtherPicturesNames(){
+        BufferedReader input;
+        String classJar =
+                Gallery.class.getResource("/MainTotemGame.class").toString();
+        if (classJar.startsWith("jar:")) {
+            InputStream in;
+            in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfPic.txt");
+            input = new BufferedReader(new InputStreamReader(in));
+        }else {
+            try {
+                //System.out.print(Configuration.getDirectory());
+                input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfPic.txt"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("can't read names of images!");
+            }
+        }
+        String line;
+        try {
+            while ((line = input.readLine()) != null) {
+                String imgName = Configuration.getDirectory()+line;
+                otherNames.add(imgName);
+            }
+            input.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return otherNames;
     }
 
     public ArrayList<String> getCardsNames(){
