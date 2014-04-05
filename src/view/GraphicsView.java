@@ -218,6 +218,10 @@ public class GraphicsView extends JFrame{
         return looser;
 
     }*/
+
+    public void repaintView(){
+        myPanel.repaint();
+    }
     public GraphicsView(){
         ArrayList <Character> openKeys = new ArrayList<>();
         ArrayList<Character> catchKeys = new ArrayList<>();
@@ -231,6 +235,7 @@ public class GraphicsView extends JFrame{
         defaultSettings(names, openKeys, catchKeys, angles);
 //        myGame = new Game(names, CardView.getCardsNumbers());
         client = isServer ? new MyClient(names, CardView.getCardsNumbers()) : new BasicClient(names, CardView.getCardsNumbers());
+        client.setGraphicsView(this);
         //myGame = new Game(startView(openKeys, catchKeys, angles), graphics.CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();
         myPanel.initiation(client, catchKeys, openKeys, angles);

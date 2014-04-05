@@ -1,7 +1,11 @@
 package utils;
 
+import model.Game;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Queue;
+
 /**
  * Created by lavton on 09.03.14.
  */
@@ -110,4 +114,53 @@ public class Configuration {
         }
 
     }
+
+    public static void decodeCommands(Queue<Byte> commands,
+                                      Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid){
+        whoDid.clear();
+        whatDid.clear();
+        while (!commands.isEmpty()){
+            byte current=commands.remove();
+            Game.WhatPlayerDid what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+            Integer who = decodeOneCommand(current, what);
+            whoDid.add(who);
+            whatDid.add(what);
+/*            whoDid.add(current/2);
+            if (current-(current/2)*2==0){
+                whatDid.add(Game.WhatPlayerDid.TOOK_TOTEM);
+            }else {
+                whatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
+            }*/
+        }
+    }
+    public static int decodeOneCommand(Byte command, Game.WhatPlayerDid what){
+        int who = command/2;
+        if (command-(command/2)*2==0){
+            what = Game.WhatPlayerDid.TOOK_TOTEM;
+        }else {
+            what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+        }
+        return who;
+    }
+
+
+    public static void codeCommands(Queue<Byte> commands,
+                                      Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid){
+        commands.clear();
+        while (!whoDid.isEmpty()){
+            Integer who = whoDid.remove();
+            Game.WhatPlayerDid what = whatDid.remove();
+            Byte command = codeOneCommand( who, what);
+            commands.add(command);
+        }
+    }
+    public static byte codeOneCommand(Integer who, Game.WhatPlayerDid what){
+        byte command = (byte)(who*2);
+
+        if (what == Game.WhatPlayerDid.OPEN_NEW_CARD){
+            command++;
+        }
+        return command;
+    }
+
 }

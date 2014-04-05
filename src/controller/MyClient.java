@@ -5,8 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.SynchronousQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import utils.*;
 import model.*;
 import view.*;
@@ -17,7 +16,7 @@ public class MyClient implements  TotemClient{
     private InputStream inputStream;
     private OutputStream outputStream;
     private boolean isHasServerAnswer;
-    private Queue<Byte> comands;
+    private Queue<Byte> commands;
     private Queue<Integer> whoDid;
     private Queue<Game.WhatPlayerDid> whatDid;
 
@@ -27,8 +26,14 @@ public class MyClient implements  TotemClient{
     }
     public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         String ip = Configuration.getServerIp();
-        comands = new SynchronousQueue<>();
+        commands = new SynchronousQueue<>();
+        whatDid = new LinkedList<>();
+        whoDid = new LinkedList<>();
         int port = Configuration.getPort();
+        initConnection(ip, port, playersNames, cardNumbers);
+    }
+
+    private void initConnection(String ip,  int port, ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         try{
             socket= new Socket(ip, port);
             inputStream = socket.getInputStream();
@@ -40,9 +45,6 @@ public class MyClient implements  TotemClient{
             myGame = new Game(playersNames,cardNumbers, firstPlayer, cardSeed);
         }catch(UnknownHostException e){e.printStackTrace();}
         catch(IOException e){e.printStackTrace();}
-            }
-    public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed){
-        myGame = new Game(playersNames, cardNumbers, firstPerson, cardSeed);
     }
 
     @Override
@@ -113,6 +115,46 @@ public class MyClient implements  TotemClient{
     public LinkedList<Card> getAllCards(){
         return myGame.getAllCards();
     }
+    @Override
+    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid){
+        try {
+            outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
+            getInformationFromServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (!whoDid.isEmpty()){
+            Integer who = whoDid.remove();
+            Game.WhatPlayerDid what = whatDid.remove();
+            myGame.moveWithoutAnswer(who, what);
+        }
+
+    }
+
+    public void getInformationFromServer(){
+        try{
+            String outputStr;
+            int length;
+            int res;
+            boolean isReading=false;
+            commands.clear();
+            while (true){
+                length = (inputStream.read());
+                for (int i=0; i<length; i++){
+                    res=inputStream.read();
+                    commands.add((byte) (res));
+                }
+            }
+        }catch(UnknownHostException e){e.printStackTrace();}
+        catch(IOException e){e.printStackTrace();}
+        Configuration.decodeCommands(commands, whoDid, whatDid);
+    }
+
+    @Override
+    public void setGraphicsView(GraphicsView view){
+        myGame.setGraphicsView(view);
+    }
+
 /*    private class ToServer extends Thread{
         @Override
         public void run(){
@@ -130,7 +172,7 @@ public class MyClient implements  TotemClient{
                     length = (inputStream.read());
                     for (int i=0; i<length; i++){
                         res=inputStream.read();
-                        comands.add((byte)(res));
+                        commands.add((byte)(res));
                     }
                 }
             }catch(UnknownHostException e){e.printStackTrace();}
@@ -144,17 +186,4 @@ public class MyClient implements  TotemClient{
 
         }
     }                                       */
-    private void decodeCommands(){
-        whoDid.clear();
-        whatDid.clear();
-        while (!comands.isEmpty()){
-            byte current=comands.remove();
-            whoDid.add(current/2);
-            if (current-(current/2)*2==0){
-                whatDid.add(Game.WhatPlayerDid.TOOK_TOTEM);
-            }else {
-                whatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
-            }
-        }
-    }
 }

@@ -1,4 +1,6 @@
 package model;
+import view.GraphicsView;
+
 import java.util.*;
 
 /**
@@ -292,5 +294,13 @@ public class Game{
     
     public Player getPlayer(int playerIndex){
         return players.get(playerIndex);
+    }
+    private GraphicsView graphicsView;
+    public void setGraphicsView(GraphicsView view){
+        graphicsView = view;
+    }
+    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid){
+        makeMove(playerIndex, whatPlayerDid);
+        graphicsView.repaintView();
     }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import model.*;
+import view.GraphicsView;
+
 /**
  * Created with IntelliJ IDEA.
  * User: lavton
@@ -26,6 +28,8 @@ public interface TotemClient {
     public void arrowsInMakeMove(int winner);
     public void openAllTopCards();
     public LinkedList<Card> getAllCards();
+    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
+    public void setGraphicsView(GraphicsView view);
 //    public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
   //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
 

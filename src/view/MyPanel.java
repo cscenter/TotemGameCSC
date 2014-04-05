@@ -295,17 +295,19 @@ public class MyPanel extends JPanel {
                 Character inputChar = k.getKeyChar();
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
                 boolean suchKeyHere = false;
-                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.CARD_OPENED;
                 whoPlayed = 0;
                 for (int i = 0; i < client.getPlayersCount(); i++){
                     if (playersView.get(i).getOpenCardKey() == inputChar){
-                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+//                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        client.moveWithoutAnswer(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
                     }
                     if (playersView.get(i).getCatchTotemKey() == inputChar){
-                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+  //                      resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        client.moveWithoutAnswer(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
