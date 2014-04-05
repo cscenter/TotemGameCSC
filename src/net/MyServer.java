@@ -10,20 +10,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import utils.*;
 
-public class MyServer {
+public class MyServer extends TimerTask{
     private int whoDidThis;
     private int whatHeDid;
-    private int numberOfPl = 1;
-    private LinkedList<Socket> clients;
-    private LinkedList<InputStream> clientInput;
-    private LinkedList<OutputStream> clientOutput;
-    private Queue<Byte> comands;
+    private Timer timer;
+    private int numberOfPl = 4;
+    private ArrayList<Socket> clients;
+    private ArrayList<InputStream> clientInput;
+    private ArrayList<OutputStream> clientOutput;
+    private Queue<Byte> commands;
     public MyServer(){
-        clientOutput = new LinkedList<>();
-        clients = new LinkedList<>();
-        clientInput = new LinkedList<>();
-        comands = new SynchronousQueue<>();
+        clientOutput = new ArrayList<>();
+        clients = new ArrayList<>();
+        clientInput = new ArrayList<>();
+        commands = new SynchronousQueue<>();
         initServer();
+        timer = new Timer();
+        timer.schedule(this, Configuration.getTimeToWait());
     }
     private void initServer(){
         try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
@@ -31,6 +34,7 @@ public class MyServer {
             for (int i=0; i<numberOfPl; i++){
                 try {
                     Socket socket = serverSocket.accept();
+                    socket.setSoTimeout(Configuration.getTimeToWait());
                     clients.add(socket);
                     InputStream inputStream = socket.getInputStream();
                     clientInput.add(inputStream);
@@ -65,5 +69,56 @@ public class MyServer {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void run(){
+        ArrayList<Reader> readers = new ArrayList<>(numberOfPl);
+        for (int i=0; i< numberOfPl; i++){
+            readers.add(new Reader(i));
+        }
+        for (Reader reader : readers){
+            reader.start();
+        }
+        for (Reader reader : readers){
+            try {
+                reader.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        byte[] flushing = new byte[commands.size()];
+        int curNum=0;
+        while (!commands.isEmpty()){
+            flushing[curNum++] = commands.remove();
+        }
+        for (OutputStream stream : clientOutput){
+            try {
+                stream.write((byte)commands.size());
+                stream.write(flushing);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class Reader extends Thread{
+        int player;
+        public Reader(int myPlayerNumber){
+            player = myPlayerNumber;
+        }
+        @Override
+        public void run(){
+            int getting=-1;
+            try {
+                getting = clientInput.get(player).read();
+            } catch (SocketTimeoutException e){}
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (getting!=-1){
+                commands.add((byte)getting);
+            }
+        }
     }
 }
