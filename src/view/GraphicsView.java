@@ -7,16 +7,19 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import model.*;
 import utils.*;
+import controller.*;
 
 /**
  * Класс, отвечающий за работу с игроками
  * В графическом режиме
  */
 public class GraphicsView extends JFrame{
-    private Game myGame;
+//    private Game myGame;
     private static int FRAME_SIZE;
     private MyPanel myPanel;
-    
+    boolean isServer = false;
+    TotemClient client;
+
     /**
      * Поля, которые нужно знать View о игроках
      */
@@ -183,7 +186,7 @@ public class GraphicsView extends JFrame{
         return names;
     }
 
-    int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
+ /*   int chooseOneOfPlayers(ArrayList<Integer> playersIndex){
         int looser;
         Scanner scan = new Scanner(System.in);
         do {
@@ -214,7 +217,7 @@ public class GraphicsView extends JFrame{
         } while(true);
         return looser;
 
-    }
+    }*/
     public GraphicsView(){
         ArrayList <Character> openKeys = new ArrayList<>();
         ArrayList<Character> catchKeys = new ArrayList<>();
@@ -226,10 +229,11 @@ public class GraphicsView extends JFrame{
         //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу
         ArrayList<String> names = new ArrayList<>();
         defaultSettings(names, openKeys, catchKeys, angles);
-        myGame = new Game(names, CardView.getCardsNumbers());
+//        myGame = new Game(names, CardView.getCardsNumbers());
+        client = isServer ? new MyClient(names, CardView.getCardsNumbers()) : new BasicClient(names, CardView.getCardsNumbers());
         //myGame = new Game(startView(openKeys, catchKeys, angles), graphics.CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();
-        myPanel.initiation(myGame, catchKeys, openKeys, angles);
+        myPanel.initiation(client, catchKeys, openKeys, angles);
         add(myPanel);
         pack();
         addKeyListener(myPanel.initMyKeyListener());

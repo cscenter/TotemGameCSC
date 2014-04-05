@@ -1,6 +1,8 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+
 import model.*;
 /**
  * Created with IntelliJ IDEA.
@@ -23,6 +25,7 @@ public interface TotemClient {
     public void afterDuelMakeMove(int winner, int looser);
     public void arrowsInMakeMove(int winner);
     public void openAllTopCards();
+    public LinkedList<Card> getAllCards();
 //    public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
   //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
 

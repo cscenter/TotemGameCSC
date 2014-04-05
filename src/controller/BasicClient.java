@@ -1,6 +1,8 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+
 import model.*;
 
 public class BasicClient implements TotemClient {
@@ -68,6 +70,11 @@ public class BasicClient implements TotemClient {
     @Override
     public void openAllTopCards() {
         myGame.openAllTopCards();
+    }
+
+    @Override
+    public LinkedList<Card> getAllCards(){
+        return myGame.getAllCards();
     }
     public BasicClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         myGame = new Game(playersNames,cardNumbers);

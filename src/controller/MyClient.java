@@ -3,10 +3,7 @@ package controller;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,7 +109,11 @@ public class MyClient implements  TotemClient{
     public void openAllTopCards() {
         myGame.openAllTopCards();
     }
-    private class ToServer extends Thread{
+    @Override
+    public LinkedList<Card> getAllCards(){
+        return myGame.getAllCards();
+    }
+/*    private class ToServer extends Thread{
         @Override
         public void run(){
 
@@ -142,7 +143,7 @@ public class MyClient implements  TotemClient{
 
 
         }
-    }
+    }                                       */
     private void decodeCommands(){
         whoDid.clear();
         whatDid.clear();

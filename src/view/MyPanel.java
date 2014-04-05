@@ -14,9 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import utils.*;
+import controller.*;
 
 public class MyPanel extends JPanel {
-    private model.Game myGame;
+//    private model.Game client;
+    private TotemClient client;
     private int panel_size;
     private boolean allOpenFlag;
     private boolean catchTotemModeFlag;
@@ -147,13 +149,13 @@ public class MyPanel extends JPanel {
             g.clearRect(20, panel_size-70, panel_size-30, 75);
         }
         g.clearRect(0,0,panel_size, 20);
-        String whoPlayedMes = "It's "+playersView.get(myGame.getPlayerWhoWillGo()).getPlayerName()+"'s turn!";
+        String whoPlayedMes = "It's "+playersView.get(client.getPlayerWhoWillGo()).getPlayerName()+"'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20,20);
-        int all = myGame.getPlayersCount();
-        int x1 = myGame.getPlayer((all - 1 + myGame.getPlayerWhoWillGo())%all).getXCoordinate(),
-            y1 = myGame.getPlayer((all - 1 + myGame.getPlayerWhoWillGo())%all).getYCoordinate(), 
-            x2 = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate(),
-            y2 = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(); 
+        int all = client.getPlayersCount();
+        int x1 = client.getPlayer((all - 1 + client.getPlayerWhoWillGo())%all).getXCoordinate(),
+            y1 = client.getPlayer((all - 1 + client.getPlayerWhoWillGo())%all).getYCoordinate(), 
+            x2 = client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate(),
+            y2 = client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate(); 
        float t = (float)2./5;
         float x,y;
         while(t<(float)3./5){
@@ -173,18 +175,18 @@ public class MyPanel extends JPanel {
            t = t + (float)(1./20);
         }       
         int plWhoGo = 0;
-        for (int i =0; i < myGame.getPlayersCount(); i++){
-            if (myGame.getPlayer(i).isGO()) plWhoGo = i;
-            myGame.getPlayer(i).setGo(false);
+        for (int i =0; i < client.getPlayersCount(); i++){
+            if (client.getPlayer(i).isGO()) plWhoGo = i;
+            client.getPlayer(i).setGo(false);
             
         }   
-        myGame.getPlayer(myGame.getPlayerWhoWillGo()).setGo(true);
+        client.getPlayer(client.getPlayerWhoWillGo()).setGo(true);
         try {
             Image imgU = Configuration.getGallery().getImage("data/arrow_u.png");
             Image imgD = Configuration.getGallery().getImage("data/arrow_d.png");
             
-            int playerX = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate();
-            int playerY = myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate();
+            int playerX = client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate();
+            int playerY = client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate();
             
             if(plWhoGo%4 == 1){
                 g.drawImage(imgU, playerX - 60, playerY + 150, 100, 250, null);
@@ -199,12 +201,12 @@ public class MyPanel extends JPanel {
                 g.drawImage(imgD, playerX - 300,  playerY - 120, 100, 250, null);
             }
            
-            g.drawImage(ImageIO.read(new File("data/tboy-go1.png")),    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate() -110, myGame.getPlayer(myGame.getPlayerWhoWillGo()).getYCoordinate(), null);
-            //    myGame.getPlayer(myGame.getPlayerWhoWillGo()).getXCoordinate()
+            g.drawImage(ImageIO.read(new File("data/tboy-go1.png")),    client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate() -110, client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate(), null);
+            //    client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate()
         } catch (IOException ex) {
             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-       // myGame.getPlayer(myGame.getPlayerWhoWillGo()).setGo(false);
+       // client.getPlayer(client.getPlayerWhoWillGo()).setGo(false);
     }   
        
     public MyMouseListener initMyMouseListener(){
@@ -215,8 +217,8 @@ public class MyPanel extends JPanel {
     }
 
     //вместо конструктора
-    public void initiation(Game game, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
-        myGame = game;
+    public void initiation(TotemClient tClient, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle){
+        client = tClient;
         playersView = new ArrayList<>(ktKeys.size());
         cardsView = new ArrayList<>();
         for (int i=0; i<400; i++){//Как сделать нормально?
@@ -230,7 +232,7 @@ public class MyPanel extends JPanel {
                 num = Integer.parseInt(numberMatcher.group());
 
             
-            for (Card card : myGame.getAllCards()){
+            for (Card card : client.getAllCards()){
                 if (card.getCardNumber() == num){
                     ClassLoader cl = MyPanel.class.getClassLoader();
 
@@ -242,9 +244,9 @@ public class MyPanel extends JPanel {
             }
         }
         for (int i=0; i<ktKeys.size(); i++){
-            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), myGame.getPlayer(i), angle.get(i)));
+            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), client.getPlayer(i), angle.get(i)));
         }
-        totemV = new TotemView(game.getTotem());
+        totemV = new TotemView(client.getTotem());
     }
 
 
@@ -254,28 +256,28 @@ public class MyPanel extends JPanel {
         public void mouseClicked(MouseEvent e) {
             if (catchTotemModeFlag){
                 Point p = e.getLocationOnScreen();
-                ArrayList<Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                ArrayList<Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
                 for (int i=0; i<playersView.size();i++){
                     if (playersView.get(i).isIn(p)){
                         int looser = i;
-                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        client.afterDuelMakeMove(whoPlayed,looser);
                         catchTotemModeFlag = false;
                         break;
                     }
                 }
                 if (totemV.isIn(p)){
                     catchTotemModeFlag = false;
-                    myGame.arrowsInMakeMove(whoPlayed);
+                    client.arrowsInMakeMove(whoPlayed);
                     catchTotemModeFlag = false;
                 }
             }
             if (multyDuelFlag){
                 Point p = e.getLocationOnScreen();
-                ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
+                ArrayList <Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
                 for (int i=0; i<playersView.size();i++){
                     if (playersView.get(i).isIn(p)){
                         int looser = i;
-                        myGame.afterDuelMakeMove(whoPlayed,looser);
+                        client.afterDuelMakeMove(whoPlayed,looser);
                         multyDuelFlag = false;
                         break;
                     }
@@ -295,15 +297,15 @@ public class MyPanel extends JPanel {
                 boolean suchKeyHere = false;
                 Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
                 whoPlayed = 0;
-                for (int i = 0; i < myGame.getPlayersCount(); i++){
+                for (int i = 0; i < client.getPlayersCount(); i++){
                     if (playersView.get(i).getOpenCardKey() == inputChar){
-                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
                     }
                     if (playersView.get(i).getCatchTotemKey() == inputChar){
-                        resultOfMakeMove = myGame.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         suchKeyHere = true;
                         whoPlayed = i;
                         break;
@@ -325,7 +327,7 @@ public class MyPanel extends JPanel {
                             {
                             xMes += 10;
                             mesOk = 1;
-                            message = "It's not your turn, " + myGame.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
+                            message = "It's not your turn, " + client.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
                              MyPanel.this.repaint();
                             }
                           };
@@ -334,33 +336,33 @@ public class MyPanel extends JPanel {
                          if (xMes > 90) timer.cancel();
                         xMes = 0;
                         System.out.printf("It's not your turn, %s. Don't hurry!\n",
-                                myGame.getPlayer(whoPlayed).getName());
+                                client.getPlayer(whoPlayed).getName());
                         break;
                     case TOTEM_WAS_CATCH_CORRECT:
                          mesOk = 1;
-                         message = "You won duel, " + myGame.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
+                         message = "You won duel, " + client.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
                          typeTotem = 2;
                          MyPanel.this.repaint();
                         System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
-                                myGame.getPlayer(whoPlayed).getName());
+                                client.getPlayer(whoPlayed).getName());
                         break;
                     case TOTEM_WAS_CATCH_INCORRECT:
                          mesOk = 1;
-                         message = "You mustn't take totem, " + myGame.getPlayer(whoPlayed).getName() + " So you took all open cards!";
+                         message = "You mustn't take totem, " + client.getPlayer(whoPlayed).getName() + " So you took all open cards!";
                          typeTotem = 1;
                          MyPanel.this.repaint();
                         System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
-                                myGame.getPlayer(whoPlayed).getName());
+                                client.getPlayer(whoPlayed).getName());
                         break;
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
-                                myGame.getPlayer(whoPlayed).getName());
+                                client.getPlayer(whoPlayed).getName());
                         playersView.get(whoPlayed).setTopCardView(cardsView);
 
                         break;
                     case NOT_DEFINED_CATCH:
-//                        ArrayList <Integer> possibleLosers = myGame.checkDuelWithPlayer(myGame.getPlayer(whoPlayed));
-                        if (myGame.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
+//                        ArrayList <Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
+                        if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE){
                             catchTotemModeFlag = true;
                         }else{
                             multyDuelFlag = true;
@@ -382,19 +384,19 @@ public class MyPanel extends JPanel {
                         break;
                 }
 
-                for (int i = 0; i < myGame.getPlayersCount(); i++){
-                    if (myGame.getPlayer(i).getCardsCount() == 0){
+                for (int i = 0; i < client.getPlayersCount(); i++){
+                    if (client.getPlayer(i).getCardsCount() == 0){
                          mesOk = 1;
-                         message = "Player %s won! It's very good :)\n" + myGame.getPlayer(i).getName();
+                         message = "Player %s won! It's very good :)\n" + client.getPlayer(i).getName();
                          MyPanel.this.repaint();
-                        System.out.printf("Player %s won! It's very good :)\n", myGame.getPlayer(i).getName());
+                        System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
                     }
                 }
                 MyPanel.this.repaint();
             }else{
 
                 if (k.getKeyCode()==KeyEvent.VK_ENTER){
-                    myGame.openAllTopCards();
+                    client.openAllTopCards();
                     for (PlayerView player : playersView){
                         player.setTopCardView(cardsView);
                     }
