@@ -17,7 +17,7 @@ public class GraphicsView extends JFrame{
 //    private Game myGame;
     private static int FRAME_SIZE;
     private MyPanel myPanel;
-    boolean isServer = false;
+    boolean isServer;
     TotemClient client;
 
     /**
@@ -223,6 +223,7 @@ public class GraphicsView extends JFrame{
         myPanel.repaint();
     }
     public GraphicsView(){
+        isServer = Configuration.isServer;
         ArrayList <Character> openKeys = new ArrayList<>();
         ArrayList<Character> catchKeys = new ArrayList<>();
         ArrayList<Double> angles = new ArrayList<>();

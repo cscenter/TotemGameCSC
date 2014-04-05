@@ -35,6 +35,7 @@ public class Configuration {
     private static ArrayList<String> peopleNames;
     private static ArrayList<Character> peopleOpenKeys;
     private static ArrayList<Character> peopleCatchKeys;
+    public static boolean isServer = false;
 
     public static void ChangeDir(String newDir){
         DIRECTORY = newDir;
