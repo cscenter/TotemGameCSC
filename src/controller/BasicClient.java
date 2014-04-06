@@ -19,11 +19,6 @@ public class BasicClient implements TotemClient {
     }
 
     @Override
-    public boolean haveWeGotAnswer() {
-        return true;
-    }
-
-    @Override
     public Game.Totem getTotem() {
         return myGame.getTotem();
     }

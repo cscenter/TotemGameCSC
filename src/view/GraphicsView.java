@@ -236,6 +236,7 @@ public class GraphicsView extends JFrame{
         defaultSettings(names, openKeys, catchKeys, angles);
 //        myGame = new Game(names, CardView.getCardsNumbers());
         client = isServer ? new MyClient(names, CardView.getCardsNumbers()) : new BasicClient(names, CardView.getCardsNumbers());
+        System.out.println("Generate GUI");
         client.setGraphicsView(this);
         //myGame = new Game(startView(openKeys, catchKeys, angles), graphics.CardView.getCardsNumbers(gallery));
         myPanel = new MyPanel();

@@ -14,13 +14,14 @@ public class MyServer extends TimerTask{
     private int whoDidThis;
     private int whatHeDid;
     private Timer timer;
-    private int numberOfPl = 4;
+    private int numberOfPl;
     private ArrayList<Socket> clients;
     private ArrayList<InputStream> clientInput;
     private ArrayList<OutputStream> clientOutput;
     private Queue<Byte> commands;
     public MyServer(){
         clientOutput = new ArrayList<>();
+        numberOfPl=Configuration.getNumberOfPlayers();
         clients = new ArrayList<>();
         clientInput = new ArrayList<>();
         commands = new SynchronousQueue<>();
@@ -31,6 +32,7 @@ public class MyServer extends TimerTask{
     private void initServer(){
         try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
+            System.out.println("wait users");
             for (int i=0; i<numberOfPl; i++){
                 try {
                     Socket socket = serverSocket.accept();
@@ -39,7 +41,7 @@ public class MyServer extends TimerTask{
                     InputStream inputStream = socket.getInputStream();
                     clientInput.add(inputStream);
                     clientOutput.add(socket.getOutputStream());
-
+                    System.out.println(numberOfPl-i-1+ " left");
                 }catch (Exception e){
                     throw e;
                 }

@@ -30,7 +30,7 @@ public class Configuration {
     private static final String SERVER_IP = "127.0.0.1";
     private static final int MAX_NUMBER_OF_PLAYERS=15;
     private static int timeToWait=1000;
-    private static int numberOfPlayers;
+    public static int numberOfPlayers=2;
     private static Gallery gallery;
     private static ArrayList<String> peopleNames;
     private static ArrayList<Character> peopleOpenKeys;
@@ -126,12 +126,6 @@ public class Configuration {
             Integer who = decodeOneCommand(current, what);
             whoDid.add(who);
             whatDid.add(what.getValue());
-/*            whoDid.add(current/2);
-            if (current-(current/2)*2==0){
-                whatDid.add(Game.WhatPlayerDid.TOOK_TOTEM);
-            }else {
-                whatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
-            }*/
         }
     }
     public static int decodeOneCommand(Byte command, WPDHolder what){

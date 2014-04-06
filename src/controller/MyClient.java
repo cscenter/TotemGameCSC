@@ -15,7 +15,6 @@ public class MyClient implements  TotemClient{
     private Socket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
-    private boolean isHasServerAnswer;
     private Queue<Byte> commands;
     private Queue<Integer> whoDid;
     private Queue<Game.WhatPlayerDid> whatDid;
@@ -31,10 +30,12 @@ public class MyClient implements  TotemClient{
         whoDid = new LinkedList<>();
         int port = Configuration.getPort();
         initConnection(ip, port, playersNames, cardNumbers);
+        new ToClient().start();
     }
 
     private void initConnection(String ip,  int port, ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
         try{
+            System.out.println("connect to server");
             socket= new Socket(ip, port);
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
@@ -42,6 +43,7 @@ public class MyClient implements  TotemClient{
             int firstPlayer = inputStream.read();
             int cardSeed = inputStream.read();
             whatPlayer = inputStream.read();
+            System.out.println("initializing complite");
             myGame = new Game(playersNames,cardNumbers, firstPlayer, cardSeed);
         }catch(UnknownHostException e){e.printStackTrace();}
         catch(IOException e){e.printStackTrace();}
@@ -57,10 +59,7 @@ public class MyClient implements  TotemClient{
         return myGame.getPlayer(i);
     }
 
-    @Override
-    public boolean haveWeGotAnswer() {
-        return isHasServerAnswer;
-    }
+
 
     @Override
     public Game.Totem getTotem() {
@@ -118,41 +117,53 @@ public class MyClient implements  TotemClient{
     @Override
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid){
         try {
-            outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
-            getInformationFromServer();
+            if (playerIndex == whatPlayer){
+                outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
+            }
+//            getInformationFromServer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (!whoDid.isEmpty()){
-            Integer who = whoDid.remove();
-            Game.WhatPlayerDid what = whatDid.remove();
-            myGame.moveWithoutAnswer(who, what);
-        }
 
     }
 
-    public void getInformationFromServer(){
-        try{
-            String outputStr;
-            int length;
-            int res;
-            boolean isReading=false;
-            commands.clear();
-            while (true){
-                length = (inputStream.read());
-                for (int i=0; i<length; i++){
-                    res=inputStream.read();
-                    commands.add((byte) (res));
-                }
-            }
-        }catch(UnknownHostException e){e.printStackTrace();}
-        catch(IOException e){e.printStackTrace();}
-        Configuration.decodeCommands(commands, whoDid, whatDid);
-    }
 
     @Override
     public void setGraphicsView(GraphicsView view){
         myGame.setGraphicsView(view);
+    }
+    private class ToClient extends Thread{
+        public void getInformationFromServer(){
+            try{
+                String outputStr;
+                int length;
+                int res;
+                boolean isReading=false;
+                commands.clear();
+                while (true){
+                    length = (inputStream.read());
+                    for (int i=0; i<length; i++){
+                        res=inputStream.read();
+                        commands.add((byte) (res));
+                    }
+                }
+            }catch(UnknownHostException e){e.printStackTrace();}
+            catch(IOException e){e.printStackTrace();}
+            Configuration.decodeCommands(commands, whoDid, whatDid);
+        }
+        @Override
+        public void run(){
+            while (!isGameEnded()){
+                getInformationFromServer();
+                while (!whoDid.isEmpty()){
+                    Integer who = whoDid.remove();
+                    Game.WhatPlayerDid what = whatDid.remove();
+                    myGame.moveWithoutAnswer(who, what);
+                }
+
+            }
+        }
+
     }
 
 /*    private class ToServer extends Thread{

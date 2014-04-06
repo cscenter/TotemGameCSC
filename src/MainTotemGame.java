@@ -22,14 +22,17 @@ public class MainTotemGame {
                     (new View()).run();
                     break;
                 case '3':
+                    Configuration.numberOfPlayers=2;
                     Configuration.isServer=true;
                     new GraphicsView();
                     break;
                 case '4':
+                    Configuration.numberOfPlayers=2;
                     Configuration.isServer=true;
                     new MyServer();
                     break;
                 case '0':
+                    Configuration.numberOfPlayers=4;
                     Configuration.isServer=false;
                     new GraphicsView();
                     break;
