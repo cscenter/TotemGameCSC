@@ -122,10 +122,10 @@ public class Configuration {
         whatDid.clear();
         while (!commands.isEmpty()){
             byte current=commands.remove();
-            Game.WhatPlayerDid what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+            WPDHolder what = new WPDHolder(Game.WhatPlayerDid.OPEN_NEW_CARD);
             Integer who = decodeOneCommand(current, what);
             whoDid.add(who);
-            whatDid.add(what);
+            whatDid.add(what.getValue());
 /*            whoDid.add(current/2);
             if (current-(current/2)*2==0){
                 whatDid.add(Game.WhatPlayerDid.TOOK_TOTEM);
@@ -134,12 +134,12 @@ public class Configuration {
             }*/
         }
     }
-    public static int decodeOneCommand(Byte command, Game.WhatPlayerDid what){
+    public static int decodeOneCommand(Byte command, WPDHolder what){
         int who = command/2;
         if (command-(command/2)*2==0){
-            what = Game.WhatPlayerDid.TOOK_TOTEM;
+            what.setValue(Game.WhatPlayerDid.TOOK_TOTEM);
         }else {
-            what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+            what.setValue(Game.WhatPlayerDid.OPEN_NEW_CARD);
         }
         return who;
     }
@@ -157,11 +157,15 @@ public class Configuration {
     }
     public static byte codeOneCommand(Integer who, Game.WhatPlayerDid what){
         byte command = (byte)(who*2);
-
         if (what == Game.WhatPlayerDid.OPEN_NEW_CARD){
             command++;
         }
         return command;
     }
-
+    public static class WPDHolder {
+        private Game.WhatPlayerDid value;
+        public WPDHolder(Game.WhatPlayerDid initial) { value = initial; }
+        public void setValue(Game.WhatPlayerDid newValue) { value = newValue; }
+        public Game.WhatPlayerDid getValue() { return value; }
+    }
 }
