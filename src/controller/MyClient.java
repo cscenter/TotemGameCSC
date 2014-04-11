@@ -39,11 +39,14 @@ public class MyClient implements  TotemClient{
             socket= new Socket(ip, port);
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
+            if (socket.isConnected()){
+                System.out.println("connection done. Wait for other players to start initializing");
+            }
             String outputStr;
             int firstPlayer = inputStream.read();
             int cardSeed = inputStream.read();
             whatPlayer = inputStream.read();
-            System.out.println("initializing complite");
+            System.out.println("initializing complete");
             myGame = new Game(playersNames,cardNumbers, firstPlayer, cardSeed);
         }catch(UnknownHostException e){e.printStackTrace();}
         catch(IOException e){e.printStackTrace();}
@@ -124,7 +127,7 @@ public class MyClient implements  TotemClient{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println("send action to server");
     }
 
 
@@ -155,6 +158,7 @@ public class MyClient implements  TotemClient{
         public void run(){
             while (!isGameEnded()){
                 getInformationFromServer();
+                System.out.println("get information from server");
                 while (!whoDid.isEmpty()){
                     Integer who = whoDid.remove();
                     Game.WhatPlayerDid what = whatDid.remove();

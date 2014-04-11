@@ -32,7 +32,7 @@ public class MyServer extends TimerTask{
     private void initServer(){
         try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
-            System.out.println("wait users");
+            System.out.println("wait for "+numberOfPl+" users");
             for (int i=0; i<numberOfPl; i++){
                 try {
                     Socket socket = serverSocket.accept();
@@ -48,19 +48,21 @@ public class MyServer extends TimerTask{
             }
 
             //генерим кто первый ходит и зерно для случайного набора карт
-            byte firstPlayer = (byte)(((new Random()).nextInt())%numberOfPl);
+            byte firstPlayer = (byte)(Math.abs((new Random()).nextInt())%numberOfPl);
             byte cardSeed = (byte)((new Random()).nextInt());
 
             //пересылаем это всем
             //+ кто каким ходит??
+            System.out.println("start to give them initizlize information: first Player is #" +
+            firstPlayer+", card Seed is number "+cardSeed);
             for (byte i = 0; i < clientOutput.size(); i++){
                 OutputStream os = clientOutput.get(i);
                 os.write(firstPlayer);
                 os.write(cardSeed);
                 os.write(i);
                 os.flush();
-
             }
+            System.out.println("init finish. lets go!");
 /*            for (OutputStream os : clientOutput){
                 os.write(firstPlayer);
                 os.write(cardSeed);
@@ -119,6 +121,7 @@ public class MyServer extends TimerTask{
                 e.printStackTrace();
             }
             if (getting!=-1){
+                System.out.println("get information from user #"+player);
                 commands.add((byte)getting);
             }
         }

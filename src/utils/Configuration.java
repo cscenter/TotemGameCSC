@@ -95,7 +95,7 @@ public class Configuration {
         String line;
         try {
             line = input.readLine();
-            numberOfPlayers = Integer.parseInt(line);
+      //      numberOfPlayers = Integer.parseInt(line);
             peopleNames = new ArrayList<>(numberOfPlayers);
             peopleCatchKeys = new ArrayList<>(numberOfPlayers);
             peopleOpenKeys = new ArrayList<>(numberOfPlayers);
