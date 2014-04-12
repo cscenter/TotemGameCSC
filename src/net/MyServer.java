@@ -32,7 +32,7 @@ public class MyServer extends TimerTask {
         readers = new ArrayList<>(numberOfPl);
         initServer();
         timer = new Timer();
-        timer.schedule(this, Configuration.getTimeToWait());
+        timer.schedule(this, 10000, Configuration.getTimeToWait());
     }
 
     private void initServer() {
@@ -88,18 +88,18 @@ public class MyServer extends TimerTask {
         int queueSize = commands.size();
         byte[] flushing = new byte[queueSize];
         int curNum = 0;
-        try {
-            while (curNum < queueSize) {
-                flushing[curNum++] = commands.remove();
-            }
-        } catch (NoSuchElementException e) {
-            System.err.println(curNum);
-            System.err.println(queueSize);
+        while (curNum < queueSize) {
+            flushing[curNum++] = commands.remove();
         }
+        for (int i = 0; i < flushing.length; i++){
+            System.out.print(flushing[i]+ " ");
+        }
+        System.out.println("\nso get "+ flushing.length+" commands. Now flush them to users");
         for (OutputStream stream : clientOutput) {
             try {
                 stream.write(queueSize);
                 stream.write(flushing);
+                stream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -159,13 +159,16 @@ public class MyClient implements TotemClient {
                 int res;
                 boolean isReading = false;
                 commands.clear();
-                while (true) {
-                    length = (inputStream.read());
-                    for (int i = 0; i < length; i++) {
-                        res = inputStream.read();
-                        commands.add((byte) (res));
-                    }
+//                while (true) {
+                length = (inputStream.read());
+                if (length > 0){
+                    System.out.println("will read " + length + " commands");
                 }
+                for (int i = 0; i < length; i++) {
+                    res = inputStream.read();
+                    commands.add((byte) (res));
+                }
+  //              }
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -178,7 +181,9 @@ public class MyClient implements TotemClient {
         public void run() {
             while (!isGameEnded()) {
                 getInformationFromServer();
-                System.out.println("get information from server");
+                if (whatDid.size() > 0) {
+                    System.out.println("get information from server");
+                }
                 while (!whoDid.isEmpty()) {
                     Integer who = whoDid.remove();
                     Game.WhatPlayerDid what = whatDid.remove();
