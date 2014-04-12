@@ -14,6 +14,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 
 public class MyClient implements TotemClient {
@@ -33,7 +35,7 @@ public class MyClient implements TotemClient {
 
     public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers) {
         String ip = Configuration.getServerIp();
-        commands = new SynchronousQueue<>();
+        commands = new ConcurrentLinkedQueue<>();
         whatDid = new LinkedList<>();
         whoDid = new LinkedList<>();
         int port = Configuration.getPort();

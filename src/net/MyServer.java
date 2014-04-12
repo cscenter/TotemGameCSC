@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 
 public class MyServer extends TimerTask {
@@ -27,7 +28,7 @@ public class MyServer extends TimerTask {
         numberOfPl = Configuration.getNumberOfPlayers();
         clients = new ArrayList<>();
         clientInput = new ArrayList<>();
-        commands = new SynchronousQueue<>();
+        commands = new ConcurrentLinkedQueue<>();
         readers = new ArrayList<>(numberOfPl);
         initServer();
         timer = new Timer();
@@ -84,14 +85,20 @@ public class MyServer extends TimerTask {
 
     @Override
     public void run() {
-        byte[] flushing = new byte[commands.size()];
+        int queueSize = commands.size();
+        byte[] flushing = new byte[queueSize];
         int curNum = 0;
-        while (!commands.isEmpty()) {
-            flushing[curNum++] = commands.remove();
+        try {
+            while (curNum < queueSize) {
+                flushing[curNum++] = commands.remove();
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(curNum);
+            System.err.println(queueSize);
         }
         for (OutputStream stream : clientOutput) {
             try {
-                stream.write((byte) commands.size());
+                stream.write(queueSize);
                 stream.write(flushing);
             } catch (IOException e) {
                 e.printStackTrace();
