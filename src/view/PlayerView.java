@@ -47,7 +47,12 @@ public class PlayerView{
         xCoordinate = (int)((scale/3.5) * Math.sin(angle*Math.PI/180) + scale / 2.2);
         yCoordinate = (int)((scale/3.5) * Math.cos(angle*Math.PI/180) + scale / 2.5);
        // player.setCoordinate(xCoordinate, yCoordinate);
+        if (player == null){
+            System.err.println("player is null!");
+                    throw new RuntimeException();
+        }
         playerInfo = player;
+
     }
 
 

@@ -359,7 +359,9 @@ public class MyPanel extends JPanel {
                     case CARD_OPENED:
                         System.out.printf("%s open next card\n",
                                 client.getPlayer(whoPlayed).getName());
-                        playersView.get(whoPlayed).setTopCardView(cardsView);
+                        try{
+                            playersView.get(whoPlayed).setTopCardView(cardsView);
+                        }catch (Exception e){}
 
                         break;
                     case NOT_DEFINED_CATCH:
