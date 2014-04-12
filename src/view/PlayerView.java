@@ -94,8 +94,14 @@ public class PlayerView {
         g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(), xCoordinate + scale / 60 + 70, yCoordinate + CardView.getCardSize() + scale / 30);
 
         if (playerInfo.getOpenCardsCount() != 0) {
-            Image image = topCardView.getCardImage();
-            g.drawImage(image, xCoordinate, yCoordinate + CardView.getCardSize(), CardView.getCardSize(), CardView.getCardSize(), panel);
+            Image image;
+            try {
+                image = topCardView.getCardImage();
+                g.drawImage(image, xCoordinate, yCoordinate + CardView.getCardSize(), CardView.getCardSize(), CardView.getCardSize(), panel);
+            } catch (Exception e) {
+                System.err.println("can't find image!");
+            }
+
             g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
         } else if (playerInfo.getCloseCardsCount() != 0)
             g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
