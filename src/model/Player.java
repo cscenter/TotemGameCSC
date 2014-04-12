@@ -1,13 +1,13 @@
 package model;
-import java.util.*;
+
+import java.util.LinkedList;
 
 /**
  * один игрок
  * у него есть имя.
  * и открытые и закрытые карты
  */
-public class Player
-{
+public class Player {
     private LinkedList<Card> openedCards, closedCards;
     private String name;
     private int xCoordinate;
@@ -17,9 +17,10 @@ public class Player
     /**
      * конструктор.
      * Открытых карт нет
+     *
      * @param playerName имя игрока
-     * */
-    public Player(String playerName){
+     */
+    public Player(String playerName) {
         name = playerName;
         openedCards = new LinkedList<>();
         closedCards = new LinkedList<>();
@@ -28,9 +29,10 @@ public class Player
 
     /**
      * заносим закрытые карты
+     *
      * @param cards часть allCards, которая будет передана в качестве закрытых
      */
-    public void setCardsToPlayer(LinkedList<Card> cards){
+    public void setCardsToPlayer(LinkedList<Card> cards) {
         closedCards.addAll(cards);
     }
 
@@ -49,61 +51,64 @@ public class Player
         System.out.printf("\n\n");
     }
 */
-    public String getName(){
-    	return name;    
-    }    
-    public int getCardsCount()
-    {
+    public String getName() {
+        return name;
+    }
+
+    public int getCardsCount() {
         return openedCards.size() + closedCards.size();
     }
-    public int getOpenCardsCount()
-    {
+
+    public int getOpenCardsCount() {
         return openedCards.size();
     }
-    public int getCloseCardsCount()
-    {
+
+    public int getCloseCardsCount() {
         return closedCards.size();
     }
-    
-    public Card openNextCard()
-    {
-        if (closedCards.size() == 0){
+
+    public Card openNextCard() {
+        if (closedCards.size() == 0) {
             return openedCards.get(openedCards.size() - 1);
         }
         Card card = closedCards.pollFirst();
         openedCards.addLast(card);
         return card;
     }
-    
-    public Card getTopOpenedCard()
-    {
-        if (getOpenCardsCount() == 0){
+
+    public Card getTopOpenedCard() {
+        if (getOpenCardsCount() == 0) {
             return null;
         }
         return openedCards.getLast();
     }
 
-    public LinkedList<Card> pickUpAllOpenedCards(){
+    public LinkedList<Card> pickUpAllOpenedCards() {
         LinkedList<Card> result = new LinkedList<>(openedCards);
         openedCards.clear();
-        
+
         return result;
     }
-   public int getXCoordinate(){
-       return xCoordinate;
-   }
-   public int getYCoordinate(){
-       return yCoordinate;
-   }
-   public void setCoordinate(int x, int y){
-       xCoordinate = x;
-       yCoordinate = y;
-   } 
-   public void setGo(boolean ok){
-       isgo = ok;
-   }
-   public boolean isGO(){
-       return isgo;
-   }
-    
+
+    public int getXCoordinate() {
+        return xCoordinate;
+    }
+
+    public int getYCoordinate() {
+        return yCoordinate;
+    }
+
+    public void setCoordinate(int x, int y) {
+        xCoordinate = x;
+        yCoordinate = y;
+    }
+
+    public void setGo(boolean ok) {
+        isgo = ok;
+    }
+
+    public boolean isGO() {
+        return isgo;
+    }
+
 }

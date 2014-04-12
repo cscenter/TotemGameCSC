@@ -1,10 +1,12 @@
 package controller;
 
+import model.Card;
+import model.Game;
+import model.Player;
+import view.GraphicsView;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import model.*;
-import view.GraphicsView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,22 +17,36 @@ import view.GraphicsView;
  */
 public interface TotemClient {
     public int getPlayersCount();
+
     public Player getPlayer(int i);
+
     public Game.Totem getTotem();
+
     public int getPlayerWhoWillGo();
+
     public int getTurnNumber();
+
     public boolean isGameEnded();
+
     public Game.ResultOfMakeMove makeMove(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
+
     public ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem);
+
     public Game.GameMode getGameMode();
+
     public void afterDuelMakeMove(int winner, int looser);
+
     public void arrowsInMakeMove(int winner);
+
     public void openAllTopCards();
+
     public LinkedList<Card> getAllCards();
+
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
+
     public void setGraphicsView(GraphicsView view);
 //    public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
-  //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
+    //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
 
 
-    }
+}

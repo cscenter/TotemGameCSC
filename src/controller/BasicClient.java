@@ -1,13 +1,16 @@
 package controller;
 
+import model.Card;
+import model.Game;
+import model.Player;
+import view.GraphicsView;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import model.*;
-import view.GraphicsView;
-
 public class BasicClient implements TotemClient {
     private Game myGame;
+
     @Override
     public int getPlayersCount() {
         return myGame.getPlayersCount();
@@ -69,22 +72,25 @@ public class BasicClient implements TotemClient {
     }
 
     @Override
-    public LinkedList<Card> getAllCards(){
+    public LinkedList<Card> getAllCards() {
         return myGame.getAllCards();
     }
 
     @Override
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid){
+    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
         myGame.moveWithoutAnswer(playerIndex, whatPlayerDid);
     }
+
     @Override
-    public void setGraphicsView(GraphicsView view){
+    public void setGraphicsView(GraphicsView view) {
         myGame.setGraphicsView(view);
     }
-    public BasicClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
-        myGame = new Game(playersNames,cardNumbers);
+
+    public BasicClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers) {
+        myGame = new Game(playersNames, cardNumbers);
     }
-    public BasicClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed){
+
+    public BasicClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed) {
         myGame = new Game(playersNames, cardNumbers, firstPerson, cardSeed);
     }
 

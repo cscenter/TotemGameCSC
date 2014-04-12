@@ -1,16 +1,22 @@
 package controller;
 
-import java.io.*;
+import model.Card;
+import model.Game;
+import model.Player;
+import utils.Configuration;
+import view.GraphicsView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
 
-import utils.*;
-import model.*;
-import view.*;
-
-public class MyClient implements  TotemClient{
+public class MyClient implements TotemClient {
     private Game myGame;
     private Socket socket;
     private InputStream inputStream;
@@ -20,10 +26,12 @@ public class MyClient implements  TotemClient{
     private Queue<Game.WhatPlayerDid> whatDid;
 
     private int whatPlayer;
-    public int getWhatPlayer(){
+
+    public int getWhatPlayer() {
         return whatPlayer;
     }
-    public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
+
+    public MyClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers) {
         String ip = Configuration.getServerIp();
         commands = new SynchronousQueue<>();
         whatDid = new LinkedList<>();
@@ -33,13 +41,13 @@ public class MyClient implements  TotemClient{
         new ToClient().start();
     }
 
-    private void initConnection(String ip,  int port, ArrayList<String> playersNames, ArrayList<Integer> cardNumbers){
-        try{
+    private void initConnection(String ip, int port, ArrayList<String> playersNames, ArrayList<Integer> cardNumbers) {
+        try {
             System.out.println("connect to server");
-            socket= new Socket(ip, port);
+            socket = new Socket(ip, port);
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
-            if (socket.isConnected()){
+            if (socket.isConnected()) {
                 System.out.println("connection done. Wait for other players to start initializing");
             }
             String outputStr;
@@ -47,9 +55,12 @@ public class MyClient implements  TotemClient{
             int cardSeed = inputStream.read();
             whatPlayer = inputStream.read();
             System.out.println("initializing complete");
-            myGame = new Game(playersNames,cardNumbers, firstPlayer, cardSeed);
-        }catch(UnknownHostException e){e.printStackTrace();}
-        catch(IOException e){e.printStackTrace();}
+            myGame = new Game(playersNames, cardNumbers, firstPlayer, cardSeed);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -61,7 +72,6 @@ public class MyClient implements  TotemClient{
     public Player getPlayer(int i) {
         return myGame.getPlayer(i);
     }
-
 
 
     @Override
@@ -99,6 +109,7 @@ public class MyClient implements  TotemClient{
     public Game.GameMode getGameMode() {
         return myGame.getGameMode();
     }
+
     @Override
     public void afterDuelMakeMove(int winner, int looser) {
         myGame.afterDuelMakeMove(winner, looser);
@@ -113,14 +124,16 @@ public class MyClient implements  TotemClient{
     public void openAllTopCards() {
         myGame.openAllTopCards();
     }
+
     @Override
-    public LinkedList<Card> getAllCards(){
+    public LinkedList<Card> getAllCards() {
         return myGame.getAllCards();
     }
+
     @Override
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid){
+    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
         try {
-            if (playerIndex == whatPlayer){
+            if (playerIndex == whatPlayer) {
                 outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
             }
 //            getInformationFromServer();
@@ -132,34 +145,39 @@ public class MyClient implements  TotemClient{
 
 
     @Override
-    public void setGraphicsView(GraphicsView view){
+    public void setGraphicsView(GraphicsView view) {
         myGame.setGraphicsView(view);
     }
-    private class ToClient extends Thread{
-        public void getInformationFromServer(){
-            try{
+
+    private class ToClient extends Thread {
+        public void getInformationFromServer() {
+            try {
                 String outputStr;
                 int length;
                 int res;
-                boolean isReading=false;
+                boolean isReading = false;
                 commands.clear();
-                while (true){
+                while (true) {
                     length = (inputStream.read());
-                    for (int i=0; i<length; i++){
-                        res=inputStream.read();
+                    for (int i = 0; i < length; i++) {
+                        res = inputStream.read();
                         commands.add((byte) (res));
                     }
                 }
-            }catch(UnknownHostException e){e.printStackTrace();}
-            catch(IOException e){e.printStackTrace();}
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Configuration.decodeCommands(commands, whoDid, whatDid);
         }
+
         @Override
-        public void run(){
-            while (!isGameEnded()){
+        public void run() {
+            while (!isGameEnded()) {
                 getInformationFromServer();
                 System.out.println("get information from server");
-                while (!whoDid.isEmpty()){
+                while (!whoDid.isEmpty()) {
                     Integer who = whoDid.remove();
                     Game.WhatPlayerDid what = whatDid.remove();
                     myGame.moveWithoutAnswer(who, what);

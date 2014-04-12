@@ -1,20 +1,22 @@
 package view;
 
+import controller.BasicClient;
+import controller.MyClient;
+import controller.TotemClient;
+import utils.Configuration;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import model.*;
-import utils.*;
-import controller.*;
 
 /**
  * Класс, отвечающий за работу с игроками
  * В графическом режиме
  */
-public class GraphicsView extends JFrame{
-//    private Game myGame;
+public class GraphicsView extends JFrame {
+    //    private Game myGame;
     private static int FRAME_SIZE;
     private MyPanel myPanel;
     boolean isServer;
@@ -32,78 +34,80 @@ public class GraphicsView extends JFrame{
      * t, y
      * u, i
      */
-    private char getNewChar(String inputMessage, String errorOutputMessage){
+    private char getNewChar(String inputMessage, String errorOutputMessage) {
         String inputString;
         char inputChar;
         Scanner scan = new Scanner(System.in);
-        do{
-            try{
+        do {
+            try {
                 System.out.println(inputMessage);
                 inputString = scan.nextLine();
                 inputChar = inputString.charAt(0);
-            } catch (StringIndexOutOfBoundsException e){
+            } catch (StringIndexOutOfBoundsException e) {
                 System.out.printf("%s\n", errorOutputMessage);
                 continue;
             }
             break;
-        }while(true);
+        } while (true);
         return inputChar;
     }
-    private void defaultSettings(ArrayList <String> names, ArrayList <Character> openKeys, ArrayList<Character> catchKeys,
-                                 ArrayList<Double> angles){
-        for (int i=0; i< Configuration.getNumberOfPlayers(); i++){
+
+    private void defaultSettings(ArrayList<String> names, ArrayList<Character> openKeys, ArrayList<Character> catchKeys,
+                                 ArrayList<Double> angles) {
+        for (int i = 0; i < Configuration.getNumberOfPlayers(); i++) {
             names.add(Configuration.getPeopleNames().get(i));
             openKeys.add(Configuration.getPeopleOpenKeys().get(i));
             catchKeys.add(Configuration.getPeopleCatchKeys().get(i));
-            angles.add(360.0*i/Configuration.getNumberOfPlayers());
-                    }
+            angles.add(360.0 * i / Configuration.getNumberOfPlayers());
+        }
     }
 
 
-    private int setNumberOfPlayers(){
+    private int setNumberOfPlayers() {
         int numberOfPeople;
         Scanner scan = new Scanner(System.in);
         do {
-            try{
+            try {
                 System.out.println("Please, insert number of players");
                 numberOfPeople = scan.nextInt();
                 scan.nextLine();
-            } catch (InputMismatchException | StringIndexOutOfBoundsException e){
+            } catch (InputMismatchException | StringIndexOutOfBoundsException e) {
                 System.out.println("Integer must be integer, you, clever user! try again\n");
                 scan.nextLine();
                 continue;
             }
             System.out.printf("\n");
-            if (numberOfPeople <= 1){
+            if (numberOfPeople <= 1) {
                 System.out.printf("%d isn't correct number of players! try again\n", numberOfPeople);
-            }else{
+            } else {
                 break;
             }
-        } while(true);
+        } while (true);
         return numberOfPeople;
     }
-    private void notDefaultSettings(ArrayList<String> rezultStrings){
+
+    private void notDefaultSettings(ArrayList<String> rezultStrings) {
         int numberOfPeople = setNumberOfPlayers();
         Scanner scan = new Scanner(System.in);
         String inputString;
         char inputCatchTotemKey;
         char inputOpenCardKey;
 //        myPanel.playersView.ensureCapacity(numberOfPeople);
-        for (int i = 0; i < numberOfPeople; i++){
+        for (int i = 0; i < numberOfPeople; i++) {
             String inputS;
             do {
-                System.out.printf("player %d: insert your name\n", i+1);
+                System.out.printf("player %d: insert your name\n", i + 1);
                 inputS = scan.nextLine();
-                if (inputS.length()!=0){
+                if (inputS.length() != 0) {
                     break;
-                }else{
+                } else {
                     System.out.println("Name can't be empty string! try again");
                 }
-            }while(true);
+            } while (true);
             rezultStrings.add(inputS);
             label:
             do {
-                try{
+                try {
                     System.out.printf("%s: insert key to open first card\n", inputS);
                     inputString = scan.nextLine();
                     inputOpenCardKey = inputString.charAt(0);
@@ -115,13 +119,14 @@ public class GraphicsView extends JFrame{
                             continue label;
                         }
                     }
-*/                    break;
-                }catch (StringIndexOutOfBoundsException e){
+*/
+                    break;
+                } catch (StringIndexOutOfBoundsException e) {
                     System.out.printf("%s, you know, what you just did?? You may drop the game!" +
                             " Thing about your behaviour and try once more!\n", inputS);
                 }
 
-            }while(true);
+            } while (true);
 /*            label:
             do{
                 try {
@@ -153,19 +158,20 @@ public class GraphicsView extends JFrame{
         }
 
     }
-    private ArrayList<String> startView(ArrayList <Character> openKeys, ArrayList<Character> catchKeys,
-                                        ArrayList<Double> angles){
-        ArrayList <String> names = new ArrayList<>();
+
+    private ArrayList<String> startView(ArrayList<Character> openKeys, ArrayList<Character> catchKeys,
+                                        ArrayList<Double> angles) {
+        ArrayList<String> names = new ArrayList<>();
         boolean flag = true;
         int numberOfPeople = 4;
-        do{
+        do {
             Character inputChar;
 //            myPanel.playersView = new ArrayList<>();
             inputChar = getNewChar("Use the default settings? (Y/N)", "No-No-NO, %username% ! Char means char, not empty string!");
-            switch (inputChar.toString().toUpperCase().charAt(0)){ /* использовать параметры по умолчанию?*/
+            switch (inputChar.toString().toUpperCase().charAt(0)) { /* использовать параметры по умолчанию?*/
                 case 'Y':           /*да*/
                     flag = false;
-                    defaultSettings(names,openKeys, catchKeys, angles);
+                    defaultSettings(names, openKeys, catchKeys, angles);
                     break;
                 case 'N':               /*нет*/
                     flag = false;
@@ -180,9 +186,9 @@ public class GraphicsView extends JFrame{
         System.out.println("So, we have:");
         System.out.printf("Number of people: %d\n", numberOfPeople);
 //        for (graphics.PlayerView p : myPanel.playersView){
-  //          System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
-    //                p.playerViewName, p.openCardKey, p.catchTotemKey);
-      //  }
+        //          System.out.printf("Player %s has '%c' as key to open last card and '%c' as key to catch totem\n",
+        //                p.playerViewName, p.openCardKey, p.catchTotemKey);
+        //  }
         return names;
     }
 
@@ -219,16 +225,17 @@ public class GraphicsView extends JFrame{
 
     }*/
 
-    public void repaintView(){
+    public void repaintView() {
         myPanel.repaint();
     }
-    public GraphicsView(){
+
+    public GraphicsView() {
         isServer = Configuration.isServer;
-        ArrayList <Character> openKeys = new ArrayList<>();
+        ArrayList<Character> openKeys = new ArrayList<>();
         ArrayList<Character> catchKeys = new ArrayList<>();
         ArrayList<Double> angles = new ArrayList<>();
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
-        (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+                (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
         setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
 
         //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу

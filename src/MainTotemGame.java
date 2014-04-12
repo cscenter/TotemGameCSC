@@ -1,7 +1,7 @@
-import controller.MyClient;
-import view.*;
 import net.MyServer;
 import utils.Configuration;
+import view.GraphicsView;
+import view.View;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,28 +12,28 @@ import utils.Configuration;
  */
 
 public class MainTotemGame {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         int i = 0;
-        if (args.length ==0){
+        if (args.length == 0) {
             new GraphicsView(); //.run();
-        }else{
-            switch (args[0].charAt(0)){
+        } else {
+            switch (args[0].charAt(0)) {
                 case '1':
                     (new View()).run();
                     break;
                 case '3':
-                    Configuration.numberOfPlayers=2;
-                    Configuration.isServer=true;
+                    Configuration.numberOfPlayers = 2;
+                    Configuration.isServer = true;
                     new GraphicsView();
                     break;
                 case '4':
-                    Configuration.numberOfPlayers=2;
-                    Configuration.isServer=true;
+                    Configuration.numberOfPlayers = 2;
+                    Configuration.isServer = true;
                     new MyServer();
                     break;
                 case '0':
-                    Configuration.numberOfPlayers=4;
-                    Configuration.isServer=false;
+                    Configuration.numberOfPlayers = 4;
+                    Configuration.isServer = false;
                     new GraphicsView();
                     break;
 
@@ -41,7 +41,7 @@ public class MainTotemGame {
 
                     (new View()).run();
             }
-            if (args.length==2){
+            if (args.length == 2) {
                 Configuration.ChangeDir(args[1]);
             }
         }

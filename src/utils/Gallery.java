@@ -17,10 +17,11 @@ public class Gallery {
     private ArrayList<String> otherNames;
     private HashMap<String, Image> resources;
 
-    public Image getImage(String name){
-        return  resources.get(name);
+    public Image getImage(String name) {
+        return resources.get(name);
     }
-    public Gallery(){
+
+    public Gallery() {
         resources = new HashMap<>(100);
         cardsNames = new ArrayList<>(100);
         otherNames = new ArrayList<>();
@@ -28,7 +29,7 @@ public class Gallery {
         ArrayList<String> imgNames = getCardsNames();
         getOtherPicturesNames();
 //        imgNames.addAll(getOtherPicturesNames());       /* почему так не получается???*/
-        for (String imgName : imgNames){
+        for (String imgName : imgNames) {
             Image image;
             URL url = cl.getResource(imgName);
             try {
@@ -38,7 +39,7 @@ public class Gallery {
             }
             resources.put(imgName, image);
         }
-        for (String name : otherNames){
+        for (String name : otherNames) {
             Image image;
             URL url = cl.getResource(name);
             try {
@@ -51,18 +52,18 @@ public class Gallery {
         }
     }
 
-    private ArrayList<String> getOtherPicturesNames(){
+    private ArrayList<String> getOtherPicturesNames() {
         BufferedReader input;
         String classJar =
                 Gallery.class.getResource("/MainTotemGame.class").toString();
         if (classJar.startsWith("jar:")) {
             InputStream in;
-            in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfPic.txt");
+            in = Gallery.class.getResourceAsStream(Configuration.getDirectory() + "listOfPic.txt");
             input = new BufferedReader(new InputStreamReader(in));
-        }else {
+        } else {
             try {
                 //System.out.print(Configuration.getDirectory());
-                input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfPic.txt"));
+                input = new BufferedReader(new FileReader(Configuration.getDirectory() + "listOfPic.txt"));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException("can't read names of images!");
             }
@@ -70,28 +71,28 @@ public class Gallery {
         String line;
         try {
             while ((line = input.readLine()) != null) {
-                String imgName = Configuration.getDirectory()+line;
+                String imgName = Configuration.getDirectory() + line;
                 otherNames.add(imgName);
             }
             input.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return otherNames;
     }
 
-    public ArrayList<String> getCardsNames(){
-        if (cardsNames.isEmpty()){
+    public ArrayList<String> getCardsNames() {
+        if (cardsNames.isEmpty()) {
             BufferedReader input;
             String classJar =
                     Gallery.class.getResource("/MainTotemGame.class").toString();
             if (classJar.startsWith("jar:")) {
                 InputStream in;
-                in = Gallery.class.getResourceAsStream(Configuration.getDirectory()+"listOfCards.txt");
+                in = Gallery.class.getResourceAsStream(Configuration.getDirectory() + "listOfCards.txt");
                 input = new BufferedReader(new InputStreamReader(in));
-            }else {
+            } else {
                 try {
-                    input = new BufferedReader(new FileReader(Configuration.getDirectory()+"listOfCards.txt"));
+                    input = new BufferedReader(new FileReader(Configuration.getDirectory() + "listOfCards.txt"));
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException("can't read names of images");
                 }
@@ -99,20 +100,20 @@ public class Gallery {
             String line;
             try {
                 while ((line = input.readLine()) != null) {
-    //                System.err.println(line);
-                    cardsNames.add(Configuration.getDirectory()+line);
-      //              result.add(getCardNumber(line));
+                    //                System.err.println(line);
+                    cardsNames.add(Configuration.getDirectory() + line);
+                    //              result.add(getCardNumber(line));
 
                 }
                 input.close();
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return cardsNames;
     }
 
-    private static int getCardNumber(String str){
+    private static int getCardNumber(String str) {
 //        System.err.println(str);
         Pattern numberPattern = Pattern.compile("[0-9]+");
         Matcher numberMatcher = numberPattern.matcher(str);

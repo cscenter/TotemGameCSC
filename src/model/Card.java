@@ -1,12 +1,14 @@
 package model;
+
 /**
  * Класс - одна карта. У неё есть цвет, id и тип
-*/
-public class Card{
+ */
+public class Card {
     final private int color;
     final private int number;
     final private CardType cardType;
-    public enum CardType{
+
+    public enum CardType {
         NORMAL,
         ARROWS_OUT,
         ARROWS_IN,
@@ -14,22 +16,25 @@ public class Card{
 //        HAND_IN,
 //        ARROWS_TO_NEXT;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         int num = getCardNumber();
-        if (num<100){
-            return "0"+num;
+        if (num < 100) {
+            return "0" + num;
         }
-        return num+"";
+        return num + "";
     }
-    CardType getCardType(){
+
+    CardType getCardType() {
         return cardType;
     }
-    public Card (int number){
+
+    public Card(int number) {
         color = number % 10;
         this.number = number / 10;
-        if (color == 5){
-            switch (this.number / 10){
+        if (color == 5) {
+            switch (this.number / 10) {
                 case 0:
                     cardType = CardType.ARROWS_COLORED;
                     break;
@@ -42,17 +47,20 @@ public class Card{
                 default:
                     cardType = CardType.NORMAL;
             }
-        }else{
+        } else {
             cardType = CardType.NORMAL;
         }
     }
-    public int getCardNumber(){
+
+    public int getCardNumber() {
         return number * 10 + color;
     }
-    public int getCardColor(){
+
+    public int getCardColor() {
         return color;
     }
-    public int getCardFormNumber(){
+
+    public int getCardFormNumber() {
         return number;
     }
 }
