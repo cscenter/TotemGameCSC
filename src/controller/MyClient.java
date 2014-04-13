@@ -65,6 +65,10 @@ public class MyClient implements TotemClient {
      * какому игроку соответвует этот контроллер
      * @return номер игрока
      */
+    /**
+     * ссылка на вид. он обновляется после появления инфы с сервера
+     */
+    private GraphicsView graphicsView;
     @Override
     public int getWhatPlayer() {
         return whatPlayer;
@@ -300,13 +304,13 @@ public class MyClient implements TotemClient {
     }
 
     /**
-     * передаёт модели ссылку на вид. Временное решение. будет добавлен листенер...
+     * создаёт ссылку на вид
      *
      * @param view ссылка на вид
      */
     @Override
     public void setGraphicsView(GraphicsView view) {
-        myGame.setGraphicsView(view);
+        graphicsView = view;
     }
 
     /**
@@ -344,21 +348,53 @@ public class MyClient implements TotemClient {
          * в бесконечном цикле ждём информации с сервера
          * и передаём её в модель
          *
-         * (временное решение)
+         * т.к. игрок мог открыть карту лишь если у него не было дуэли,
+         * открытие карты можно перенести по событиям вконец.
+         * формируем очереди из одних захватов тотема + (возможно) одной открытой карты для последнего игрока
+         * модель интересует лишь первый захват тотема
+         * и открытая карта. Передаём это ей
+         *
+         * А view - вся последовательность захватов тотема. Передаём ему.
          */
         @Override
         public void run() {
             while (!isGameEnded()) {
                 getInformationFromServer();
+                Queue<Integer> newWhoDid = new LinkedList<>();
+                Queue<Game.WhatPlayerDid> newWhatDid = new LinkedList<>();
+                boolean hasOneTotem = false;
+                int whoTookTotemFirst = -1;
+                boolean hasOpenCard = false;
+                int whoOpenCard = -1;
                 if (whatDid.size() > 0) {
                     System.out.println("get information from server");
                 }
                 while (!whoDid.isEmpty()) {
                     Integer who = whoDid.remove();
                     Game.WhatPlayerDid what = whatDid.remove();
-                    myGame.moveWithoutAnswer(who, what);
+                    if ((what == Game.WhatPlayerDid.TOOK_TOTEM)){
+                        if (!hasOneTotem){
+                            whoTookTotemFirst = who;
+                            hasOneTotem = true;
+                        }
+                        newWhatDid.add(what);
+                        newWhoDid.add(who);
+                    } else {
+                        if (!hasOpenCard){
+                            hasOpenCard = true;
+                            whoOpenCard = who;
+                        }
+                    }
                 }
-
+                if (hasOneTotem){
+                    myGame.makeMove(whoTookTotemFirst, Game.WhatPlayerDid.TOOK_TOTEM);
+                }
+                if(hasOpenCard){
+                    newWhatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
+                    newWhoDid.add(whoOpenCard);
+                    myGame.makeMove(whoOpenCard, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                }
+                graphicsView.repaintView(newWhoDid, newWhatDid);
             }
         }
 

@@ -3,13 +3,12 @@ package view;
 import controller.BasicClient;
 import controller.MyClient;
 import controller.TotemClient;
+import model.Game;
 import utils.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Класс, отвечающий за работу с игроками
@@ -225,7 +224,12 @@ public class GraphicsView extends JFrame {
 
     }*/
 
-    public void repaintView() {
+    /**
+     * функция перерисовки после того, как сервер прислал информацию.
+     * @param whoDid кто ходил
+     * @param whatDid что сделал. Тут всё, кроме, возможно, последнего, должны быть захваты тотема
+     */
+    public void repaintView(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid) {
         myPanel.repaint();
     }
 

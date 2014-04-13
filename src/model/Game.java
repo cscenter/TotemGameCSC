@@ -430,29 +430,4 @@ public class Game {
     public Player getPlayer(int playerIndex) {
         return players.get(playerIndex);
     }
-
-    /**
-     * ссылка на View.
-     * ВРЕМЕННОЕ РЕШЕНИЕ
-     */
-    private GraphicsView graphicsView;
-
-    /**
-     * задаёт ссылку на View
-     * ВРЕМЕННОЕ РЕШЕНИЕ
-     * @param view ссылка
-     */
-    public void setGraphicsView(GraphicsView view) {
-        graphicsView = view;
-    }
-
-    /**
-     * ход.сейчас реализованно через makeMove. по одному пихнуть всё и потом перерисовать
-     * @param playerIndex кто походил
-     * @param whatPlayerDid что сделал походивший
-     */
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        makeMove(playerIndex, whatPlayerDid);
-        graphicsView.repaintView();
-    }
 }

@@ -122,7 +122,7 @@ public interface TotemClient {
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
 
     /**
-     * передаёт модели ссылку на вид. Временное решение. будет добавлен листенер...
+     * ссылка на View, нужна будет для передачи результатов с сервера
      *
      * @param view ссылка на вид
      */

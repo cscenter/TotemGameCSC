@@ -7,6 +7,7 @@ import view.GraphicsView;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * простая имплиминтация контроллера (для одного компа)
@@ -17,7 +18,7 @@ public class BasicClient implements TotemClient {
      * ссылка на модель
      */
     private Game myGame;
-
+    private GraphicsView graphicsView;
     /**
      * считает количество игроков
      *
@@ -159,7 +160,13 @@ public class BasicClient implements TotemClient {
      */
     @Override
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        myGame.moveWithoutAnswer(playerIndex, whatPlayerDid);
+        myGame.makeMove(playerIndex, whatPlayerDid);
+        Queue <Integer> who = new LinkedList<>();
+        who.add(playerIndex);
+        Queue <Game.WhatPlayerDid> what = new LinkedList<>();
+        what.add(whatPlayerDid);
+
+        graphicsView.repaintView(who, what);
     }
 
     /**
@@ -169,7 +176,8 @@ public class BasicClient implements TotemClient {
      */
     @Override
     public void setGraphicsView(GraphicsView view) {
-        myGame.setGraphicsView(view);
+        graphicsView = view;
+        //myGame.setGraphicsView(view);
     }
 
     /**
