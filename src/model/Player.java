@@ -137,7 +137,12 @@ public class Player {
         xCoordinate = x;
         yCoordinate = y;
     }
+  */
 
+    /**
+     * тут какая-то магия. Маша, напиши, пожалуста,что делает эта переменная
+     */
+    boolean isgo;
     public void setGo(boolean ok) {
         isgo = ok;
     }
@@ -145,5 +150,5 @@ public class Player {
     public boolean isGO() {
         return isgo;
     }
-  */
+
 }

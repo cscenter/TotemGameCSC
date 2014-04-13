@@ -98,6 +98,21 @@ public class PlayerView {
     }
 
     /**
+     * возвращает координату игрока по оси x
+     * @return координата игрока по оси x
+     */
+    public int getXCoordinate(){
+        return xCoordinate;
+    }
+
+    /**
+     * возвращает координату по оси y
+     * @return координата по оси y
+     */
+    public int getYCoordinate(){
+        return yCoordinate;
+    }
+    /**
      * конструктор. задаёт кнопки, угол и ссылку на информацию об игроке
      * @param newOpenCardKey кнопка открытия карты
      * @param newCatchTotemKey кнопка захвата тотема

@@ -33,6 +33,8 @@ public class MyPanel extends JPanel {
     private int mesOk;
     private int typeTotem;
     private int xMes;
+    private TotemView totemV;
+    private ArrayList<PlayerView> playersView;
     private int pos;
     private Timer timer;
 
@@ -111,9 +113,6 @@ public class MyPanel extends JPanel {
         }
     }
 
-    private TotemView totemV;
-    private ArrayList<PlayerView> playersView;
-
     private void reSize(int haracteristicScale) {
         panel_size = haracteristicScale;
         PlayerView.setScale(haracteristicScale);
@@ -143,7 +142,7 @@ public class MyPanel extends JPanel {
         for (PlayerView player : playersView) {
             try {
                 player.drawPlayer(g, this);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -163,10 +162,14 @@ public class MyPanel extends JPanel {
         String whoPlayedMes = "It's " + playersView.get(client.getPlayerWhoWillGo()).getPlayerName() + "'s turn!";
         g.drawChars(whoPlayedMes.toCharArray(), 0, whoPlayedMes.length(), 20, 20);
         int all = client.getPlayersCount();
-        int x1 = client.getPlayer((all - 1 + client.getPlayerWhoWillGo()) % all).getXCoordinate(),
+        int x1 = playersView.get((all - 1 + client.getPlayerWhoWillGo()) % all).getXCoordinate();
+        int y1 = playersView.get((all - 1 + client.getPlayerWhoWillGo()) % all).getYCoordinate();
+        int x2 = playersView.get(client.getPlayerWhoWillGo()).getXCoordinate();
+        int y2 = playersView.get(client.getPlayerWhoWillGo()).getYCoordinate();
+/*        int x1 = client.getPlayer((all - 1 + client.getPlayerWhoWillGo()) % all).getXCoordinate(),
                 y1 = client.getPlayer((all - 1 + client.getPlayerWhoWillGo()) % all).getYCoordinate(),
                 x2 = client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate(),
-                y2 = client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate();
+                y2 = client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate();*/
         float t = (float) 2. / 5;
         float x, y;
         while (t < (float) 3. / 5) {
@@ -187,7 +190,8 @@ public class MyPanel extends JPanel {
         }
         int plWhoGo = 0;
         for (int i = 0; i < client.getPlayersCount(); i++) {
-            if (client.getPlayer(i).isGO()) plWhoGo = i;
+            if (client.getPlayer(i).isGO())
+                plWhoGo = i;
             client.getPlayer(i).setGo(false);
 
         }
@@ -196,8 +200,8 @@ public class MyPanel extends JPanel {
             Image imgU = Configuration.getGallery().getImage("data/arrow_u.png");
             Image imgD = Configuration.getGallery().getImage("data/arrow_d.png");
 
-            int playerX = client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate();
-            int playerY = client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate();
+            int playerX = playersView.get(client.getPlayerWhoWillGo()).getXCoordinate(); // client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate();
+            int playerY = playersView.get(client.getPlayerWhoWillGo()).getYCoordinate(); // client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate();
 
             if (plWhoGo % 4 == 1) {
                 g.drawImage(imgU, playerX - 60, playerY + 150, 100, 250, null);
@@ -212,9 +216,9 @@ public class MyPanel extends JPanel {
                 g.drawImage(imgD, playerX - 300, playerY - 120, 100, 250, null);
             }
 
-            g.drawImage(ImageIO.read(new File("data/tboy-go1.png")), client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate() - 110, client.getPlayer(client.getPlayerWhoWillGo()).getYCoordinate(), null);
+            g.drawImage(Configuration.getGallery().getImage("data/tboy-go1.png"), playerX - 110, playerY, null);
             //    client.getPlayer(client.getPlayerWhoWillGo()).getXCoordinate()
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         // client.getPlayer(client.getPlayerWhoWillGo()).setGo(false);
