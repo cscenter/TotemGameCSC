@@ -173,6 +173,16 @@ public class BasicClient implements TotemClient {
     }
 
     /**
+     * возвращает кому принадлежит этот контроллер. фиктивно.
+     *
+     * @return кому принадлежит контроллер
+     */
+    @Override
+    public int getWhatPlayer() {
+        return 0;
+    }
+
+    /**
      * конструктор, в который передаётся имена и номера карт в порядке получения
      *
      * @param playersNames имена игроков

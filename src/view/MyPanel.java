@@ -259,8 +259,14 @@ public class MyPanel extends JPanel {
                 }
             }
         }
+      /* было (360.0 * i / Configuration.getNumberOfPlayers());
+      хотим (360.0 * (i - №клиента)  / Configuration.getNumberOfPlayers());
+       значит надо вычесть - 360.0 * client.getWhatPlayer() / Configuration.getNumberOfPlayers();
+        */
         for (int i = 0; i < ktKeys.size(); i++) {
-            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), client.getPlayer(i), angle.get(i)));
+            double currentAngle = angle.get(i);
+            currentAngle = currentAngle - 360.0 * client.getWhatPlayer() / Configuration.getNumberOfPlayers();
+            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), client.getPlayer(i), currentAngle));
         }
         totemV = new TotemView(client.getTotem());
     }

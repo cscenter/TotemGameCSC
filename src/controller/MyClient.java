@@ -60,11 +60,12 @@ public class MyClient implements TotemClient {
      * мы можем совершить лишь один ход за промежуток, в котором сервер получает команды.
      * вопрос,совершили ли мы его уже?
      */
-    private AtomicBoolean canWeGo;
+    private boolean canWeGo;
     /**
      * какому игроку соответвует этот контроллер
      * @return номер игрока
      */
+    @Override
     public int getWhatPlayer() {
         return whatPlayer;
     }
@@ -82,7 +83,7 @@ public class MyClient implements TotemClient {
         commands = new ConcurrentLinkedQueue<>();
         whatDid = new LinkedList<>();
         whoDid = new LinkedList<>();
-        canWeGo.lazySet(false);
+        canWeGo = false;
         int port = Configuration.getPort();
         initConnection(ip, port, playersNames, cardNumbers);
         new ToClient().start();
@@ -284,8 +285,8 @@ public class MyClient implements TotemClient {
      */
     @Override
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        if (canWeGo.get()){ //если ещё не ходили в этом кванте
-            canWeGo.lazySet(false);
+        if (canWeGo){ //если ещё не ходили в этом кванте
+            canWeGo = false;
             try {
                 if (playerIndex == whatPlayer) {
                     outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
@@ -322,7 +323,7 @@ public class MyClient implements TotemClient {
                 int length;
                 int res;
                 commands.clear();
-                canWeGo.lazySet(true);
+                canWeGo = true;
                 length = (inputStream.read());
                 if (length > 0) {
                     System.out.println("will read " + length + " commands");

@@ -127,6 +127,12 @@ public interface TotemClient {
      * @param view ссылка на вид
      */
     public void setGraphicsView(GraphicsView view);
+
+    /**
+     * возвращает кому принадлежит этот контроллер. фиктивно для игры на одном компе
+     * @return кому принадлежит контроллер
+     */
+    public int getWhatPlayer();
 //    public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers);
     //  public controller.TotemClient(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed);
 
