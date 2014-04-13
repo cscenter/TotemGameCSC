@@ -8,33 +8,69 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * визуальная информация о карте
+ */
 public class CardView {
+    /**
+     * размер карты
+     */
     private static int cardSize;
+    /**
+     * ссылка на саму карту
+     */
+    private final Card card;
+    /**
+     * ссылка на картинку карты
+     */
+    private final Image cardImage;
+    /**
+     * код карты
+     */
+    private final int id;
 
+    /**
+     * возвращает размер карты
+     * @return размер карты
+     */
     public static int getCardSize() {
         return cardSize;
     }
 
-    public CardView(ClassLoader cl, Card card, Image img, int id) {
+    /**
+     * конструктор. инициализирует пременные
+     * @param card описание карты
+     * @param img изображение карты
+     * @param id код карты
+     */
+    public CardView(Card card, Image img, int id) {
         this.card = card;
 //        this.fileCard = fileCard;
         this.cardImage = img;
         this.id = id;
     }
 
-    private final Card card;
-    //    private final File fileCard;
-    private final Image cardImage;
-    private final int id;
-
+    /**
+     * вовращает изображение карты
+     * @return изображение карты
+     */
     public Image getCardImage() {
         return cardImage;
     }
 
+    /**
+     * возвращает код карты
+     * @return код карты
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * возвращает список из номеров карт
+     * @see utils.Gallery#getCardsNames()
+     * @return список из номеров карт
+     */
     public static ArrayList<Integer> getCardsNumbers() {
         ArrayList<Integer> result = new ArrayList<>();
         ArrayList<String> cardsNames = Configuration.getGallery().getCardsNames();
@@ -44,19 +80,21 @@ public class CardView {
         return result;
     }
 
+    /**
+     * возвращает номер карты по строке
+     * @see utils.Gallery#getCardNumber(String)
+     * @param str строка с номеров карты
+     * @return число - номер карты
+     */
     private static int getCardNumber(String str) {
 //        System.err.println(str);
-        try {
-            Pattern numberPattern = Pattern.compile("[0-9]+");
-            Matcher numberMatcher = numberPattern.matcher(str);
-            numberMatcher.find();
-            return Integer.parseInt(numberMatcher.group());
-        } catch (IllegalStateException e) {
-            System.err.println(str);
-            throw new RuntimeException();
-        }
+        return Configuration.getGallery().getCardNumber(str);
     }
 
+    /**
+     * делает изменение размера картинки по характеристическому масштабу
+     * @param haracteristicScale характеристический масштаб
+     */
     public static void resize(int haracteristicScale) {
         cardSize = haracteristicScale / 10;
     }

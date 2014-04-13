@@ -249,7 +249,7 @@ public class MyPanel extends JPanel {
                     ClassLoader cl = MyPanel.class.getClassLoader();
 
 //                    Image image = (new ImageIcon(cl.getResource(cardI))).getImage();
-                    CardView cardView = new CardView(cl, card, Configuration.getGallery().getImage(cardI), num);
+                    CardView cardView = new CardView(card, Configuration.getGallery().getImage(cardI), num);
                     cardsView.set(num, cardView);
                     break;
                 }

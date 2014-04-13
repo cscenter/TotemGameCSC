@@ -8,12 +8,18 @@ import java.util.LinkedList;
  * и открытые и закрытые карты
  */
 public class Player {
+    /**
+     * карты игрока
+     */
     private LinkedList<Card> openedCards, closedCards;
+    /**
+     * имя
+     */
     private String name;
-    private int xCoordinate;
+/*    private int xCoordinate;
     private int yCoordinate;
     private boolean isgo = false;
-
+  */
     /**
      * конструктор.
      * Открытых карт нет
@@ -51,22 +57,44 @@ public class Player {
         System.out.printf("\n\n");
     }
 */
+
+    /**
+     *
+     * @return имя игрока
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @return общее количество карт
+     */
     public int getCardsCount() {
         return openedCards.size() + closedCards.size();
     }
 
+    /**
+     *
+     * @return количество открытых карт
+     */
     public int getOpenCardsCount() {
         return openedCards.size();
     }
 
+    /**
+     *
+     * @return количество закрытых карт
+     */
     public int getCloseCardsCount() {
         return closedCards.size();
     }
 
+    /**
+     * открываем новую карту:
+     * переносим из закрытых в открытые в начало
+     * @return открытая карта
+     */
     public Card openNextCard() {
         if (closedCards.size() == 0) {
             return openedCards.get(openedCards.size() - 1);
@@ -76,6 +104,10 @@ public class Player {
         return card;
     }
 
+    /**
+     * возвращает верхнюю открытую карту
+     * @return верхняя открытая карта или null в случае отсутствия
+     */
     public Card getTopOpenedCard() {
         if (getOpenCardsCount() == 0) {
             return null;
@@ -83,14 +115,17 @@ public class Player {
         return openedCards.getLast();
     }
 
+    /**
+     * забираем все открытые карты
+     * @return список из всех карт
+     */
     public LinkedList<Card> pickUpAllOpenedCards() {
         LinkedList<Card> result = new LinkedList<>(openedCards);
         openedCards.clear();
-
         return result;
     }
 
-    public int getXCoordinate() {
+/*    public int getXCoordinate() {
         return xCoordinate;
     }
 
@@ -110,5 +145,5 @@ public class Player {
     public boolean isGO() {
         return isgo;
     }
-
+  */
 }

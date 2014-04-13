@@ -10,19 +10,51 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.SynchronousQueue;
 
+/**
+ * серверная часть приложения
+ * в отдельных потоках крутятся ридеры для клиентов
+ * и раз в некое кол-во времени
+ * @see utils.Configuration#timeToWait
+ * получившаяся очередь рассылается игрокам
+ */
 public class MyServer extends TimerTask {
-    private int whoDidThis;
-    private int whatHeDid;
+    /**
+     * Таймер
+     */
     private Timer timer;
+    /**
+     * количество игроков
+     */
     private int numberOfPl;
+
+    /**
+     * список сокетов от клиентов
+     */
     private ArrayList<Socket> clients;
+    /**
+     * список соединений клиент-сервер
+     */
     private ArrayList<InputStream> clientInput;
+    /**
+     * список соединений сервер-клиент
+     */
     private ArrayList<OutputStream> clientOutput;
+    /**
+     * закодированные команды
+     * @see controller.MyClient#commands
+     */
     private Queue<Byte> commands;
+    /**
+     * список классов - чтецов
+     */
     private ArrayList<Reader> readers;
 
+    /**
+     * конструктор. инициализирует все переменные,
+     * запускает сервер на соединение
+     * даёт таймеру расписание
+     */
     public MyServer() {
         clientOutput = new ArrayList<>();
         numberOfPl = Configuration.getNumberOfPlayers();
@@ -35,6 +67,12 @@ public class MyServer extends TimerTask {
         timer.schedule(this, 10000, Configuration.getTimeToWait());
     }
 
+    /**
+     * сетевое соединение сервера.
+     * Ждёт входящих,
+     * пересылает им инфу о первом игроке, кем этот игрок будет и основании для рандома
+     * запускает потоки на прослушку
+     */
     private void initServer() {
         try (ServerSocket serverSocket = new ServerSocket(Configuration.getPort())) {
             //подключили всех пользователей
@@ -57,7 +95,7 @@ public class MyServer extends TimerTask {
             byte cardSeed = (byte) ((new Random()).nextInt());
 
             //пересылаем это всем
-            //+ кто каким ходит??
+            //+ кто за какого игрока ответственен
             System.out.println("start to give them initialize information: first Player is #" +
                     firstPlayer + ", card Seed is number " + cardSeed);
             for (byte i = 0; i < clientOutput.size(); i++) {
@@ -83,6 +121,12 @@ public class MyServer extends TimerTask {
 
     }
 
+    /**
+     * run у Таймера
+     * берёт часть очереди, которая была на начало выполнения функции
+     * загоняет её в массив байтов
+     * пересылает всем игрокам
+     */
     @Override
     public void run() {
         int queueSize = commands.size();
@@ -91,10 +135,10 @@ public class MyServer extends TimerTask {
         while (curNum < queueSize) {
             flushing[curNum++] = commands.remove();
         }
-        for (int i = 0; i < flushing.length; i++){
-            System.out.print(flushing[i]+ " ");
+        for (int i = 0; i < flushing.length; i++) {
+            System.out.print(flushing[i] + " ");
         }
-        System.out.println("\nso get "+ flushing.length+" commands. Now flush them to users");
+        System.out.println("\nso get " + flushing.length + " commands. Now flush them to users");
         for (OutputStream stream : clientOutput) {
             try {
                 stream.write(queueSize);
@@ -106,16 +150,31 @@ public class MyServer extends TimerTask {
         }
     }
 
+    /**
+     * класс чтенца, работающий в своём потоке
+     */
     private class Reader extends Thread {
+        /**
+         * игрок, которого слушаем
+         */
         int player;
 
+        /**
+         * инициализация простая: сопоставляем пришедшего из вне игрока с тем, которого будем слушать
+         * @param myPlayerNumber номер игрока, которого будем слушать
+         */
         public Reader(int myPlayerNumber) {
             player = myPlayerNumber;
         }
 
+        /**
+         * в бесконечном цикле слушаем.
+         * Если пришла какая-нибудь команда (1 байт)
+         * дописываем его в конец очереди
+         */
         @Override
         public void run() {
-            while (true){
+            while (true) {
                 int getting = -1;
                 try {
                     getting = clientInput.get(player).read();

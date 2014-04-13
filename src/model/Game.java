@@ -12,18 +12,50 @@ import java.util.Random;
  * а так же функции выполняемые во время хода
  */
 public class Game {
+    /**
+     * список игроков
+     */
     private ArrayList<Player> players;
+    /**
+     * список всех карт
+     */
     private LinkedList<Card> allCards;
+    /**
+     * ссылка на тотем
+     */
     private Totem totem;
+    /**
+     * общее количество карт
+     */
     private static int NUMBER_OF_CARDS;
+    /**
+     * номер хода
+     */
     private int turnNumber;
+    /**
+     * игрок,который ожидается будет ходить следующим
+     */
     private int playerWhoWillGo;
 
+    /**
+     * режим игры
+     */
+    private GameMode gameMode;
+    /**
+     *
+     * @return ссылку на все карты
+     */
     public LinkedList<Card> getAllCards() {
         return allCards;
     }
 
+    /**
+     * информация о тотеме
+     */
     public class Totem {
+        /**
+         * карты под тотемом
+         */
         private LinkedList<Card> cards;
 
         /**
@@ -37,21 +69,34 @@ public class Game {
                     NUMBER_OF_CARDS));
         }
 
+        /**
+         * отдаёт все карты из-под тотема.
+         * @return список карт, которые под тотемом лежили
+         */
         public LinkedList<Card> pickUpAllCards() {
             LinkedList<Card> result = new LinkedList<>(cards);
             cards.clear();
             return result;
         }
 
+        /**
+         * @return количество карт под тотемом
+         */
         public int getCardsCount() {
             return cards.size();
         }
     }
 
+    /**
+     * @return ссылка на тотем
+     */
     public Totem getTotem() {
         return totem;
     }
 
+    /**
+     * режим игры: обычный, по цветам, когда надо сейчас хватать тотем, когда надо открыть верхнюю карту
+     */
     public enum GameMode {
         NORMAL_MODE,
         COLOR_MODE,
@@ -59,8 +104,9 @@ public class Game {
         OPEN_CARD_MODE
     }
 
-    private GameMode gameMode;
-
+    /**
+     * @return режим игры
+     */
     public GameMode getGameMode() {
         return gameMode;
     }
@@ -73,6 +119,7 @@ public class Game {
      * говорим что пойдёт первый раунд
      *
      * @param playersNames имена играющих людей
+     * @param cardNumbers номера карт
      */
     public Game(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers) {
         turnNumber = 1;
@@ -84,6 +131,13 @@ public class Game {
         gameMode = GameMode.NORMAL_MODE;
     }
 
+    /**
+     * коструктор, в котором мы задаём первого игрока и основание для перемешки карт
+     * @param playersNames имена играющих людей
+     * @param cardNumbers номера карт
+     * @param firstPerson кто ходит первым
+     * @param cardSeed основание для перемешки карт
+     */
     public Game(ArrayList<String> playersNames, ArrayList<Integer> cardNumbers, int firstPerson, int cardSeed) {
         turnNumber = 1;
         playerWhoWillGo = firstPerson;
@@ -95,11 +149,9 @@ public class Game {
     }
 
     /**
-     * генерирование карт произходит следующим образом:
-     * сначала создаётся последовательность в прямом порядке с картами
-     * Потом генерируется массив такой же длины и заполняется случайными числами
-     * Он сортируется.
-     * Карты переставляются в таком же порядке, в котором сортируется созданный случайным массив
+     * генерируем случайный порядок для карт используя
+     * @see java.util.Collections#shuffle(java.util.List)
+     * @param names номера карт
      */
     void generateAllCards(ArrayList<Integer> names) {
         allCards = new LinkedList<>();
@@ -110,6 +162,12 @@ public class Game {
         Collections.shuffle(allCards);
     }
 
+    /**
+     * генерируем случайный порядок с фиксируемым основанием, используя
+     * @see java.util.Collections#shuffle(java.util.List, java.util.Random)
+     * @param names номера карт
+     * @param cardSeed основание для перемешки карт
+     */
     void generateAllCards(ArrayList<Integer> names, int cardSeed) {
         allCards = new LinkedList<>();
         NUMBER_OF_CARDS = names.size();
@@ -120,7 +178,7 @@ public class Game {
     }
 
     /**
-     * создаёт список игроков. Имена пока не задаются.
+     * создаёт список игроков.
      * Поскольку allCards уже в случайном порядке, можно просто разбить их на одинаковые блоки
      * по количеству людей
      * и записать в закрытые карты
@@ -143,20 +201,35 @@ public class Game {
      * Конец блока генерирования
      */
 
+    /**
+     *
+     * @return номер хода
+     */
     public int getTurnNumber() {
         return turnNumber;
     }
 
+    /**
+     *
+     * @return номер человека, чей будет ход
+     */
     public int getPlayerWhoWillGo() {
         return playerWhoWillGo;
     }
 
+    /**
+     * увеличивает по модулю номер игрока, чей будет ход
+     * @return номер человека, чей будет ход увеличенный
+     */
     private int incPlayerThatWillGo() {
         playerWhoWillGo = (playerWhoWillGo + 1) % getPlayersCount();
         return playerWhoWillGo;
     }
-    // jhjkhjk
 
+    /**
+     * проверяет, кончилась ли игра. А именно есть ли игрок без карт
+     * @return флаг конца игры
+     */
     public boolean isGameEnded() {
         for (Player player : players)
             if (player.getCardsCount() == 0) {
@@ -167,9 +240,10 @@ public class Game {
 
 
     /**
-     * @param playerTookTotem ищем лишь с тем человеком, который стащил тотем
-     * @return номер игорока, с которым дуэль. -1, если таких игроков нет.
-     * НЕ ПОНЯТНО, что делать, если совпадений больше чем два?
+     * проверяем наличие дуэли с человеком. потребность проверять возникает лишь с человеком
+     * который схватил тотем
+     * @param playerTookTotem номер игрока, с которым проверяем
+     * @return список номеров игроков, с которыми была дуэль у данного
      */
     public ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem) {
         if (playerTookTotem.getOpenCardsCount() == 0) {
@@ -197,6 +271,7 @@ public class Game {
     }
 
     /**
+     * ошибшийся человек забирает все открытые карты
      * @param looser игрок, который берёт все открытые карты и карты под тотемом
      */
     private void takeAllCardsOnTheTable(Player looser) {
@@ -206,6 +281,9 @@ public class Game {
         }
     }
 
+    /**
+     * варианты результатов хода
+     */
     public enum ResultOfMakeMove {
         INCORRECT,
         TOTEM_WAS_CATCH_CORRECT,
@@ -215,11 +293,22 @@ public class Game {
         ALL_CARDS_OPENED
     }
 
+    /**
+     * что сделал человек: открыл карту или схватил тотем
+     */
     public enum WhatPlayerDid {
         TOOK_TOTEM,
         OPEN_NEW_CARD
     }
 
+    /**
+     * функция хода. На данный момент не используется, будет слита в другую
+     *
+     * @param playerIndex   кто походил
+     * @param whatPlayerDid что сделал походивший
+     * @return результат хода
+     * @see model.Game#moveWithoutAnswer(int, model.Game.WhatPlayerDid)
+     */
     public ResultOfMakeMove makeMove(int playerIndex, WhatPlayerDid whatPlayerDid) {
         switch (whatPlayerDid) {
             case TOOK_TOTEM:
@@ -279,11 +368,23 @@ public class Game {
         return ResultOfMakeMove.CARD_OPENED;
     }
 
+    /**
+     * ход после спец. карты "стрелки во внутрь"
+     *
+     * @param winner кто схватил тотем
+     */
     public void arrowsInMakeMove(int winner) {
         totem.cards.addAll(players.get(winner).pickUpAllOpenedCards());
         gameMode = GameMode.NORMAL_MODE;
     }
 
+
+    /**
+     * Если была неразрешимость, (в виде дуэли в несколько игроков) дохаживает после её устранения
+     *
+     * @param winner кто выиграл дуэль
+     * @param looser кого выигрывший посчитал проигравшим
+     */
     public void afterDuelMakeMove(int winner, int looser) {
         players.get(looser).setCardsToPlayer(totem.pickUpAllCards());
         players.get(looser).setCardsToPlayer(players.get(winner).pickUpAllOpenedCards());
@@ -293,6 +394,9 @@ public class Game {
 
     }
 
+    /**
+     * ход после спец. карты "стрелки наружу". Все открывают верхнюю
+     */
     public void openAllTopCards() {
         for (Player player : players) {
             switch (player.openNextCard().getCardType()) {
@@ -308,20 +412,45 @@ public class Game {
         }
     }
 
+    /**
+     * считает количество игроков
+     *
+     * @return количество игроков
+     */
     public int getPlayersCount() {
         return players.size();
     }
 
+    /**
+     * возвращает ссылку на конкретного игрока
+     *
+     * @param playerIndex номер игрока
+     * @return ссылка на него
+     */
     public Player getPlayer(int playerIndex) {
         return players.get(playerIndex);
     }
 
+    /**
+     * ссылка на View.
+     * ВРЕМЕННОЕ РЕШЕНИЕ
+     */
     private GraphicsView graphicsView;
 
+    /**
+     * задаёт ссылку на View
+     * ВРЕМЕННОЕ РЕШЕНИЕ
+     * @param view ссылка
+     */
     public void setGraphicsView(GraphicsView view) {
         graphicsView = view;
     }
 
+    /**
+     * ход.сейчас реализованно через makeMove. по одному пихнуть всё и потом перерисовать
+     * @param playerIndex кто походил
+     * @param whatPlayerDid что сделал походивший
+     */
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
         makeMove(playerIndex, whatPlayerDid);
         graphicsView.repaintView();

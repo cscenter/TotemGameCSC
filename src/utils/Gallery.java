@@ -11,16 +11,35 @@ import java.util.regex.Pattern;
 
 /**
  * Created by lavton on 02.03.14.
+ *
+ * в этом классе хранятся все картинки
  */
 public class Gallery {
+    /**
+     * имена карт
+     */
     private ArrayList<String> cardsNames;
+    /**
+     * имена картинок, которые не карты
+     */
     private ArrayList<String> otherNames;
+    /**
+     * хешмапа, в которой по имени картинки возвращается ссылка на изображение
+     */
     private HashMap<String, Image> resources;
 
+    /**
+     * возвращает ссылку на изображение по имени картинки, используя хеш-мапу
+     * @param name имя картинки
+     * @return ссылка на изображение
+     */
     public Image getImage(String name) {
         return resources.get(name);
     }
 
+    /**
+     * конструктор. инициализирует переменные, пытается загрузить все картинки
+     */
     public Gallery() {
         resources = new HashMap<>(100);
         cardsNames = new ArrayList<>(100);
@@ -52,6 +71,10 @@ public class Gallery {
         }
     }
 
+    /**
+     * возвращает список имён картинок, которые не карты
+     * @return список имён картинок, которые не карты
+     */
     private ArrayList<String> getOtherPicturesNames() {
         BufferedReader input;
         String classJar =
@@ -81,6 +104,10 @@ public class Gallery {
         return otherNames;
     }
 
+    /**
+     * возвращает список имён карт
+     * @return возвращает список имён карт
+     */
     public ArrayList<String> getCardsNames() {
         if (cardsNames.isEmpty()) {
             BufferedReader input;
@@ -113,7 +140,12 @@ public class Gallery {
         return cardsNames;
     }
 
-    private static int getCardNumber(String str) {
+    /**
+     * по имени карты возвращает её номер
+     * @param str имя карты
+     * @return номер карты
+     */
+    public static int getCardNumber(String str) {
 //        System.err.println(str);
         Pattern numberPattern = Pattern.compile("[0-9]+");
         Matcher numberMatcher = numberPattern.matcher(str);
