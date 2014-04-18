@@ -198,7 +198,7 @@ public class MyClient implements TotemClient {
     }
 
     /**
-     * функция хода. На данный момент не используется, будет слита в другую
+     * функция хода. Используется для непосредственного занесения данных в модель
      *
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
@@ -386,15 +386,11 @@ public class MyClient implements TotemClient {
                         }
                     }
                 }
-                if (hasOneTotem){
-                    myGame.makeMove(whoTookTotemFirst, Game.WhatPlayerDid.TOOK_TOTEM);
-                }
                 if(hasOpenCard){
                     newWhatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
                     newWhoDid.add(whoOpenCard);
-                    myGame.makeMove(whoOpenCard, Game.WhatPlayerDid.OPEN_NEW_CARD);
                 }
-                graphicsView.repaintView(newWhoDid, newWhatDid);
+                graphicsView.repaintView(newWhoDid, newWhatDid, hasOpenCard, hasOneTotem);
             }
         }
 

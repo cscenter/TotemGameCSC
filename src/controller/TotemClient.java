@@ -63,7 +63,7 @@ public interface TotemClient {
     public boolean isGameEnded();
 
     /**
-     * функция хода. На данный момент не используется, будет слита в другую
+     * функция хода. Используется для непосредственного изменения модели
      *
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший

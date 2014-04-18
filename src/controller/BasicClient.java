@@ -81,7 +81,7 @@ public class BasicClient implements TotemClient {
     }
 
     /**
-     * функция хода. На данный момент не используется, будет слита в другую
+     * функция хода. Используется для непосредственного занесение данных в модель
      *
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
@@ -152,7 +152,6 @@ public class BasicClient implements TotemClient {
     }
 
     /**
-     * функция будет слита с
      *
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
@@ -160,13 +159,12 @@ public class BasicClient implements TotemClient {
      */
     @Override
     public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        myGame.makeMove(playerIndex, whatPlayerDid);
         Queue <Integer> who = new LinkedList<>();
         who.add(playerIndex);
         Queue <Game.WhatPlayerDid> what = new LinkedList<>();
         what.add(whatPlayerDid);
-
-        graphicsView.repaintView(who, what);
+        boolean hasOpenCard = (whatPlayerDid == Game.WhatPlayerDid.OPEN_NEW_CARD) ? true : false;
+        graphicsView.repaintView(who, what, hasOpenCard, !hasOpenCard);
     }
 
     /**

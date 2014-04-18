@@ -7,6 +7,7 @@ import utils.Configuration;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,8 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -224,6 +224,117 @@ public class MyPanel extends JPanel {
         // client.getPlayer(client.getPlayerWhoWillGo()).setGo(false);
     }
 
+
+    public void repaintModel(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid,
+                            boolean isSmbOpen,boolean isSmbdCatch) {
+        Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+        whoPlayed = 0;
+        if (isSmbdCatch){
+            whoPlayed = whoDid.remove();
+            resultOfMakeMove = client.makeMove(whoPlayed, whatDid.remove());
+            switch (resultOfMakeMove) {
+                case TOTEM_WAS_CATCH_CORRECT:
+                    mesOk = 1;
+                    message = "You won duel, " + client.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
+                    typeTotem = 2;
+                    MyPanel.this.repaint();
+                    System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case TOTEM_WAS_CATCH_INCORRECT:
+                    mesOk = 1;
+                    message = "You mustn't take totem, " + client.getPlayer(whoPlayed).getName() + " So you took all open cards!";
+                    typeTotem = 1;
+                    MyPanel.this.repaint();
+                    System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case NOT_DEFINED_CATCH:
+                    if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
+                        catchTotemModeFlag = true;
+                    } else {
+                        multyDuelFlag = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            for (int i = 0; i < client.getPlayersCount(); i++) {
+                if (client.getPlayer(i).getCardsCount() == 0) {
+                    mesOk = 1;
+                    message = "Player %s won! It's very good :)\n" + client.getPlayer(i).getName();
+                    MyPanel.this.repaint();
+                    System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
+                }
+            }
+        }
+
+        if (isSmbOpen){
+            while (whoDid.size() > 1){
+                whatDid.remove();
+                whoDid.remove();
+            }
+            whoPlayed = whoDid.remove();
+            resultOfMakeMove = client.makeMove(whoPlayed, whatDid.remove());
+
+            switch (resultOfMakeMove) {
+                case INCORRECT:
+                    java.util.Timer timer = new java.util.Timer();
+                    TimerTask task = new TimerTask() {
+
+                        public void run() {
+                            xMes += 10;
+                            mesOk = 1;
+                            message = "It's not your turn, " + client.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
+                            MyPanel.this.repaint();
+                        }
+                    };
+                    timer.schedule(task, 1000, 100);
+                    if (xMes > 90) timer.cancel();
+                    xMes = 0;
+                    System.out.printf("It's not your turn, %s. Don't hurry!\n",
+                            client.getPlayer(whoPlayed).getName());
+                    break;
+                case CARD_OPENED:
+                    System.out.printf("%s open next card\n",
+                            client.getPlayer(whoPlayed).getName());
+                    try {
+                        playersView.get(whoPlayed).setTopCardView(cardsView);
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                case NOT_DEFINED_CATCH:
+                    if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
+                        catchTotemModeFlag = true;
+                    } else {
+                        multyDuelFlag = true;
+                    }
+                    break;
+                case ALL_CARDS_OPENED:
+                    allOpenFlag = true;
+                    for (PlayerView player : playersView) {
+                        player.setTopCardView(cardsView);
+                    }
+
+                    mesOk = 1;
+                    message = "All players will open top cards. To do this, press Enter";
+                    MyPanel.this.repaint();
+
+                    System.out.println("All players will open top cards. To do this, press Enter");
+                    break;
+                default:
+                    break;
+            }
+
+
+        }
+
+        repaint();
+    }
+
+
     public MyMouseListener initMyMouseListener() {
         return new MyMouseListener();
     }
@@ -259,7 +370,8 @@ public class MyPanel extends JPanel {
                 }
             }
         }
-      /* было (360.0 * i / Configuration.getNumberOfPlayers());
+      /* хотим, чтобы клиент, за которого отвечает этот вид был внизу.
+      было (360.0 * i / Configuration.getNumberOfPlayers());
       хотим (360.0 * (i - №клиента)  / Configuration.getNumberOfPlayers());
        значит надо вычесть - 360.0 * client.getWhatPlayer() / Configuration.getNumberOfPlayers();
         */

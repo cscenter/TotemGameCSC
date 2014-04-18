@@ -228,9 +228,12 @@ public class GraphicsView extends JFrame {
      * функция перерисовки после того, как сервер прислал информацию.
      * @param whoDid кто ходил
      * @param whatDid что сделал. Тут всё, кроме, возможно, последнего, должны быть захваты тотема
+     * @param isSmbdCatch флаг отвечающий тому, был ли хотя бы один захват тотема
+     * @param isSmbOpen флаг, отвечающий тому, была ли открыта новая карта
      */
-    public void repaintView(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid) {
-        myPanel.repaint();
+    public void repaintView(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid,
+                            boolean isSmbOpen,boolean isSmbdCatch) {
+        myPanel.repaintModel(whoDid, whatDid, isSmbOpen, isSmbdCatch);
     }
 
     public GraphicsView() {

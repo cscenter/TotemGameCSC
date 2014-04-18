@@ -55,7 +55,7 @@ public class Configuration {
     /**
      * время квантования
      */
-    private static int timeToWait = 1000;
+    private static int timeToWait = 4000;
     /**
      * количество игроков, которых будет ждать сервер
      */
