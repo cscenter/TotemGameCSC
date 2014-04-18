@@ -227,7 +227,7 @@ public class MyPanel extends JPanel {
 
     public void repaintModel(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid,
                             boolean isSmbOpen,boolean isSmbdCatch) {
-        Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.INCORRECT;
+        Game.ResultOfMakeMove resultOfMakeMove;
         whoPlayed = 0;
         if (isSmbdCatch){
             whoPlayed = whoDid.remove();
@@ -331,7 +331,9 @@ public class MyPanel extends JPanel {
 
         }
 
-        repaint();
+        if (isSmbdCatch || isSmbOpen) {
+            repaint();
+        }
     }
 
 
@@ -429,24 +431,17 @@ public class MyPanel extends JPanel {
                 Character inputChar = k.getKeyChar();
                 inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
                 boolean suchKeyHere = false;
-                Game.ResultOfMakeMove resultOfMakeMove = Game.ResultOfMakeMove.CARD_OPENED;
-                whoPlayed = 0;
                 for (int i = 0; i < client.getPlayersCount(); i++) {
                     if (playersView.get(i).getOpenCardKey() == inputChar) {
-//                        resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         client.moveWithoutAnswer(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
                         suchKeyHere = true;
-                        whoPlayed = i;
                         break;
                     }
                     if (playersView.get(i).getCatchTotemKey() == inputChar) {
-                        //                      resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         client.moveWithoutAnswer(i, Game.WhatPlayerDid.TOOK_TOTEM);
                         suchKeyHere = true;
-                        whoPlayed = i;
                         break;
                     }
-                    repaint();
                 }
                 if (!(suchKeyHere)) {
                     mesOk = 1;
@@ -454,85 +449,7 @@ public class MyPanel extends JPanel {
                     System.out.println("Nobody have such key. Try again.\n");
                     MyPanel.this.repaint();
                 }
-                switch (resultOfMakeMove) {
-                    case INCORRECT:
-                        java.util.Timer timer = new java.util.Timer();
-                        TimerTask task = new TimerTask() {
-
-                            public void run() {
-                                xMes += 10;
-                                mesOk = 1;
-                                message = "It's not your turn, " + client.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
-                                MyPanel.this.repaint();
-                            }
-                        };
-                        //while(xMes<100){
-                        timer.schedule(task, 1000, 100);
-                        if (xMes > 90) timer.cancel();
-                        xMes = 0;
-                        System.out.printf("It's not your turn, %s. Don't hurry!\n",
-                                client.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_CORRECT:
-                        mesOk = 1;
-                        message = "You won duel, " + client.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
-                        typeTotem = 2;
-                        MyPanel.this.repaint();
-                        System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
-                                client.getPlayer(whoPlayed).getName());
-                        break;
-                    case TOTEM_WAS_CATCH_INCORRECT:
-                        mesOk = 1;
-                        message = "You mustn't take totem, " + client.getPlayer(whoPlayed).getName() + " So you took all open cards!";
-                        typeTotem = 1;
-                        MyPanel.this.repaint();
-                        System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
-                                client.getPlayer(whoPlayed).getName());
-                        break;
-                    case CARD_OPENED:
-                        System.out.printf("%s open next card\n",
-                                client.getPlayer(whoPlayed).getName());
-                        try {
-                            playersView.get(whoPlayed).setTopCardView(cardsView);
-                        } catch (Exception e) {
-                        }
-
-                        break;
-                    case NOT_DEFINED_CATCH:
-//                        ArrayList <Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
-                        if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
-                            catchTotemModeFlag = true;
-                        } else {
-                            multyDuelFlag = true;
-                        }
-                        break;
-                    case ALL_CARDS_OPENED:
-                        allOpenFlag = true;
-                        for (PlayerView player : playersView) {
-                            player.setTopCardView(cardsView);
-                        }
-
-                        mesOk = 1;
-                        message = "All players will open top cards. To do this, press Enter";
-                        MyPanel.this.repaint();
-
-                        System.out.println("All players will open top cards. To do this, press Enter");
-                        break;
-                    default:
-                        break;
-                }
-
-                for (int i = 0; i < client.getPlayersCount(); i++) {
-                    if (client.getPlayer(i).getCardsCount() == 0) {
-                        mesOk = 1;
-                        message = "Player %s won! It's very good :)\n" + client.getPlayer(i).getName();
-                        MyPanel.this.repaint();
-                        System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
-                    }
-                }
-                MyPanel.this.repaint();
             } else {
-
                 if (k.getKeyCode() == KeyEvent.VK_ENTER) {
                     client.openAllTopCards();
                     for (PlayerView player : playersView) {
