@@ -1,9 +1,0 @@
-tboy.png
-tboy-go1.png
-totem.png
-totemR.png
-totemW.png
-arrow_d.png
-arrow_u.png
-b1.png
-tback.jpg
