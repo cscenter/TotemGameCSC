@@ -22,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MyPanel extends JPanel {
-    //    private model.Game client;
     private TotemClient client;
     private int panel_size;
     private boolean allOpenFlag;
@@ -41,20 +40,21 @@ public class MyPanel extends JPanel {
     private ArrayList<CardView> cardsView;
     private Graphics g;
 
+    /**
+     * класс, отвечающий за отрисовку тотема
+     */
     public class TotemView {
         private model.Game.Totem totem;
         private int totemRad;
         private int xCoord;
         private int yCoord;
 
+        /**
+         * Привязка тотема-модели
+         * @param totem1
+         */
         public TotemView(model.Game.Totem totem1) {
             totem = totem1;
-        }
-
-        public void clearD(Graphics g) {
-            g.clearRect(xCoord - CardView.getCardSize() / 2 - panel_size / 10 - 45, yCoord - CardView.getCardSize() / 2 - panel_size / 20,
-                    (int) (CardView.getCardSize() * 2.5) + 45, CardView.getCardSize() + panel_size / 10 + 120);
-
         }
 
         public void drawTotem(Graphics g) throws IOException {
@@ -237,7 +237,7 @@ public class MyPanel extends JPanel {
                     mesOk = 1;
                     message = "You won duel, " + client.getPlayer(whoPlayed).getName() + " All your open cards and all cards under totem go to your opponent";
                     typeTotem = 2;
-                    MyPanel.this.repaint();
+//                    MyPanel.this.repaint();
                     System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
                             client.getPlayer(whoPlayed).getName());
                     break;
@@ -245,7 +245,7 @@ public class MyPanel extends JPanel {
                     mesOk = 1;
                     message = "You mustn't take totem, " + client.getPlayer(whoPlayed).getName() + " So you took all open cards!";
                     typeTotem = 1;
-                    MyPanel.this.repaint();
+  //                  MyPanel.this.repaint();
                     System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
                             client.getPlayer(whoPlayed).getName());
                     break;
@@ -264,7 +264,7 @@ public class MyPanel extends JPanel {
                 if (client.getPlayer(i).getCardsCount() == 0) {
                     mesOk = 1;
                     message = "Player %s won! It's very good :)\n" + client.getPlayer(i).getName();
-                    MyPanel.this.repaint();
+    //                MyPanel.this.repaint();
                     System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
                 }
             }
@@ -287,7 +287,7 @@ public class MyPanel extends JPanel {
                             xMes += 10;
                             mesOk = 1;
                             message = "It's not your turn, " + client.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
-                            MyPanel.this.repaint();
+  //                          MyPanel.this.repaint();
                         }
                     };
                     timer.schedule(task, 1000, 100);
@@ -320,7 +320,7 @@ public class MyPanel extends JPanel {
 
                     mesOk = 1;
                     message = "All players will open top cards. To do this, press Enter";
-                    MyPanel.this.repaint();
+    //                MyPanel.this.repaint();
 
                     System.out.println("All players will open top cards. To do this, press Enter");
                     break;

@@ -32,7 +32,7 @@ public class MainTotemGame {
                     new MyServer();
                     break;
                 case '0':
-                    Configuration.numberOfPlayers = 4;
+                    Configuration.numberOfPlayers = 3;
                     Configuration.isServer = false;
                     new GraphicsView();
                     break;
