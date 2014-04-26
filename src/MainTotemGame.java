@@ -22,6 +22,10 @@ public class MainTotemGame {
                     (new View()).run();
                     break;
                 case '3':
+//                    if (args[1].equals()){
+
+  //                  }
+                    Configuration.SERVER_IP = args[1];
                     Configuration.numberOfPlayers = 2;
                     Configuration.isServer = true;
                     new GraphicsView();

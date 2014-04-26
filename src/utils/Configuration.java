@@ -39,7 +39,7 @@ public class Configuration {
     /**
      * порт, на котором слушает сервер
      */
-    private static final int PORT = 6923;
+    private static int PORT = 6923;
     /**
      * дириктория, в которой лежат картинки
      */
@@ -47,7 +47,7 @@ public class Configuration {
     /**
      * IP сервера
      */
-    private static final String SERVER_IP = "127.0.0.1";
+    public static String SERVER_IP = "127.0.0.1";
     /**
      * максимальное количество игроков
      */
