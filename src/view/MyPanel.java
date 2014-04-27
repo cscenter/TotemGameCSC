@@ -29,6 +29,7 @@ public class MyPanel extends JPanel {
     private int mesOk;
     private int typeTotem;
     private int xMes;
+    int basicFontSize = 15;
     private TotemView totemV;
     private ArrayList<PlayerView> playersView;
     private int pos;
@@ -46,7 +47,8 @@ public class MyPanel extends JPanel {
      */
     public class TotemView {
         private model.Game.Totem totem;
-        private int totemRad;
+        private int totemHeight;
+        private int totemWeight;
         private int xCoord;
         private int yCoord;
         /**
@@ -57,8 +59,8 @@ public class MyPanel extends JPanel {
             totem = totem1;
         }
 
-        public void drawTotem(Graphics g) throws IOException {
-            if (mesOk == 1) {
+        public void drawTotem(Graphics g) {
+/*            if (mesOk == 1) {
                 Font font = new Font("Arial", Font.BOLD, 15);
                 Font oldFont = g.getFont();
                 g.setColor(Color.red);
@@ -75,46 +77,52 @@ public class MyPanel extends JPanel {
             String cardsCount = String.valueOf(totem.getCardsCount());
             // g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord-graphics.CardView.getCardSize()/2+panel_size/60, yCoord+graphics.CardView.getCardSize()/2+panel_size/30);
 
-            g.fill3DRect(10, 10, 10, 10, allOpenFlag);
-
+      //      g.fill3DRect(10, 10, 10, 10, allOpenFlag);
+  */
+            String cardsCount = String.valueOf(totem.getCardsCount());
             if (typeTotem == 0) {
                 Image img = Configuration.getGallery().getImage("data/totem.png");
-                g.drawImage(img, xCoord - totemRad * 4 + 20, yCoord - totemRad * 2, null);
+                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
+//                g.drawImage(img, xCoord - (int)(totemRad * 4.5), yCoord - totemRad * 2, null);
             }
 
             if (typeTotem == 1) {
                 Image img = Configuration.getGallery().getImage("data/totemW.png");
-                g.drawImage(img, xCoord - totemRad * 4 + 20, yCoord - totemRad * 2, null);
+                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
                 typeTotem = 0;
             }
             if (typeTotem == 2) {
                 Image img = Configuration.getGallery().getImage("data/totemR.png");
-                g.drawImage(img, xCoord - totemRad * 4 + 20, yCoord - totemRad * 2, null);
+                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
                 typeTotem = 0;
             }
 
-            Font font = new Font("Tahoma", Font.BOLD, 15);
+            Font font = new Font("Tahoma", Font.BOLD, basicFontSize);
+            g.setColor(Color.cyan);
             g.setFont(font);
-            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord - CardView.getCardSize() / 2 + panel_size / 60 + 10, yCoord + CardView.getCardSize() / 2 + panel_size / 30 + 40);
+            g.drawString(cardsCount, xCoord - (int)(basicFontSize / 2.5), yCoord + totemHeight / 2);
+//            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord - CardView.getCardSize() / 2 + panel_size / 60 + 10, yCoord + CardView.getCardSize() / 2 + panel_size / 30 + 40);
 
 
         }
 
         public boolean isIn(Point p) {
-            return (p.distance(xCoord, yCoord) < totemRad);
+            return ((Math.abs(p.x - xCoord) < totemWeight / 2) && (Math.abs(p.y - yCoord) < totemHeight / 2 ));
         }
 
         public void resize(int haracteristicScale) {
-            totemV.totemRad = (int) (haracteristicScale / 50.5);
+            totemV.totemHeight = (int) (haracteristicScale / 7);
+            totemV.totemWeight = (int) (haracteristicScale / 10);
             totemV.yCoord = (int) (haracteristicScale / 2.2);
-            totemV.xCoord = totemV.yCoord + 50;
+            totemV.xCoord = totemV.yCoord + haracteristicScale / 30;
         }
     }
 
     private void reSize(int haracteristicScale) {
+        basicFontSize = haracteristicScale / 35;
         panel_size = haracteristicScale;
-        PlayerView.setScale(haracteristicScale);
         CardView.resize(haracteristicScale);
+        PlayerView.setScale(haracteristicScale);
         totemV.resize(haracteristicScale);
         for (PlayerView player : playersView) {
             player.resize(haracteristicScale);
@@ -122,6 +130,21 @@ public class MyPanel extends JPanel {
 
     }
 
+    /**
+     * функция для отладки. Рисует, где находится заданная точка
+     * @param p точка, которую хотим показать
+     */
+    void drawTarget (Graphics g, Point p) {
+        int r = 10;
+        Color c = g.getColor();
+        g.setColor(Color.red);
+        int delta = (int) (r * Math.sqrt(2) / 2);
+        g.drawLine(p.x - delta, p.y - delta, p.x + delta, p.y + delta);
+        g.drawLine(p.x + delta, p.y - delta, p.x - delta, p.y + delta);
+        g.drawRect(p.x - delta, p.y - delta,
+                2 * delta, 2 * delta);
+        g.setColor(c);
+    }
     @Override
     protected void paintComponent(Graphics g) {
         //убрать с консоли всё
@@ -129,16 +152,12 @@ public class MyPanel extends JPanel {
             case NOT_DEF:
 //                super.repaint();
                 reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
-
-                Image img = Configuration.getGallery().getImage("data/b1.png");
+                repaintAll(g);
+/*                Image img = Configuration.getGallery().getImage("data/b1.png");
                 g.drawImage(img, 0, 0, panel_size + 25, panel_size, null);//MyPanel.HEIGHT, MyPanel.WIDTH, null );
                 // g.draw
 
-                try {
-                    totemV.drawTotem(g);
-                } catch (IOException ex) {
-                    Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                totemV.drawTotem(g);
                 for (PlayerView player : playersView) {
                     try {
                         player.drawPlayer(g, this);
@@ -205,13 +224,12 @@ public class MyPanel extends JPanel {
                     g.drawImage(Configuration.getGallery().getImage("data/tboy-go1.png"), playerX - 110, playerY, null);
                 } catch (Exception ex) {
                     Logger.getLogger(MyPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                }     */
                 break;
             case NEW_CARD:
                 int who = whatRepaint.lastPlayerWhoAct;
                 PlayerView currPlayer = playersView.get(who);
-                Point p = new Point(currPlayer.getXCoordinate() + CardView.getCardSize() / 2,
-                        currPlayer.getYCoordinate() + CardView.getCardSize() * 3 / 2);
+                Point p = currPlayer.getOpenCardCenter();
                 int sizeX1 = CardView.getCardSize();
                 int sizeY1 = CardView.getCardSize();
                 int sizeX2 = CardView.getCardSize() * 2;
@@ -221,7 +239,14 @@ public class MyPanel extends JPanel {
         }
     }
 
-
+    private void repaintAll(Graphics g) {
+        Image img = Configuration.getGallery().getImage("data/b1.png");
+        g.drawImage(img, 0, 0, panel_size, panel_size, null);
+        totemV.drawTotem(g);
+        for (PlayerView player : playersView) {
+            player.drawPlayer(g, this, basicFontSize);
+        }
+    }
     public void repaintModel(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid,
                             boolean isSmbOpen,boolean isSmbdCatch) {
         Game.ResultOfMakeMove resultOfMakeMove;
@@ -277,17 +302,6 @@ public class MyPanel extends JPanel {
 
             switch (resultOfMakeMove) {
                 case INCORRECT:
-/*                    TimerTask task = new TimerTask() {
-
-                        public void run() {
-                            xMes += 10;
-                            mesOk = 1;
-                            message = "It's not your turn, " + client.getPlayer(whoPlayed).getName() + " Don't hurry! " + xMes + ' ';
-  //                          MyPanel.this.repaint();
-                        }
-                    };
-                    timer.schedule(task, 1000, 100);
-                    if (xMes > 90) timer.cancel();*/
                     xMes = 0;
                     System.out.printf("It's not your turn, %s. Don't hurry!\n",
                             client.getPlayer(whoPlayed).getName());
@@ -338,6 +352,7 @@ public class MyPanel extends JPanel {
             timer.stop();
             timeToOpen = 0;
             whatRepaint = WhatRepaint.NOT_DEF;
+            repaintAll(g);
         }
         int currXSize = (sizeXEnd - sizeXBegin) * timeToOpen / steps + sizeXBegin;
         int currYSize = (sizeYEnd - sizeYBegin) * timeToOpen / steps + sizeYBegin;

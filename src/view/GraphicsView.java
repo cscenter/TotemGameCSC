@@ -186,6 +186,6 @@ public class GraphicsView extends JFrame {
         addMouseListener(myPanel.initMyMouseListener());
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setResizable(false);
+   //     this.setResizable(false);
     }
 }

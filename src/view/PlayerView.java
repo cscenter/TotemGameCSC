@@ -42,6 +42,15 @@ public class PlayerView {
     /**
      * угол от центра для игрока
      */
+
+    private int closeCardCenterX;
+    private int closeCardCenterY;
+    private int openCardCenterX;
+    private int openCardCenterY;
+    private int avatarCenterX;
+    private int avatarCenterY;
+    private int avatarHeight;
+    private int avatarWeight;
     private double angle;
     /**
      * клавиша открытия верхней карты
@@ -92,11 +101,23 @@ public class PlayerView {
      * @param haracteristicScale новый масштаб
      */
     public void resize(int haracteristicScale) {
-        xCoordinate = (int) ((haracteristicScale / 3.5) * Math.sin(angle * Math.PI / 180) + haracteristicScale / 2.2) + 40;
-        yCoordinate = (int) ((haracteristicScale / 3.5) * Math.cos(angle * Math.PI / 180) + haracteristicScale / 2.5) + 20;
-
+        xCoordinate = (int) ((haracteristicScale / 3.5) * Math.sin(angle * Math.PI / 180) + haracteristicScale / 2.2) +
+            haracteristicScale / 15;
+        yCoordinate = (int) ((haracteristicScale / 3.5) * Math.cos(angle * Math.PI / 180) + haracteristicScale / 2.5) +
+                haracteristicScale / 15;
+        closeCardCenterX = xCoordinate + CardView.getCardSize() / 2;
+        closeCardCenterY = yCoordinate - CardView.getCardSize() / 2;
+        openCardCenterX = closeCardCenterX;
+        openCardCenterY = closeCardCenterY + (int) (CardView.getCardSize()*1.2);
+        avatarHeight = haracteristicScale / 7;
+        avatarWeight = haracteristicScale / 7;
+        avatarCenterX = xCoordinate - avatarWeight / 2 - avatarWeight / 10;
+        avatarCenterY = yCoordinate;
     }
 
+    Point getOpenCardCenter() {
+        return new Point(openCardCenterX, openCardCenterY);
+    }
     /**
      * возвращает имя игрока
      * @return имя игрока
@@ -105,21 +126,6 @@ public class PlayerView {
         return playerInfo.getName();
     }
 
-    /**
-     * возвращает координату игрока по оси x
-     * @return координата игрока по оси x
-     */
-    public int getXCoordinate(){
-        return xCoordinate;
-    }
-
-    /**
-     * возвращает координату по оси y
-     * @return координата по оси y
-     */
-    public int getYCoordinate(){
-        return yCoordinate;
-    }
     /**
      * конструктор. задаёт кнопки, угол и ссылку на информацию об игроке
      * @param newOpenCardKey кнопка открытия карты
@@ -168,38 +174,39 @@ public class PlayerView {
      * @param g ссылка на графику
      * @param panel ссылка на панельку
      */
-    public void drawPlayer(Graphics g, MyPanel panel){
-        g.drawImage(Configuration.getGallery().getImage("data/tboy.png"), xCoordinate - 110, yCoordinate, panel);
-        Font font = new Font("Tahoma", Font.BOLD, 20);
-        Font oldFont = g.getFont();
+    public void drawPlayer(Graphics g, MyPanel panel, int basicFontSize){
+        g.setColor(Color.cyan);
+        g.drawImage(Configuration.getGallery().getImage("data/tboy.png"), avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
+                avatarWeight, avatarHeight, panel);
+        Font font = new Font("Tahoma", Font.BOLD, basicFontSize * 4 / 3);
         g.setFont(font);
-        g.drawString(playerInfo.getName(), xCoordinate - CardView.getCardSize() / 3, yCoordinate - scale / 30);
-
-        font = new Font("Tahoma", Font.BOLD, 15);
+        g.drawString(playerInfo.getName(), avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2 -
+                basicFontSize);
+        font = new Font("Tahoma", Font.BOLD, basicFontSize);
         g.setFont(font);
         String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-        Color oldColor = g.getColor();
-        Color newColor = new Color(0, 0, 0);
-        g.setColor(newColor);
-        g.drawChars(openCardsNumber.toCharArray(), 0, openCardsNumber.length(), xCoordinate + scale / 60 + 70, yCoordinate + CardView.getCardSize() + scale / 30);
+        g.drawString(openCardsNumber, openCardCenterX + CardView.getCardSize() / 2 + basicFontSize / 3,
+                openCardCenterY + CardView.getCardSize() / 2);
 
         if (playerInfo.getOpenCardsCount() != 0) {
             Image image;
             try {
                 image = topCardView.getCardImage();
-                g.drawImage(image, xCoordinate, yCoordinate + CardView.getCardSize(), CardView.getCardSize(), CardView.getCardSize(), panel);
+                int halfCS = CardView.getCardSize() / 2;
+                g.drawImage(image, openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
             } catch (Exception e) {
                 System.err.println("can't find image!");
             }
-
-            g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
-        } else if (playerInfo.getCloseCardsCount() != 0)
-            g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), xCoordinate, yCoordinate, CardView.getCardSize(), CardView.getCardSize(), panel);
-
+        }
+        if (playerInfo.getCloseCardsCount() != 0) {
+            int halfCS = CardView.getCardSize() / 2;
+            g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), closeCardCenterX - halfCS, closeCardCenterY - halfCS,
+                    2 * halfCS, 2 * halfCS, panel);
+        }
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-        g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(), xCoordinate + scale / 60 + 70, yCoordinate + CardView.getCardSize() + scale / 30 - CardView.getCardSize());
-        g.setColor(oldColor);
+        g.drawString(closeCardsNumber, closeCardCenterX + CardView.getCardSize() / 2 + basicFontSize / 3,
+                closeCardCenterY + CardView.getCardSize() / 2);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
-        g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int) (CardView.getCardSize() * 1.5), yCoordinate - scale / 30);
-    }
+        g.drawString(catchKey, closeCardCenterX, closeCardCenterY - CardView.getCardSize() / 2 - basicFontSize);
+}
 }
