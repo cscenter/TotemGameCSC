@@ -19,6 +19,14 @@ public class PlayerView {
      * верхняя карта
      */
     private CardView topCardView;
+
+    /**
+     *
+     * @return ссылку на изображение верхней карты
+     */
+    public Image getTopCardViewImage() {
+        return topCardView.getCardImage();
+    }
     /**
      * Информация об игроке
      */
@@ -125,7 +133,6 @@ public class PlayerView {
         angle = a;
         xCoordinate = (int) ((scale / 3.5) * Math.sin(angle * Math.PI / 180) + scale / 2.2);
         yCoordinate = (int) ((scale / 3.5) * Math.cos(angle * Math.PI / 180) + scale / 2.5);
-        // player.setCoordinate(xCoordinate, yCoordinate);
         if (player == null) {
             System.err.println("player is null!");
             throw new RuntimeException();
@@ -162,9 +169,6 @@ public class PlayerView {
      * @param panel ссылка на панельку
      */
     public void drawPlayer(Graphics g, MyPanel panel){
-        //clear(g);
-        //if (playerInfo.isGO() == false)
-
         g.drawImage(Configuration.getGallery().getImage("data/tboy.png"), xCoordinate - 110, yCoordinate, panel);
         Font font = new Font("Tahoma", Font.BOLD, 20);
         Font oldFont = g.getFont();
@@ -195,11 +199,7 @@ public class PlayerView {
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
         g.drawChars(closeCardsNumber.toCharArray(), 0, closeCardsNumber.length(), xCoordinate + scale / 60 + 70, yCoordinate + CardView.getCardSize() + scale / 30 - CardView.getCardSize());
         g.setColor(oldColor);
-//        playerInfo.setCoordinate(xCoordinate, yCoordinate);
-
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
-        //g.setFont(font);
         g.drawChars(catchKey.toCharArray(), 0, catchKey.length(), xCoordinate - (int) (CardView.getCardSize() * 1.5), yCoordinate - scale / 30);
-        //g.setFont(oldFont);
     }
 }

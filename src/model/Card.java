@@ -31,8 +31,6 @@ public class Card {
         ARROWS_OUT,
         ARROWS_IN,
         ARROWS_COLORED,
-//        HAND_IN,
-//        ARROWS_TO_NEXT;
     }
 
     /**

@@ -52,7 +52,6 @@ public class MainTotemGame {
                     } else {
                         resultOfParsing = ResultOfParsing.SERVER;
                     }
-                    //   new MyServer();
 
                 }
                 if (args[i].equals("--netclient")) {
@@ -62,8 +61,6 @@ public class MainTotemGame {
                     } else {
                         resultOfParsing = ResultOfParsing.CLIENT;
                     }
-
-//                    new GraphicsView();
                 }
                 if (args[i].equals("--locclient")) {
                     isServer = false;
@@ -73,7 +70,6 @@ public class MainTotemGame {
                         resultOfParsing = ResultOfParsing.LOCAL;
                     }
 
-                    //                  new GraphicsView();
                 }
                 if (args[i].equals("--playernum")) {
                     numOfPlayers = Integer.parseInt(args[i+1]);

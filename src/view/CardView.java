@@ -45,7 +45,6 @@ public class CardView {
      */
     public CardView(Card card, Image img, int id) {
         this.card = card;
-//        this.fileCard = fileCard;
         this.cardImage = img;
         this.id = id;
     }
@@ -98,7 +97,4 @@ public class CardView {
     public static void resize(int haracteristicScale) {
         cardSize = haracteristicScale / 10;
     }
-//    public graphics.CardView getCardView(Card card){
-//      return
-//}
 }

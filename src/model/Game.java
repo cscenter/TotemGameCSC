@@ -315,7 +315,6 @@ public class Game {
                 if (gameMode == GameMode.CATCH_TOTEM_MODE) {
                     if (result == null) {
                         arrowsInMakeMove(playerIndex);
-//                        takeAllCardsOnTheTable(players.get(playerIndex));
                         gameMode = GameMode.NORMAL_MODE;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
                     } else {

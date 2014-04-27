@@ -16,10 +16,6 @@ public class Player {
      * имя
      */
     private String name;
-/*    private int xCoordinate;
-    private int yCoordinate;
-    private boolean isgo = false;
-  */
     /**
      * конструктор.
      * Открытых карт нет
@@ -41,22 +37,6 @@ public class Player {
     public void setCardsToPlayer(LinkedList<Card> cards) {
         closedCards.addAll(cards);
     }
-
-    /**
-     * на всякий случай пока. вывод информации о игроке в консоль
-     */
-/*    public void printInformation(){
-        System.out.printf("Player %s:\nClosed card: ", name);
-        for (Card card : closedCards){
-            System.out.printf("%d ", card.getCardNumber());
-        }
-        System.out.printf("\nOpened card: ");
-        for (Card card : openedCards){
-            System.out.printf("%d ", card.getCardNumber());
-        }
-        System.out.printf("\n\n");
-    }
-*/
 
     /**
      *
@@ -124,25 +104,10 @@ public class Player {
         openedCards.clear();
         return result;
     }
-
-/*    public int getXCoordinate() {
-        return xCoordinate;
-    }
-
-    public int getYCoordinate() {
-        return yCoordinate;
-    }
-
-    public void setCoordinate(int x, int y) {
-        xCoordinate = x;
-        yCoordinate = y;
-    }
-  */
-
     /**
      * тут какая-то магия. Маша, напиши, пожалуста,что делает эта переменная
      */
-    boolean isgo;
+    boolean isgo = false;
     public void setGo(boolean ok) {
         isgo = ok;
     }

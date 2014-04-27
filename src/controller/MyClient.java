@@ -295,7 +295,6 @@ public class MyClient implements TotemClient {
                 if (playerIndex == whatPlayer) {
                     outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
                 }
-    //            getInformationFromServer();
             } catch (IOException e) {
                 e.printStackTrace();
             }

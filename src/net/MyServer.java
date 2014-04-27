@@ -109,12 +109,6 @@ public class MyServer extends TimerTask {
 
             }
             System.out.println("init finish. lets go!");
-/*            for (OutputStream os : clientOutput){
-                os.write(firstPlayer);
-                os.write(cardSeed);
-                os.flush();
-            }*/
-
         } catch (Exception e) {
             e.printStackTrace();
         }
