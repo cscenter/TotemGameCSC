@@ -47,11 +47,11 @@ public class Configuration {
     /**
      * IP сервера
      */
-    public static String SERVER_IP = "127.0.0.1";
+    private static String SERVER_IP = "127.0.0.1";
     /**
      * максимальное количество игроков
      */
-    private static final int MAX_NUMBER_OF_PLAYERS = 15;
+    private static final int MAX_NUMBER_OF_PLAYERS = 8;
     /**
      * время квантования
      */
@@ -59,7 +59,7 @@ public class Configuration {
     /**
      * количество игроков, которых будет ждать сервер
      */
-    public static int numberOfPlayers = 2;
+    private static int numberOfPlayers = 2;
     /**
      * ссылка на Галерею, там хранятся все картинки
      */
@@ -79,8 +79,11 @@ public class Configuration {
     /**
      * выбор играем по сети или нет
      */
-    public static boolean isServer = false;
+    private static boolean isServer = false;
 
+    public static boolean getIsServer(){
+        return isServer;
+    }
     /**
      * изменение дириктории, где лежат картинки
      * @param newDir новый путь
@@ -89,6 +92,26 @@ public class Configuration {
         DIRECTORY = newDir;
     }
 
+    private static int numOfCards = 150;
+
+    public static int getNumOfCards() {
+        return numOfCards;
+    }
+
+    /**
+     * задаёт параметры начальные
+     * @param isServer сетевое ли взаимодействие
+     * @param numOfPlayers количество игроков
+     * @param port порт для сервера
+     * @param IP IP сервера
+     */
+    public static void setNetworkConfig(boolean isServer, int numOfPlayers, int port, String IP, int numOfCards) {
+        SERVER_IP = IP;
+        PORT = port;
+        numberOfPlayers = numOfPlayers;
+        Configuration.isServer = isServer;
+        Configuration.numOfCards = numOfCards;
+    }
     /**
      *
      * @return максимальное количество игроков

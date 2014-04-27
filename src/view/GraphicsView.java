@@ -237,7 +237,7 @@ public class GraphicsView extends JFrame {
     }
 
     public GraphicsView() {
-        isServer = Configuration.isServer;
+        isServer = Configuration.getIsServer();
         ArrayList<Character> openKeys = new ArrayList<>();
         ArrayList<Character> catchKeys = new ArrayList<>();
         ArrayList<Double> angles = new ArrayList<>();

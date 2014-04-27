@@ -155,7 +155,8 @@ public class Game {
      */
     void generateAllCards(ArrayList<Integer> names) {
         allCards = new LinkedList<>();
-        NUMBER_OF_CARDS = names.size();
+        NUMBER_OF_CARDS = utils.Configuration.getNumOfCards();
+        System.out.println("NUMBER OF CARDS + "+NUMBER_OF_CARDS);
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             allCards.add(new Card(names.get(i)));
         }
@@ -170,7 +171,8 @@ public class Game {
      */
     void generateAllCards(ArrayList<Integer> names, int cardSeed) {
         allCards = new LinkedList<>();
-        NUMBER_OF_CARDS = names.size();
+        NUMBER_OF_CARDS = utils.Configuration.getNumOfCards();
+        System.out.println("NUMBER OF CARDS + "+NUMBER_OF_CARDS);
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             allCards.add(new Card(names.get(i)));
         }
@@ -307,7 +309,6 @@ public class Game {
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      * @return результат хода
-     * @see model.Game#moveWithoutAnswer(int, model.Game.WhatPlayerDid)
      */
     public ResultOfMakeMove makeMove(int playerIndex, WhatPlayerDid whatPlayerDid) {
         switch (whatPlayerDid) {
