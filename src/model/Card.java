@@ -6,10 +6,15 @@ package model;
 public class Card {
     /**
      * цвет карты закодированный в число
+     * 1 - синий
+     * 2 - жёлтый
+     * 3 - зелёный
+     * 4 - красный
+     * 5 - спец. карта
      */
     final private int color;
     /**
-     * номер карты, закодированный в число
+     * форма карты, закодированныая в число
      */
     final private int number;
     /**
@@ -77,7 +82,7 @@ public class Card {
     }
 
     /**
-     * @return код карты
+     * @return номер+цвет карты
      */
     public int getCardNumber() {
         return number * 10 + color;
@@ -91,7 +96,7 @@ public class Card {
     }
 
     /**
-     * @return номер карты
+     * @return номер формы карты
      */
     public int getCardFormNumber() {
         return number;

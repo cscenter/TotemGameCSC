@@ -156,7 +156,6 @@ public class Game {
     void generateAllCards(ArrayList<Integer> names) {
         allCards = new LinkedList<>();
         NUMBER_OF_CARDS = utils.Configuration.getNumOfCards();
-        System.out.println("NUMBER OF CARDS + "+NUMBER_OF_CARDS);
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             allCards.add(new Card(names.get(i)));
         }
@@ -172,7 +171,6 @@ public class Game {
     void generateAllCards(ArrayList<Integer> names, int cardSeed) {
         allCards = new LinkedList<>();
         NUMBER_OF_CARDS = utils.Configuration.getNumOfCards();
-        System.out.println("NUMBER OF CARDS + "+NUMBER_OF_CARDS);
         for (int i = 0; i < NUMBER_OF_CARDS; i++) {
             allCards.add(new Card(names.get(i)));
         }
@@ -304,7 +302,7 @@ public class Game {
     }
 
     /**
-     * функция хода. На данный момент не используется, будет слита в другую
+     * функция хода.
      *
      * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
