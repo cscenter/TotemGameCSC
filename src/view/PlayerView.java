@@ -19,7 +19,7 @@ public class PlayerView {
      * верхняя карта
      */
     private CardView topCardView;
-
+    private Image avatarImage;
     /**
      *
      * @return ссылку на изображение верхней карты
@@ -101,16 +101,47 @@ public class PlayerView {
      * @param haracteristicScale новый масштаб
      */
     public void resize(int haracteristicScale) {
-        xCoordinate = (int) ((haracteristicScale / 3.5) * Math.sin(angle * Math.PI / 180) + haracteristicScale / 2.2) +
-            haracteristicScale / 15;
-        yCoordinate = (int) ((haracteristicScale / 3.5) * Math.cos(angle * Math.PI / 180) + haracteristicScale / 2.5) +
-                haracteristicScale / 15;
+        openCardCenterX = (int) ((haracteristicScale * MyPanel.sizesDiv/ 3)  * Math.sin(angle * Math.PI / 180) *
+                (1 + Math.abs(Math.sin(2 * angle * Math.PI / 180))*0.3)
+                + haracteristicScale * MyPanel.sizesDiv/ 2);
+        openCardCenterY = (int) ((haracteristicScale / 3.5)  * Math.cos(angle * Math.PI / 180)  *
+                (1 + Math.abs(Math.sin(2 * angle * Math.PI / 180))*0.3) + haracteristicScale / 2);
+
+        xCoordinate = openCardCenterX; //(int) ((haracteristicScale / 3.5) * Math.sin(angle * Math.PI / 180) + haracteristicScale / 2.2) +
+            //haracteristicScale / 15;
+        yCoordinate = openCardCenterY; //(int) ((haracteristicScale / 3.5) * Math.cos(angle * Math.PI / 180) + haracteristicScale / 2.5) +
+               // haracteristicScale / 15;
         closeCardCenterX = xCoordinate + CardView.getCardSize() / 2;
         closeCardCenterY = yCoordinate - CardView.getCardSize() / 2;
-        openCardCenterX = closeCardCenterX;
-        openCardCenterY = closeCardCenterY + (int) (CardView.getCardSize()*1.2);
-        avatarHeight = haracteristicScale / 7;
-        avatarWeight = haracteristicScale / 7;
+        //низ
+        if ((openCardCenterX / MyPanel.sizesDiv < openCardCenterY) &&
+                (haracteristicScale - openCardCenterX / MyPanel.sizesDiv < openCardCenterY)) {
+            closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
+            closeCardCenterY = yCoordinate - (int) (CardView.getCardSize() * 3.2 / 4);
+        }
+        //верх
+        if ((openCardCenterX / MyPanel.sizesDiv > openCardCenterY) &&
+                (haracteristicScale - openCardCenterX / MyPanel.sizesDiv > openCardCenterY)) {
+            closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
+            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() * 3.2 / 4);
+        }
+        //право
+        if ((openCardCenterX / MyPanel.sizesDiv >= openCardCenterY) &&
+                (haracteristicScale - openCardCenterX / MyPanel.sizesDiv <= openCardCenterY)) {
+            closeCardCenterX = xCoordinate - (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
+            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
+        }
+        //лево
+        if ((openCardCenterX / MyPanel.sizesDiv <= openCardCenterY) &&
+                (haracteristicScale - openCardCenterX / MyPanel.sizesDiv >= openCardCenterY)) {
+            closeCardCenterX = xCoordinate + (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
+            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
+        }
+
+//        openCardCenterX = closeCardCenterX;
+  //      openCardCenterY = closeCardCenterY + (int) (CardView.getCardSize()*1.2);
+        avatarHeight = haracteristicScale / 14;
+        avatarWeight = haracteristicScale / 14;
         avatarCenterX = xCoordinate - avatarWeight / 2 - avatarWeight / 10;
         avatarCenterY = yCoordinate;
     }
@@ -133,10 +164,11 @@ public class PlayerView {
      * @param player информация об игроке
      * @param a угол, на котором игрок будет располагаться
      */
-    public PlayerView(char newOpenCardKey, char newCatchTotemKey, Player player, double a) {
+    public PlayerView(char newOpenCardKey, char newCatchTotemKey, Player player, double a, Image ava) {
         openCardKey = newOpenCardKey;
         catchTotemKey = newCatchTotemKey;
         angle = a;
+        avatarImage = ava;
         xCoordinate = (int) ((scale / 3.5) * Math.sin(angle * Math.PI / 180) + scale / 2.2);
         yCoordinate = (int) ((scale / 3.5) * Math.cos(angle * Math.PI / 180) + scale / 2.5);
         if (player == null) {
@@ -148,17 +180,12 @@ public class PlayerView {
     }
 
     /**
-     * проверяет, легла ли точка на карту
+     * проверяет, легла ли точка на аватарку
      * @param p координаты точки
      * @return флаг попадания
      */
     public boolean isIn(Point p) {
-        if ((p.getX() < xCoordinate + CardView.getCardSize()) && (p.getX() > xCoordinate - CardView.getCardSize())) {
-            if ((p.getY() < yCoordinate + CardView.getCardSize() + 40) && (p.getY() > yCoordinate - 40)) {
-                return true;
-            }
-        }
-        return false;
+        return ((Math.abs(p.x - avatarCenterX) < avatarWeight / 2) && (Math.abs(p.y - avatarCenterY) < avatarHeight / 2));
     }
 
     /**
@@ -176,7 +203,7 @@ public class PlayerView {
      */
     public void drawPlayer(Graphics g, MyPanel panel, int basicFontSize){
         g.setColor(Color.cyan);
-        g.drawImage(Configuration.getGallery().getImage("data/tboy.png"), avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
+        g.drawImage(avatarImage, avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
                 avatarWeight, avatarHeight, panel);
         Font font = new Font("Tahoma", Font.BOLD, basicFontSize * 4 / 3);
         g.setFont(font);
@@ -199,7 +226,7 @@ public class PlayerView {
             }
         }
         if (playerInfo.getCloseCardsCount() != 0) {
-            int halfCS = CardView.getCardSize() / 2;
+            int halfCS = CardView.getCardSize() / 4;
             g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), closeCardCenterX - halfCS, closeCardCenterY - halfCS,
                     2 * halfCS, 2 * halfCS, panel);
         }
@@ -208,5 +235,5 @@ public class PlayerView {
                 closeCardCenterY + CardView.getCardSize() / 2);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
         g.drawString(catchKey, closeCardCenterX, closeCardCenterY - CardView.getCardSize() / 2 - basicFontSize);
-}
+    }
 }

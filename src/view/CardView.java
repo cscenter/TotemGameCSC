@@ -95,6 +95,6 @@ public class CardView {
      * @param haracteristicScale характеристический масштаб
      */
     public static void resize(int haracteristicScale) {
-        cardSize = haracteristicScale / 10;
+        cardSize = haracteristicScale / 6;
     }
 }

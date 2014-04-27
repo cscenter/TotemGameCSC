@@ -1,4 +1,4 @@
-4
+8
 Vasya
 q
 w
@@ -11,3 +11,15 @@ y
 Manya
 u
 i
+Ania
+a
+s
+Luba
+d
+f
+Gleb
+g
+h
+Yana
+j
+k

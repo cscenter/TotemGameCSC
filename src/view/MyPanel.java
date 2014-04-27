@@ -28,6 +28,7 @@ public class MyPanel extends JPanel {
     private String message;
     private int mesOk;
     private int typeTotem;
+    static double sizesDiv = 4.0 / 3;
     private int xMes;
     int basicFontSize = 15;
     private TotemView totemV;
@@ -113,8 +114,8 @@ public class MyPanel extends JPanel {
         public void resize(int haracteristicScale) {
             totemV.totemHeight = (int) (haracteristicScale / 7);
             totemV.totemWeight = (int) (haracteristicScale / 10);
-            totemV.yCoord = (int) (haracteristicScale / 2.2);
-            totemV.xCoord = totemV.yCoord + haracteristicScale / 30;
+            totemV.yCoord = (int) (haracteristicScale / 2);
+            totemV.xCoord = (int) (totemV.yCoord * sizesDiv + haracteristicScale / 30);
         }
     }
 
@@ -241,7 +242,7 @@ public class MyPanel extends JPanel {
 
     private void repaintAll(Graphics g) {
         Image img = Configuration.getGallery().getImage("data/b1.png");
-        g.drawImage(img, 0, 0, panel_size, panel_size, null);
+        g.drawImage(img, 0, 0, (int) (panel_size * sizesDiv), panel_size,  null);
         totemV.drawTotem(g);
         for (PlayerView player : playersView) {
             player.drawPlayer(g, this, basicFontSize);
@@ -378,6 +379,7 @@ public class MyPanel extends JPanel {
     //вместо конструктора
     public void initiation(TotemClient tClient, ArrayList<Character> ktKeys, ArrayList<Character> ocKeys, ArrayList<Double> angle) {
         client = tClient;
+        sizesDiv = 4.0/3;
         whatRepaint = WhatRepaint.NOT_DEF;
         whatRepaint.lastPlayerWhoAct = 0;
         playersView = new ArrayList<>(ktKeys.size());
@@ -412,7 +414,8 @@ public class MyPanel extends JPanel {
         for (int i = 0; i < ktKeys.size(); i++) {
             double currentAngle = angle.get(i);
             currentAngle = currentAngle - 360.0 * client.getWhatPlayer() / Configuration.getNumberOfPlayers();
-            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), client.getPlayer(i), currentAngle));
+            playersView.add(new PlayerView(ocKeys.get(i), ktKeys.get(i), client.getPlayer(i), currentAngle,
+                    Configuration.getGallery().getImage("data/avatars/"+i+".png")));
         }
         totemV = new TotemView(client.getTotem());
     }

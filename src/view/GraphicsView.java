@@ -168,7 +168,7 @@ public class GraphicsView extends JFrame {
         ArrayList<Double> angles = new ArrayList<>();
         FRAME_SIZE = (Toolkit.getDefaultToolkit().getScreenSize().getHeight() > Toolkit.getDefaultToolkit().getScreenSize().getWidth()) ?
                 (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() : (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-        setPreferredSize(new Dimension(FRAME_SIZE, FRAME_SIZE));
+        setPreferredSize(new Dimension(FRAME_SIZE * 4 / 3, FRAME_SIZE));
 
         //если не хотим каждый раз выбирать по умолчанию - берём этот кусок. Если хотим - откоммичиваем что внизу
         ArrayList<String> names = new ArrayList<>();
