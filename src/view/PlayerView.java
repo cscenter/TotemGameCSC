@@ -113,37 +113,49 @@ public class PlayerView {
                // haracteristicScale / 15;
         closeCardCenterX = xCoordinate + CardView.getCardSize() / 2;
         closeCardCenterY = yCoordinate - CardView.getCardSize() / 2;
+        avatarHeight = haracteristicScale / 20;
+        avatarWeight = haracteristicScale / 20;
+        avatarCenterX = xCoordinate - avatarWeight / 2 - avatarWeight / 10;
+        avatarCenterY = yCoordinate;
+
         //низ
         if ((openCardCenterX / MyPanel.sizesDiv < openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv < openCardCenterY)) {
             closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
             closeCardCenterY = yCoordinate - (int) (CardView.getCardSize() * 3.2 / 4);
+            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY + CardView.getCardSize() / 2 + avatarHeight;
         }
         //верх
         if ((openCardCenterX / MyPanel.sizesDiv > openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv > openCardCenterY)) {
             closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
             closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() * 3.2 / 4);
+            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 - avatarHeight * 5 / 4;
+
         }
         //право
         if ((openCardCenterX / MyPanel.sizesDiv >= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv <= openCardCenterY)) {
             closeCardCenterX = xCoordinate - (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
             closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
+            avatarCenterX = openCardCenterX + CardView.getCardSize() / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 + avatarHeight;
+
         }
         //лево
         if ((openCardCenterX / MyPanel.sizesDiv <= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv >= openCardCenterY)) {
             closeCardCenterX = xCoordinate + (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
             closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
+            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 - avatarWeight * 3 / 2;
+            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 + avatarHeight;
+
         }
 
 //        openCardCenterX = closeCardCenterX;
   //      openCardCenterY = closeCardCenterY + (int) (CardView.getCardSize()*1.2);
-        avatarHeight = haracteristicScale / 14;
-        avatarWeight = haracteristicScale / 14;
-        avatarCenterX = xCoordinate - avatarWeight / 2 - avatarWeight / 10;
-        avatarCenterY = yCoordinate;
     }
 
     Point getOpenCardCenter() {
