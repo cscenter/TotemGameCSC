@@ -51,6 +51,14 @@ public class PlayerView {
     private int avatarCenterY;
     private int avatarHeight;
     private int avatarWeight;
+    private int nameXCoord;
+    private int nameYCoord;
+    private int closeCardsNumberCoordX;
+    private int closeCardsNumberCoordY;
+    private int openCardsNumberCoordX;
+    private int openCardsNumberCoordY;
+    private int keysCoordX;
+    private int keysCoordY;
     private double angle;
     /**
      * клавиша открытия верхней карты
@@ -100,8 +108,11 @@ public class PlayerView {
      * изменяет масштаб
      * @param haracteristicScale новый масштаб
      */
-    public void resize(int haracteristicScale) {
-        openCardCenterX = (int) ((haracteristicScale * MyPanel.sizesDiv/ 3)  * Math.sin(angle * Math.PI / 180) *
+    public void resize(int haracteristicScale, MyPanel panel) {
+        int basicFontSize = haracteristicScale / 35;
+        Font font = new Font("Tahoma", Font.BOLD, basicFontSize * 4 / 3);
+        int stew = panel.getFontMetrics(font).stringWidth(getPlayerName());
+        openCardCenterX = (int) ((haracteristicScale * MyPanel.sizesDiv / 3.3)  * Math.sin(angle * Math.PI / 180) *
                 (1 + Math.abs(Math.sin(2 * angle * Math.PI / 180))*0.3)
                 + haracteristicScale * MyPanel.sizesDiv/ 2);
         openCardCenterY = (int) ((haracteristicScale / 3.5)  * Math.cos(angle * Math.PI / 180)  *
@@ -117,45 +128,96 @@ public class PlayerView {
         avatarWeight = haracteristicScale / 20;
         avatarCenterX = xCoordinate - avatarWeight / 2 - avatarWeight / 10;
         avatarCenterY = yCoordinate;
+        nameXCoord = avatarCenterX + avatarWeight*2;
+        nameYCoord = avatarCenterY;
+        openCardsNumberCoordX = 0;
+        openCardsNumberCoordY = 0;
+        closeCardsNumberCoordX = 0;
+        closeCardsNumberCoordY = 0;
 
+        Font font2 = new Font("Tahoma", Font.BOLD, basicFontSize);
+        int snumW = panel.getFontMetrics(font2).stringWidth("888");
+        int skeysW = panel.getFontMetrics(font2).stringWidth("w, w");
         //низ
         if ((openCardCenterX / MyPanel.sizesDiv < openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv < openCardCenterY)) {
-            closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
-            closeCardCenterY = yCoordinate - (int) (CardView.getCardSize() * 3.2 / 4);
-            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 + avatarWeight;
-            avatarCenterY = openCardCenterY + CardView.getCardSize() / 2 + avatarHeight;
+            int CS = CardView.getCardSize();
+            closeCardCenterX = xCoordinate + CS / 4;
+            closeCardCenterY = yCoordinate - (int) (CS * 3.2 / 4);
+            avatarCenterX = openCardCenterX - CS / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY + CS / 2 + avatarHeight;
+            nameXCoord = avatarCenterX + avatarWeight;
+            nameYCoord = avatarCenterY;
+
+            openCardsNumberCoordX = openCardCenterX + CS * 11 / 20;
+            openCardsNumberCoordY = openCardCenterY + CS / 2;
+            closeCardsNumberCoordX = closeCardCenterX + CS * 11 / 40;
+            closeCardsNumberCoordY = closeCardCenterY + CS / 4;
+
+            keysCoordX = openCardCenterX - skeysW;
+            keysCoordY = openCardCenterY - CS / 2 - basicFontSize / 2;
         }
         //верх
         if ((openCardCenterX / MyPanel.sizesDiv > openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv > openCardCenterY)) {
-            closeCardCenterX = xCoordinate + CardView.getCardSize() / 4;
-            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() * 3.2 / 4);
-            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 + avatarWeight;
-            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 - avatarHeight * 5 / 4;
+            int CS = CardView.getCardSize();
+            closeCardCenterX = xCoordinate + CS / 4;
+            closeCardCenterY = yCoordinate + (int) (CS * 3.2 / 4);
+            avatarCenterX = openCardCenterX - CS / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY - CS / 2 - avatarHeight * 5 / 4;
+            nameXCoord = avatarCenterX + avatarWeight;
+            nameYCoord = avatarCenterY;
+
+            openCardsNumberCoordX = openCardCenterX + CS * 11 / 20;
+            openCardsNumberCoordY = openCardCenterY - CS / 2 + basicFontSize;
+            closeCardsNumberCoordX = closeCardCenterX + CS * 11 / 40;
+            closeCardsNumberCoordY = closeCardCenterY - CS / 4 + basicFontSize;
+
+            keysCoordX = openCardCenterX - skeysW;
+            keysCoordY = openCardCenterY + CS / 2 + basicFontSize * 5 / 4;
+
 
         }
         //право
         if ((openCardCenterX / MyPanel.sizesDiv >= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv <= openCardCenterY)) {
-            closeCardCenterX = xCoordinate - (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
-            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
-            avatarCenterX = openCardCenterX + CardView.getCardSize() / 2 + avatarWeight;
-            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 + avatarHeight;
+            int CS = CardView.getCardSize();
+            closeCardCenterX = xCoordinate - (int) (CS * (2 + 1 + 0.2) / 4);
+            closeCardCenterY = yCoordinate + (int) (CS / 4);
+            avatarCenterX = openCardCenterX + CS / 2 + avatarWeight;
+            avatarCenterY = openCardCenterY - CS / 2 + avatarHeight;
+            nameXCoord = Math.max(avatarCenterX - stew / 2, openCardCenterX + CS / 2);
+            nameYCoord = avatarCenterY + avatarHeight + basicFontSize / 3;
+
+            openCardsNumberCoordX = openCardCenterX + CS / 2 - snumW;
+            openCardsNumberCoordY = openCardCenterY + CS / 2 + basicFontSize;
+            closeCardsNumberCoordX = closeCardCenterX + CS / 4 - snumW;
+            closeCardsNumberCoordY = closeCardCenterY + CS / 4 + basicFontSize;
+
+            keysCoordX = openCardCenterX - CS / 2 - skeysW;
+            keysCoordY = openCardCenterY - basicFontSize / 2;
 
         }
         //лево
         if ((openCardCenterX / MyPanel.sizesDiv <= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv >= openCardCenterY)) {
-            closeCardCenterX = xCoordinate + (int) (CardView.getCardSize() * (2 + 1 + 0.2) / 4);
-            closeCardCenterY = yCoordinate + (int) (CardView.getCardSize() / 4);
-            avatarCenterX = openCardCenterX - CardView.getCardSize() / 2 - avatarWeight * 3 / 2;
-            avatarCenterY = openCardCenterY - CardView.getCardSize() / 2 + avatarHeight;
+            int CS = CardView.getCardSize();
+            closeCardCenterX = xCoordinate + (int) (CS * (2 + 1 + 0.2) / 4);
+            closeCardCenterY = yCoordinate + (int) (CS / 4);
+            avatarCenterX = openCardCenterX - CS / 2 - avatarWeight * 3 / 2;
+            avatarCenterY = openCardCenterY - CS / 2 + avatarHeight;
+            nameXCoord = Math.min(avatarCenterX - stew / 2, openCardCenterX - CS / 2 - stew);
+            nameYCoord = avatarCenterY + avatarHeight + basicFontSize / 3;
+
+            openCardsNumberCoordX = openCardCenterX - CS / 2;
+            openCardsNumberCoordY = openCardCenterY + CS / 2 + basicFontSize;
+            closeCardsNumberCoordX = closeCardCenterX - CS / 4;
+            closeCardsNumberCoordY = closeCardCenterY + CS / 4 + basicFontSize;
+
+            keysCoordX = openCardCenterX + CS / 2 +  basicFontSize / 4;
+            keysCoordY = openCardCenterY - basicFontSize / 2;
 
         }
-
-//        openCardCenterX = closeCardCenterX;
-  //      openCardCenterY = closeCardCenterY + (int) (CardView.getCardSize()*1.2);
     }
 
     Point getOpenCardCenter() {
@@ -219,13 +281,11 @@ public class PlayerView {
                 avatarWeight, avatarHeight, panel);
         Font font = new Font("Tahoma", Font.BOLD, basicFontSize * 4 / 3);
         g.setFont(font);
-        g.drawString(playerInfo.getName(), avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2 -
-                basicFontSize);
+        g.drawString(playerInfo.getName(), nameXCoord, nameYCoord);
         font = new Font("Tahoma", Font.BOLD, basicFontSize);
         g.setFont(font);
         String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
-        g.drawString(openCardsNumber, openCardCenterX + CardView.getCardSize() / 2 + basicFontSize / 3,
-                openCardCenterY + CardView.getCardSize() / 2);
+        g.drawString(openCardsNumber, openCardsNumberCoordX, openCardsNumberCoordY);
 
         if (playerInfo.getOpenCardsCount() != 0) {
             Image image;
@@ -243,9 +303,8 @@ public class PlayerView {
                     2 * halfCS, 2 * halfCS, panel);
         }
         String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
-        g.drawString(closeCardsNumber, closeCardCenterX + CardView.getCardSize() / 2 + basicFontSize / 3,
-                closeCardCenterY + CardView.getCardSize() / 2);
+        g.drawString(closeCardsNumber, closeCardsNumberCoordX, closeCardsNumberCoordY);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
-        g.drawString(catchKey, closeCardCenterX, closeCardCenterY - CardView.getCardSize() / 2 - basicFontSize);
+        g.drawString(catchKey, keysCoordX, keysCoordY);
     }
 }

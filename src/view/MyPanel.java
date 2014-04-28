@@ -101,7 +101,8 @@ public class MyPanel extends JPanel {
             Font font = new Font("Tahoma", Font.BOLD, basicFontSize);
             g.setColor(Color.cyan);
             g.setFont(font);
-            g.drawString(cardsCount, xCoord - (int)(basicFontSize / 2.5), yCoord + totemHeight / 2);
+            int stringw = g.getFontMetrics(font).stringWidth(cardsCount);
+            g.drawString(cardsCount, xCoord - stringw / 2, yCoord + totemHeight / 2);
 //            g.drawChars(cardsCount.toCharArray(), 0, cardsCount.length(), xCoord - CardView.getCardSize() / 2 + panel_size / 60 + 10, yCoord + CardView.getCardSize() / 2 + panel_size / 30 + 40);
 
 
@@ -126,7 +127,7 @@ public class MyPanel extends JPanel {
         PlayerView.setScale(haracteristicScale);
         totemV.resize(haracteristicScale);
         for (PlayerView player : playersView) {
-            player.resize(haracteristicScale);
+            player.resize(haracteristicScale, this);
         }
 
     }
