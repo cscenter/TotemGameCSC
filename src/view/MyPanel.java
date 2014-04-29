@@ -153,7 +153,7 @@ public class MyPanel extends JPanel {
         switch (whatRepaint){
             case NOT_DEF:
 //                super.repaint();
-                reSize(Math.min(g.getClipBounds().height, g.getClipBounds().width));
+                reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));
                 repaintAll(g);
 /*                Image img = Configuration.getGallery().getImage("data/b1.png");
                 g.drawImage(img, 0, 0, panel_size + 25, panel_size, null);//MyPanel.HEIGHT, MyPanel.WIDTH, null );

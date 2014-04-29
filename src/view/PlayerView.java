@@ -302,5 +302,6 @@ public class PlayerView {
         g.drawString(closeCardsNumber, closeCardsNumberCoordX, closeCardsNumberCoordY);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
         g.drawString(catchKey, keysCoordX, keysCoordY);
+        g.drawImage(Configuration.getGallery().getImage("conf/1_sec.png"), 10, 10, 100, 100, panel);
     }
 }

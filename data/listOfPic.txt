@@ -16,3 +16,6 @@ avatars/5.png
 avatars/6.png
 avatars/7.png
 alphaback.png
+conf/1_sec.png
+conf/2_sec.png
+conf/3_sec.png
