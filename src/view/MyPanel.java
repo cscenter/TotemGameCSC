@@ -234,8 +234,8 @@ public class MyPanel extends JPanel {
                 Point p = currPlayer.getOpenCardCenter();
                 int sizeX1 = CardView.getCardSize();
                 int sizeY1 = CardView.getCardSize();
-                int sizeX2 = CardView.getCardSize() * 2;
-                int sizeY2 = CardView.getCardSize() * 2;
+                int sizeX2 = (int) (CardView.getCardSize() * 1.1);
+                int sizeY2 = (int) (CardView.getCardSize() * 1.1);
                 Image cardI = currPlayer.getTopCardViewImage();
                 makeImageBiggerAnimation(g, 10, cardI, p, sizeX1, sizeY1, sizeX2, sizeY2);
         }
@@ -316,7 +316,7 @@ public class MyPanel extends JPanel {
                     whatRepaint.lastPlayerWhoAct = whoPlayed;
                     timeToOpen = 0;
                     AnimListenerCardOpen animListener = new AnimListenerCardOpen();
-                    timer = new Timer(100, animListener);
+                    timer = new Timer(10, animListener);
                     timer.start();
                     break;
                 case NOT_DEFINED_CATCH:
