@@ -5,16 +5,11 @@ import model.Card;
 import model.Game;
 import utils.Configuration;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +29,7 @@ public class MyPanel extends JPanel {
     private TotemView totemV;
     private ArrayList<PlayerView> playersView;
     private int pos;
-    private Timer timer;
+    private Timer openCardTimer;
 
     private ArrayList<CardView> cardsView;
     private WhatRepaint whatRepaint;
@@ -249,13 +244,14 @@ public class MyPanel extends JPanel {
             player.drawPlayer(g, this, basicFontSize);
         }
     }
-    public void repaintModel(Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid,
+    public void repaintModel(Queue<Game.WhatPlayerDid> whatDid,
                             boolean isSmbOpen,boolean isSmbdCatch) {
         Game.ResultOfMakeMove resultOfMakeMove;
         whoPlayed = 0;
         if (isSmbdCatch){
-            whoPlayed = whoDid.remove();
-            resultOfMakeMove = client.makeMove(whoPlayed, whatDid.remove());
+            Game.WhatPlayerDid what = whatDid.remove();
+            whoPlayed = what.whoWasIt;
+            resultOfMakeMove = client.makeMove(what);
             switch (resultOfMakeMove) {
                 case TOTEM_WAS_CATCH_CORRECT:
                     mesOk = 1;
@@ -295,12 +291,12 @@ public class MyPanel extends JPanel {
         }
 
         if (isSmbOpen){
-            while (whoDid.size() > 1){
+            while (whatDid.size() > 1){
                 whatDid.remove();
-                whoDid.remove();
             }
-            whoPlayed = whoDid.remove();
-            resultOfMakeMove = client.makeMove(whoPlayed, whatDid.remove());
+            Game.WhatPlayerDid whatPlayerDid = whatDid.remove();
+            whoPlayed = whatPlayerDid.whoWasIt;
+            resultOfMakeMove = client.makeMove(whatPlayerDid);
 
             switch (resultOfMakeMove) {
                 case INCORRECT:
@@ -312,12 +308,14 @@ public class MyPanel extends JPanel {
                     System.out.printf("%s open next card\n",
                             client.getPlayer(whoPlayed).getName());
                     playersView.get(whoPlayed).setTopCardView(cardsView);
-                    whatRepaint = WhatRepaint.NEW_CARD;
-                    whatRepaint.lastPlayerWhoAct = whoPlayed;
-                    timeToOpen = 0;
-                    AnimListenerCardOpen animListener = new AnimListenerCardOpen();
-                    timer = new Timer(10, animListener);
-                    timer.start();
+//                    if (!openCardTimer.isRunning()) {
+                        whatRepaint = WhatRepaint.NEW_CARD;
+                        whatRepaint.lastPlayerWhoAct = whoPlayed;
+                        timeToOpen = 0;
+                        AnimListenerCardOpen animListener = new AnimListenerCardOpen();
+                        openCardTimer = new Timer(100, animListener);
+                        openCardTimer.start();
+  //                  }
                     break;
                 case NOT_DEFINED_CATCH:
                     if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
@@ -351,7 +349,7 @@ public class MyPanel extends JPanel {
     private void makeImageBiggerAnimation(Graphics g, int steps, Image image, Point center,
                                           int sizeXBegin, int sizeYBegin, int sizeXEnd, int sizeYEnd) {
         if (timeToOpen >= steps) {
-            timer.stop();
+            openCardTimer.stop();
             timeToOpen = 0;
             whatRepaint = WhatRepaint.NOT_DEF;
             repaintAll(g);
@@ -469,12 +467,16 @@ public class MyPanel extends JPanel {
                 boolean suchKeyHere = false;
                 for (int i = 0; i < client.getPlayersCount(); i++) {
                     if (playersView.get(i).getOpenCardKey() == inputChar) {
-                        client.moveWithoutAnswer(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                        Game.WhatPlayerDid what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+                        what.whoWasIt = i;
+                        client.moveWithoutAnswer(what);
                         suchKeyHere = true;
                         break;
                     }
                     if (playersView.get(i).getCatchTotemKey() == inputChar) {
-                        client.moveWithoutAnswer(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                        Game.WhatPlayerDid what = Game.WhatPlayerDid.TOOK_TOTEM;
+                        what.whoWasIt = i;
+                        client.moveWithoutAnswer(what);
                         suchKeyHere = true;
                         break;
                     }

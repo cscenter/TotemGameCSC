@@ -250,19 +250,14 @@ public class Configuration {
      * последний бит отвечает за то, что сделал походивший
      * остальные - за номер походившего
      * @param commands кодированные команды
-     * @param whoDid кто походил
      * @param whatDid что сделал походивший
      */
-    public static void decodeCommands(Queue<Byte> commands,
-                                      Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid) {
-        whoDid.clear();
+    public static void decodeCommands(Queue<Byte> commands, Queue<Game.WhatPlayerDid> whatDid) {
         whatDid.clear();
         while (!commands.isEmpty()) {
             byte current = commands.remove();
-            WPDHolder what = new WPDHolder(Game.WhatPlayerDid.OPEN_NEW_CARD);
-            Integer who = decodeOneCommand(current, what);
-            whoDid.add(who);
-            whatDid.add(what.getValue());
+            Game.WhatPlayerDid what = decodeOneCommand(current);
+            whatDid.add(what);
         }
     }
 
@@ -271,17 +266,18 @@ public class Configuration {
      * последний бит отвечает за то, что сделал походивший
      * остальные - за номер походившего
      * @param command команда
-     * @param what обёртка над тем, что сделал походивший
-     * @return номер походившего
+     * @return кто ходил и что сделал
      */
-    public static int decodeOneCommand(Byte command, WPDHolder what) {
+    public static Game.WhatPlayerDid decodeOneCommand(Byte command) {
         int who = command / 2;
+        Game.WhatPlayerDid what;
         if (command - (command / 2) * 2 == 0) {
-            what.setValue(Game.WhatPlayerDid.TOOK_TOTEM);
+            what = Game.WhatPlayerDid.TOOK_TOTEM;
         } else {
-            what.setValue(Game.WhatPlayerDid.OPEN_NEW_CARD);
+            what = Game.WhatPlayerDid.OPEN_NEW_CARD;
         }
-        return who;
+        what.whoWasIt = who;
+        return what;
     }
 
     /**
@@ -290,16 +286,13 @@ public class Configuration {
      * остальные - за номер походившего
      *
      * @param commands кодированные команды
-     * @param whoDid кто походил
      * @param whatDid что сделал походивший
      */
-    public static void codeCommands(Queue<Byte> commands,
-                                    Queue<Integer> whoDid, Queue<Game.WhatPlayerDid> whatDid) {
+    public static void codeCommands(Queue<Byte> commands, Queue<Game.WhatPlayerDid> whatDid) {
         commands.clear();
-        while (!whoDid.isEmpty()) {
-            Integer who = whoDid.remove();
+        while (!whatDid.isEmpty()) {
             Game.WhatPlayerDid what = whatDid.remove();
-            Byte command = codeOneCommand(who, what);
+            Byte command = codeOneCommand(what);
             commands.add(command);
         }
     }
@@ -309,50 +302,14 @@ public class Configuration {
      * последний бит отвечает за то, что сделал походивший
      * остальные - за номер походившего
      *
-     * @param who кто походил
      * @param what что сделал походивший
      * @return команду в кодированном виде
      */
-    public static byte codeOneCommand(Integer who, Game.WhatPlayerDid what) {
-        byte command = (byte) (who * 2);
+    public static byte codeOneCommand(Game.WhatPlayerDid what) {
+        byte command = (byte) (what.whoWasIt * 2);
         if (what == Game.WhatPlayerDid.OPEN_NEW_CARD) {
             command++;
         }
         return command;
-    }
-
-    /**
-     * класс-обёртка над тем, что сделал игрок
-     * @see model.Game.WhatPlayerDid
-     */
-    public static class WPDHolder {
-        /**
-         * что сделал походивший
-         */
-        private Game.WhatPlayerDid value;
-
-        /**
-         * конструктор
-         * @param initial что сделал походивший
-         */
-        public WPDHolder(Game.WhatPlayerDid initial) {
-            value = initial;
-        }
-
-        /**
-         * присвоение значения
-         * @param newValue новое значение
-         */
-        public void setValue(Game.WhatPlayerDid newValue) {
-            value = newValue;
-        }
-
-        /**
-         *
-         * @return что сделал походивший
-         */
-        public Game.WhatPlayerDid getValue() {
-            return value;
-        }
     }
 }

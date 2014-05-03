@@ -298,17 +298,18 @@ public class Game {
      */
     public enum WhatPlayerDid {
         TOOK_TOTEM,
-        OPEN_NEW_CARD
+        OPEN_NEW_CARD;
+        public int whoWasIt;
     }
 
     /**
      * функция хода.
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      * @return результат хода
      */
-    public ResultOfMakeMove makeMove(int playerIndex, WhatPlayerDid whatPlayerDid) {
+    public ResultOfMakeMove makeMove(WhatPlayerDid whatPlayerDid) {
+        int playerIndex = whatPlayerDid.whoWasIt;
         switch (whatPlayerDid) {
             case TOOK_TOTEM:
                 ArrayList<Integer> result = checkDuelWithPlayer(players.get(playerIndex));

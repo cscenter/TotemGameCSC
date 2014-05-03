@@ -40,14 +40,10 @@ public class MyClient implements TotemClient {
      */
     private OutputStream outputStream;
     /**
-     * команды в зашифрованном виде
-     * @see utils.Configuration#decodeCommands(java.util.Queue, java.util.Queue, java.util.Queue)
+     * команды в закодированном виде
+     * @see utils.Configuration#decodeCommands(java.util.Queue, java.util.Queue)
      */
     private Queue<Byte> commands;
-    /**
-     * список людей, которые ходили
-     */
-    private Queue<Integer> whoDid;
     /**
      * список того, что сделали люди, которые ходили
      */
@@ -86,7 +82,6 @@ public class MyClient implements TotemClient {
         String ip = Configuration.getServerIp();
         commands = new ConcurrentLinkedQueue<>();
         whatDid = new LinkedList<>();
-        whoDid = new LinkedList<>();
         canWeGo = false;
         int port = Configuration.getPort();
         initConnection(ip, port, playersNames, cardNumbers);
@@ -200,15 +195,14 @@ public class MyClient implements TotemClient {
     /**
      * функция хода. Используется для непосредственного занесения данных в модель
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      * @return результат хода
-     * @see controller.TotemClient#moveWithoutAnswer(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#moveWithoutAnswer(model.Game.WhatPlayerDid)
      */
     @Override
-    public Game.ResultOfMakeMove makeMove(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
+    public Game.ResultOfMakeMove makeMove(Game.WhatPlayerDid whatPlayerDid) {
 
-        return myGame.makeMove(playerIndex, whatPlayerDid);
+        return myGame.makeMove(whatPlayerDid);
     }
 
 
@@ -280,20 +274,19 @@ public class MyClient implements TotemClient {
 
     /**
      * функция будет слита с
-     * @see controller.TotemClient#makeMove(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#makeMove(model.Game.WhatPlayerDid)
      * кодирует последний ход и отправляет данные на сервер.
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      *
      */
     @Override
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
+    public void moveWithoutAnswer(Game.WhatPlayerDid whatPlayerDid) {
         if (canWeGo){ //если ещё не ходили в этом кванте
             canWeGo = false;
             try {
-                if (playerIndex == whatPlayer) {
-                    outputStream.write(Configuration.codeOneCommand(playerIndex, whatPlayerDid));
+                if (whatPlayerDid.whoWasIt == whatPlayer) {
+                    outputStream.write(Configuration.codeOneCommand(whatPlayerDid));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -340,7 +333,7 @@ public class MyClient implements TotemClient {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Configuration.decodeCommands(commands, whoDid, whatDid);
+            Configuration.decodeCommands(commands, whatDid);
         }
 
         /**
@@ -359,7 +352,6 @@ public class MyClient implements TotemClient {
         public void run() {
             while (!isGameEnded()) {
                 getInformationFromServer();
-                Queue<Integer> newWhoDid = new LinkedList<>();
                 Queue<Game.WhatPlayerDid> newWhatDid = new LinkedList<>();
                 boolean hasOneTotem = false;
                 int whoTookTotemFirst = -1;
@@ -368,16 +360,16 @@ public class MyClient implements TotemClient {
                 if (whatDid.size() > 0) {
                     System.out.println("get information from server");
                 }
-                while (!whoDid.isEmpty()) {
-                    Integer who = whoDid.remove();
+                while (!whatDid.isEmpty()) {
                     Game.WhatPlayerDid what = whatDid.remove();
+                    Integer who = what.whoWasIt;
                     if ((what == Game.WhatPlayerDid.TOOK_TOTEM)){
                         if (!hasOneTotem){
                             whoTookTotemFirst = who;
+                            what.whoWasIt = who;
                             hasOneTotem = true;
                         }
                         newWhatDid.add(what);
-                        newWhoDid.add(who);
                     } else {
                         if (!hasOpenCard){
                             hasOpenCard = true;
@@ -386,10 +378,11 @@ public class MyClient implements TotemClient {
                     }
                 }
                 if(hasOpenCard){
-                    newWhatDid.add(Game.WhatPlayerDid.OPEN_NEW_CARD);
-                    newWhoDid.add(whoOpenCard);
+                    Game.WhatPlayerDid open = Game.WhatPlayerDid.OPEN_NEW_CARD;
+                    open.whoWasIt = whoOpenCard;
+                    newWhatDid.add(open);
                 }
-                graphicsView.repaintView(newWhoDid, newWhatDid, hasOpenCard, hasOneTotem);
+                graphicsView.repaintView(newWhatDid, hasOpenCard, hasOneTotem);
             }
         }
 

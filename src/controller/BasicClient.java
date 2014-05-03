@@ -83,14 +83,13 @@ public class BasicClient implements TotemClient {
     /**
      * функция хода. Используется для непосредственного занесение данных в модель
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      * @return результат хода
-     * @see controller.TotemClient#moveWithoutAnswer(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#moveWithoutAnswer(model.Game.WhatPlayerDid)
      */
     @Override
-    public Game.ResultOfMakeMove makeMove(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        return myGame.makeMove(playerIndex, whatPlayerDid);
+    public Game.ResultOfMakeMove makeMove(Game.WhatPlayerDid whatPlayerDid) {
+        return myGame.makeMove(whatPlayerDid);
     }
 
     /**
@@ -153,18 +152,15 @@ public class BasicClient implements TotemClient {
 
     /**
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
-     * @see controller.TotemClient#makeMove(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#makeMove(model.Game.WhatPlayerDid)
      */
     @Override
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid) {
-        Queue <Integer> who = new LinkedList<>();
-        who.add(playerIndex);
+    public void moveWithoutAnswer(Game.WhatPlayerDid whatPlayerDid) {
         Queue <Game.WhatPlayerDid> what = new LinkedList<>();
         what.add(whatPlayerDid);
         boolean hasOpenCard = (whatPlayerDid == Game.WhatPlayerDid.OPEN_NEW_CARD) ? true : false;
-        graphicsView.repaintView(who, what, hasOpenCard, !hasOpenCard);
+        graphicsView.repaintView(what, hasOpenCard, !hasOpenCard);
     }
 
     /**

@@ -65,12 +65,11 @@ public interface TotemClient {
     /**
      * функция хода. Используется для непосредственного изменения модели
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
      * @return результат хода
-     * @see controller.TotemClient#moveWithoutAnswer(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#moveWithoutAnswer(model.Game.WhatPlayerDid)
      */
-    public Game.ResultOfMakeMove makeMove(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
+    public Game.ResultOfMakeMove makeMove(Game.WhatPlayerDid whatPlayerDid);
 
     /**
      * Проверяет, возникла ли дуэль с кем-либо. Используется в случае неоднозначного хода
@@ -115,11 +114,10 @@ public interface TotemClient {
     /**
      * функция будет слита с
      *
-     * @param playerIndex   кто походил
      * @param whatPlayerDid что сделал походивший
-     * @see controller.TotemClient#makeMove(int, model.Game.WhatPlayerDid)
+     * @see controller.TotemClient#makeMove(model.Game.WhatPlayerDid)
      */
-    public void moveWithoutAnswer(int playerIndex, Game.WhatPlayerDid whatPlayerDid);
+    public void moveWithoutAnswer(Game.WhatPlayerDid whatPlayerDid);
 
     /**
      * ссылка на View, нужна будет для передачи результатов с сервера

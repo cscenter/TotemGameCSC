@@ -315,13 +315,17 @@ public class View {
             int whoPlayed = 0;
             for (int i = 0; i < client.getPlayersCount(); i++) {
                 if (playersView.get(i).openCardKey == inputChar) {
-                    resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.OPEN_NEW_CARD);
+                    Game.WhatPlayerDid what = Game.WhatPlayerDid.OPEN_NEW_CARD;
+                    what.whoWasIt = i;
+                    resultOfMakeMove = client.makeMove(what);
                     suchKeyHere = true;
                     whoPlayed = i;
                     break;
                 }
                 if (playersView.get(i).catchTotemKey == inputChar) {
-                    resultOfMakeMove = client.makeMove(i, Game.WhatPlayerDid.TOOK_TOTEM);
+                    Game.WhatPlayerDid what = Game.WhatPlayerDid.TOOK_TOTEM;
+                    what.whoWasIt = i;
+                    resultOfMakeMove = client.makeMove(Game.WhatPlayerDid.TOOK_TOTEM);
                     suchKeyHere = true;
                     whoPlayed = i;
                     break;
