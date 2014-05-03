@@ -41,7 +41,7 @@ public class MyPanel extends JPanel {
 
     private Timer arrowsOutTimer;
     private boolean arrowsOutAnimFlag;
-    private int timeOfArrowsOut = 0;
+    private int timeOfArrowsOut = 4;
     class AnimListenerArrowsOut implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -55,6 +55,7 @@ public class MyPanel extends JPanel {
     private WhatRepaint whatRepaint;
     private enum WhatRepaint {
         NEW_CARD,
+        NEW_CARD_WITH_ARROWS_OUT,
         NOT_DEF,
         ALL_OPEN_TOP_CARD_COUNT,
         ALL_OPEN_TOP_CARD_ANIM;
@@ -153,6 +154,7 @@ public class MyPanel extends JPanel {
                 reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));
                 repaintAll(g);
                 break;
+            case NEW_CARD_WITH_ARROWS_OUT:
             case NEW_CARD:
                 int who = whatRepaint.lastPlayerWhoAct;
                 PlayerView currPlayer = playersView.get(who);
@@ -161,31 +163,39 @@ public class MyPanel extends JPanel {
                 int sizeY1 = CardView.getCardSize();
                 int sizeX2 = (int) (CardView.getCardSize() * 1.1);
                 int sizeY2 = (int) (CardView.getCardSize() * 1.1);
-                Image cardI = currPlayer.getTopCardViewImage();
+                Image cardI = currPlayer.getTopCardViewImage();                
                 makeImageBiggerAnimation(g, 10, cardI, p, sizeX1, sizeY1, sizeX2, sizeY2);
                 break;
             case ALL_OPEN_TOP_CARD_COUNT:
                 reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));
                 repaintAll(g);
-                Font font = new Font("Tahoma", Font.BOLD, panel_size/5);
-                g.setColor(Color.blue);
-                g.setFont(font);
-                String count = String.valueOf(timeOfArrowsOut);
-                g.drawString(count, panel_size/2, panel_size/2);
-                if (timeOfArrowsOut <= 0) {
+                if (playersView.get(whatRepaint.lastPlayerWhoAct).getTopCardType() == 
+                           Card.CardType.ARROWS_OUT) {
+                    Font font = new Font("Tahoma", Font.BOLD, panel_size/5);
+                    g.setColor(Color.blue);
+                    g.setFont(font);
+                    String count = String.valueOf(timeOfArrowsOut);
+                    g.drawString(count, panel_size/2, panel_size/2);
+                    if (timeOfArrowsOut <= 0) {
+                        arrowsOutTimer.stop();
+                        arrowsOutAnimFlag = false;
+                        reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));
+                        client.openAllTopCards();
+                        for (PlayerView player : playersView) {
+                            player.setTopCardView(cardsView);
+                        }                    
+                        timeToOpenCard = 0;
+                        AnimListenerCardOpen animListener = new AnimListenerCardOpen();
+                        openCardAnimFlag = true;
+                        openCardTimer = new Timer(50, animListener);
+                        openCardTimer.start();
+                        whatRepaint = WhatRepaint.ALL_OPEN_TOP_CARD_ANIM;
+                    }
+                } else {
                     arrowsOutTimer.stop();
                     arrowsOutAnimFlag = false;
-                    reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));
-                    client.openAllTopCards();
-                    for (PlayerView player : playersView) {
-                        player.setTopCardView(cardsView);
-                    }                    
-                    timeToOpenCard = 0;
-                    AnimListenerCardOpen animListener = new AnimListenerCardOpen();
-                    openCardAnimFlag = true;
-                    openCardTimer = new Timer(50, animListener);
-                    openCardTimer.start();
-                    whatRepaint = WhatRepaint.ALL_OPEN_TOP_CARD_ANIM;
+                    whatRepaint = WhatRepaint.NOT_DEF;
+                    reSize(Math.min(g.getClipBounds().height, (int) (g.getClipBounds().width  / sizesDiv)));                    
                 }
                 break;
             case ALL_OPEN_TOP_CARD_ANIM:
@@ -199,7 +209,6 @@ public class MyPanel extends JPanel {
                     cardI = currPlayer.getTopCardViewImage();
                     makeImageBiggerAnimation(g, 10, cardI, p, sizeX1, sizeY1, sizeX2, sizeY2);
                 }
-
                 break;
         }
     }
@@ -295,12 +304,16 @@ public class MyPanel extends JPanel {
                     break;
                 case ALL_CARDS_OPENED:
                     playersView.get(whoPlayed).setTopCardView(cardsView);
-                    whatRepaint = WhatRepaint.ALL_OPEN_TOP_CARD_COUNT;
-                    timeOfArrowsOut = 3;
-                    AnimListenerArrowsOut animListener = new AnimListenerArrowsOut();
+                    whatRepaint = WhatRepaint.NEW_CARD_WITH_ARROWS_OUT;
+                    whatRepaint.lastPlayerWhoAct = whoPlayed;
+                    if (! openCardAnimFlag) {
+                        timeToOpenCard = 0;
+                        AnimListenerCardOpen animListener = new AnimListenerCardOpen();
+                        openCardAnimFlag = true;
+                        openCardTimer = new Timer(50, animListener);
+                        openCardTimer.start();
+                    }
                     arrowsOutAnimFlag = true;
-                    arrowsOutTimer = new Timer (1000, animListener);
-                    arrowsOutTimer.start();
 /*                    for (PlayerView player : playersView) {
                         player.setTopCardView(cardsView);
                     }
@@ -320,15 +333,48 @@ public class MyPanel extends JPanel {
             repaint();
         }
     }
-
+    private int checkWhoHasArrowsOut() {
+        for (int i = 0; i < playersView.size(); i++) {
+            PlayerView player = playersView.get(i);
+            if (player.getTopCardType() == Card.CardType.ARROWS_OUT) {
+                return i;
+            }
+        }
+        return -1;
+    }
     private void makeImageBiggerAnimation(Graphics g, int steps, Image image, Point center,
                                           int sizeXBegin, int sizeYBegin, int sizeXEnd, int sizeYEnd) {
         if (timeToOpenCard >= steps) {
             openCardTimer.stop();
             timeToOpenCard = 0;
             openCardAnimFlag = false;
-            whatRepaint = WhatRepaint.NOT_DEF;
+            if (whatRepaint == WhatRepaint.NEW_CARD_WITH_ARROWS_OUT) {
+                timeOfArrowsOut = 4;
+                AnimListenerArrowsOut animListener = new AnimListenerArrowsOut();
+                arrowsOutAnimFlag = true;
+                int whoAct = whatRepaint.lastPlayerWhoAct;
+                whatRepaint = WhatRepaint.ALL_OPEN_TOP_CARD_COUNT;
+                whatRepaint.lastPlayerWhoAct = whoAct;
+                arrowsOutTimer = new Timer (1000, animListener);
+                arrowsOutTimer.start();
+                System.err.println("AAAAAAAAAAAAAAAAA");
+            } else if (whatRepaint == WhatRepaint.ALL_OPEN_TOP_CARD_ANIM) {
+                int playerWithArrows = checkWhoHasArrowsOut();
+                if (playerWithArrows != -1) {
+                    whatRepaint = WhatRepaint.ALL_OPEN_TOP_CARD_COUNT;
+                    whatRepaint.lastPlayerWhoAct = playerWithArrows;
+                    timeOfArrowsOut = 4;
+                    AnimListenerArrowsOut animListener = new AnimListenerArrowsOut();
+                    arrowsOutAnimFlag = true;
+                    arrowsOutTimer = new Timer (1000, animListener);
+                    arrowsOutTimer.start();
+                }
+            } else {
+                arrowsOutAnimFlag = false;
+                whatRepaint = WhatRepaint.NOT_DEF;
+            }
             repaintAll(g);
+
         }
         int currXSize = (sizeXEnd - sizeXBegin) * timeToOpenCard / steps + sizeXBegin;
         int currYSize = (sizeYEnd - sizeYBegin) * timeToOpenCard / steps + sizeYBegin;
@@ -353,7 +399,7 @@ public class MyPanel extends JPanel {
         cardsView = new ArrayList<>();
         openCardAnimFlag = false;
         arrowsOutAnimFlag = false;
-        for (int i = 0; i < 400; i++) {//Как сделать нормально?
+        for (int i = 0; i < 400; i++) {
             cardsView.add(null);
         }
         for (String cardI : Configuration.getGallery().getCardsNames()) {
@@ -431,11 +477,12 @@ public class MyPanel extends JPanel {
         // нажатие клавиши
         @Override
         public void keyPressed(KeyEvent k) {
-            if (! arrowsOutAnimFlag) {
-                Character inputChar = k.getKeyChar();
-                inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
-                boolean suchKeyHere = false;
-                for (int i = 0; i < client.getPlayersCount(); i++) {
+            Character inputChar = k.getKeyChar();
+            inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
+            boolean suchKeyHere = false;
+            for (int i = 0; i < client.getPlayersCount(); i++) {
+                if (! arrowsOutAnimFlag) {
+
                     if (playersView.get(i).getOpenCardKey() == inputChar) {
                         Game.WhatPlayerDid what = Game.WhatPlayerDid.OPEN_NEW_CARD;
                         what.whoWasIt = i;
@@ -443,22 +490,23 @@ public class MyPanel extends JPanel {
                         suchKeyHere = true;
                         break;
                     }
-                    if (playersView.get(i).getCatchTotemKey() == inputChar) {
-                        Game.WhatPlayerDid what = Game.WhatPlayerDid.TOOK_TOTEM;
-                        what.whoWasIt = i;
-                        client.moveWithoutAnswer(what);
-                        suchKeyHere = true;
-                        break;
-                    }
                 }
-                if (!(suchKeyHere)) {
-                    mesOk = 1;
-                    message = "Nobody have such key. Try again.";
-                    System.out.println("Nobody have such key. Try again.\n");
-                    MyPanel.this.repaint();
+
+                if (playersView.get(i).getCatchTotemKey() == inputChar) {
+                    Game.WhatPlayerDid what = Game.WhatPlayerDid.TOOK_TOTEM;
+                    what.whoWasIt = i;
+                    client.moveWithoutAnswer(what);
+                    suchKeyHere = true;
+                    break;
                 }
             }
-            MyPanel.this.repaint();
+            if (!(suchKeyHere)) {
+                mesOk = 1;
+                message = "Nobody have such key. Try again.";
+                System.out.println("Nobody have such key. Try again.\n");
+                MyPanel.this.repaint();
+            }
+//            MyPanel.this.repaint();
         }
     }
 

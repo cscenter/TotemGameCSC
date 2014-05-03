@@ -96,6 +96,15 @@ public class Player {
     }
 
     /**
+     * возвращает тип открытой карты. Если верхней карты нет - вернёт обычный тип
+    */
+    public Card.CardType getTopCardType() {
+        if (getOpenCardsCount() == 0) {
+            return Card.CardType.NORMAL;
+        }
+        return getTopOpenedCard().getCardType();
+    }
+    /**
      * забираем все открытые карты
      * @return список из всех карт
      */

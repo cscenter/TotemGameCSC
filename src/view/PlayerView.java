@@ -32,6 +32,9 @@ public class PlayerView {
      * Информация об игроке
      */
     private Player playerInfo;
+    public model.Card.CardType getTopCardType() {
+        return playerInfo.getTopCardType();
+    }
     /**
      * координата по оси x
      */
@@ -292,6 +295,7 @@ public class PlayerView {
         } else {
             int halfCS = CardView.getCardSize() / 2;
             g.drawImage(Configuration.getGallery().getImage("alphaback.png"), openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
+            g.drawRect(openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS);
         }
         if (playerInfo.getCloseCardsCount() != 0) {
             int halfCS = CardView.getCardSize() / 4;
