@@ -19,3 +19,4 @@ alphaback.png
 conf/1_sec.png
 conf/2_sec.png
 conf/3_sec.png
+conf/turn_switch_indicator.png

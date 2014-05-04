@@ -22,6 +22,7 @@ public class MyPanel extends JPanel {
     private String message;
     private int mesOk;
     private int typeTotem;
+
     static double sizesDiv = 4.0 / 3;
     private int xMes;
     int basicFontSize = 15;
@@ -217,8 +218,9 @@ public class MyPanel extends JPanel {
         Image img = Configuration.getGallery().getImage("data/b1.png");
         g.drawImage(img, 0, 0, (int) (panel_size * sizesDiv), panel_size,  null);
         totemV.drawTotem(g);
+        int whoWillGo = client.getPlayerWhoWillGo();
         for (PlayerView player : playersView) {
-            player.drawPlayer(g, this, basicFontSize);
+            player.drawPlayer(g, this, basicFontSize, whoWillGo);
         }
     }
     public void repaintModel(Queue<Game.WhatPlayerDid> whatDid,

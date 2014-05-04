@@ -22,13 +22,17 @@ public class Player {
      *
      * @param playerName имя игрока
      */
-    public Player(String playerName) {
+    public Player(String playerName, int ID) {
         name = playerName;
+        id = ID;
         openedCards = new LinkedList<>();
         closedCards = new LinkedList<>();
     }
 
-
+    private int id;
+    public int getId() {
+        return id;
+    }
     /**
      * заносим закрытые карты
      *
@@ -113,16 +117,4 @@ public class Player {
         openedCards.clear();
         return result;
     }
-    /**
-     * тут какая-то магия. Маша, напиши, пожалуста,что делает эта переменная
-     */
-    boolean isgo = false;
-    public void setGo(boolean ok) {
-        isgo = ok;
-    }
-
-    public boolean isGO() {
-        return isgo;
-    }
-
 }

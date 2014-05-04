@@ -32,6 +32,10 @@ public class PlayerView {
      * Информация об игроке
      */
     private Player playerInfo;
+
+    /**
+    * возвращает тип верхней карты
+    */
     public model.Card.CardType getTopCardType() {
         return playerInfo.getTopCardType();
     }
@@ -271,7 +275,7 @@ public class PlayerView {
      * @param g ссылка на графику
      * @param panel ссылка на панельку
      */
-    public void drawPlayer(Graphics g, MyPanel panel, int basicFontSize){
+    public void drawPlayer(Graphics g, MyPanel panel, int basicFontSize, int whoWillGo){
         g.setColor(Color.cyan);
         g.drawImage(avatarImage, avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
                 avatarWeight, avatarHeight, panel);
@@ -306,6 +310,13 @@ public class PlayerView {
         g.drawString(closeCardsNumber, closeCardsNumberCoordX, closeCardsNumberCoordY);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
         g.drawString(catchKey, keysCoordX, keysCoordY);
-        g.drawImage(Configuration.getGallery().getImage("conf/1_sec.png"), 10, 10, 100, 100, panel);
+//        g.drawImage(Configuration.getGallery().getImage("conf/1_sec.png"), 10, 10, 100, 100, panel);
+        if (playerInfo.getId() == whoWillGo) {
+            g.drawImage(Configuration.getGallery().getImage("conf/turn_switch_indicator.png"),
+                avatarCenterX - avatarWeight*3/2, avatarCenterY - avatarHeight/2, avatarWeight, avatarHeight, panel);
+            g.drawOval(avatarCenterX - avatarWeight*3/2, avatarCenterY - avatarHeight/2, avatarWeight, avatarHeight);
+
+        }
+
     }
 }

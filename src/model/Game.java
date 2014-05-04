@@ -190,7 +190,7 @@ public class Game {
         players = new ArrayList<>(numberOfPlayers);
         int numberOfCardsForPlayers = NUMBER_OF_CARDS / numberOfPlayers;
         for (int i = 0; i < numberOfPlayers; i++) {
-            players.add(new Player(playersNames.get(i)));
+            players.add(new Player(playersNames.get(i), i));
             players.get(i).setCardsToPlayer(new LinkedList<>(allCards.subList(i * numberOfCardsForPlayers,
                     (i + 1) * numberOfCardsForPlayers)));
         }
@@ -401,12 +401,9 @@ public class Game {
             switch (player.openNextCard().getCardType()) {
                 case ARROWS_COLORED:
                     gameMode = GameMode.COLOR_MODE;
-                    break;
                 case ARROWS_IN:
                     gameMode = GameMode.CATCH_TOTEM_MODE;
                     break;
-                case ARROWS_OUT:
-                    gameMode = GameMode.OPEN_CARD_MODE;
             }
         }
     }
