@@ -222,7 +222,7 @@ public class Game {
      * @return номер человека, чей будет ход увеличенный
      */
     private int incPlayerThatWillGo() {
-        playerWhoWillGo = (playerWhoWillGo + 1) % getPlayersCount();
+        playerWhoWillGo = (playerWhoWillGo + getPlayersCount() - 1) % getPlayersCount();
         return playerWhoWillGo;
     }
 
@@ -325,10 +325,12 @@ public class Game {
                     if (result == null) {
                         takeAllCardsOnTheTable(players.get(playerIndex));
                         gameMode = GameMode.NORMAL_MODE;
+                        playerWhoWillGo = playerIndex;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_INCORRECT;
                     } else if (result.size() == 1) {
                         afterDuelMakeMove(playerIndex, result.get(0));
                         gameMode = GameMode.NORMAL_MODE;
+                        playerWhoWillGo = result.get(0);
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
                     } else {
                         return ResultOfMakeMove.NOT_DEFINED_CATCH;
