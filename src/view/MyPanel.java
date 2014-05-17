@@ -22,7 +22,7 @@ public class MyPanel extends JPanel {
     private String message;
     private int mesOk;
     private int typeTotem;
-
+    private Point lastClicedPlace = null;
     static double sizesDiv = 4.0 / 3;
     private int xMes;
     int basicFontSize = 15;
@@ -212,6 +212,11 @@ public class MyPanel extends JPanel {
                 }
                 break;
         }
+        if (lastClicedPlace != null) {
+            drawTarget(g, lastClicedPlace);
+//            lastClicedPlace = null;
+        }
+
     }
 
     private void repaintAll(Graphics g) {
@@ -442,8 +447,10 @@ public class MyPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
+
+            Point p = e.getPoint();
+            System.out.println("Mouse cliced "+p);
             if (catchTotemModeFlag) {
-                Point p = e.getLocationOnScreen();
                 ArrayList<Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
                 for (int i = 0; i < playersView.size(); i++) {
                     if (playersView.get(i).isIn(p)) {
@@ -460,7 +467,6 @@ public class MyPanel extends JPanel {
                 }
             }
             if (multyDuelFlag) {
-                Point p = e.getLocationOnScreen();
                 ArrayList<Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
                 for (int i = 0; i < playersView.size(); i++) {
                     if (playersView.get(i).isIn(p)) {
@@ -471,6 +477,8 @@ public class MyPanel extends JPanel {
                     }
                 }
             }
+            lastClicedPlace = p;
+            MyPanel.this.repaint();
         }
     }
 
