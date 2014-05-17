@@ -440,6 +440,9 @@ public class MyPanel extends JPanel {
                     Configuration.getGallery().getImage("data/avatars/"+i+".png")));
         }
         totemV = new TotemView(client.getTotem());
+        addKeyListener(initMyKeyListener());
+        addMouseListener(initMyMouseListener());
+
     }
 
 
