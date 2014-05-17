@@ -15,16 +15,16 @@ import view.View;
 public class MainTotemGame {
     private static void printHelp() {
         System.out.println("You are trying to run \"Totem Game\"");
-        System.out.println("you can do it with options");
-        System.out.println("\"--server\" to run as server OR " +
-                " \"--netclient\" to run as client in network game OR " +
-                " \"--locclient\" to run at local PC");
-        System.out.println();
-        System.out.println("also some addition options");
-        System.out.println("[--playernum] to set number of players from 2 to 8, " +
-                "[--card] to set number of cards from playernum to 150 " +
-                "[--port] to set port to server and to client, "+
-                "[--IP] to give server's IP to client");
+        System.out.println("Usage: java -jar Totem.jar mode [options]");
+        System.out.println("\nmode:");
+        System.out.println("     --server     : run as server in network game");
+        System.out.println("     --netclient  : run as client in network game");
+        System.out.println("     --locclient  : run at local PC");
+        System.out.println("\noptions:");
+        System.out.println("     --playernum  : set number of players from 2 to 8");
+        System.out.println("     --card       : set number of cards from playernum to 150");
+        System.out.println("     --port       : (for net game only) set port to server and to client");
+        System.out.println("     --IP         : (for net game only) give server's IP to client");
     }
     private static enum ResultOfParsing {
         INCORRECT,
@@ -73,7 +73,7 @@ public class MainTotemGame {
                 }
                 if (args[i].equals("--playernum")) {
                     numOfPlayers = Integer.parseInt(args[i+1]);
-                    if ((numOfPlayers > 8) || (numOfPlayers < 1)) {
+                    if ((numOfPlayers > 8) || (numOfPlayers <= 1)) {
                         numOfPlayers = 4;
                         resultOfParsing = ResultOfParsing.INCORRECT;
                         break;
