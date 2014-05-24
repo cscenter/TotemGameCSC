@@ -20,3 +20,6 @@ conf/1_sec.png
 conf/2_sec.png
 conf/3_sec.png
 conf/turn_switch_indicator.png
+conf/sq_blue.png
+conf/sq_green.png
+conf/sq_red.png

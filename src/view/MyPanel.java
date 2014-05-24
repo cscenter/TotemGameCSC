@@ -81,22 +81,25 @@ public class MyPanel extends JPanel {
 
         public void drawTotem(Graphics g) {
             String cardsCount = String.valueOf(totem.getCardsCount());
-            if (typeTotem == 0) {
-                Image img = Configuration.getGallery().getImage("data/totem.png");
-                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
-//                g.drawImage(img, xCoord - (int)(totemRad * 4.5), yCoord - totemRad * 2, null);
-            }
+
 
             if (typeTotem == 1) {
-                Image img = Configuration.getGallery().getImage("data/totemW.png");
-                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
+                setTotemAura(PlayerView.PlayerAura.RED);
+//                Image img2 = Configuration.getGallery().getImage("data/conf/sq_red.png");
+  //              g.drawImage(img2, xCoord - totemWeight*3/3, yCoord - totemHeight*3/3, totemWeight*6/3, totemHeight*6/3, MyPanel.this);
                 typeTotem = 0;
             }
             if (typeTotem == 2) {
-                Image img = Configuration.getGallery().getImage("data/totemR.png");
-                g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
+                setTotemAura(PlayerView.PlayerAura.GREEN);
+//                Image img2 = Configuration.getGallery().getImage("data/conf/sq_green.png");
+  //              g.drawImage(img2, xCoord - totemWeight*3/3, yCoord - totemHeight*3/3, totemWeight*6/3, totemHeight*6/3, MyPanel.this);
                 typeTotem = 0;
             }
+            drawTotemAura (g, MyPanel.this);
+            setTotemAura(PlayerView.PlayerAura.NOT);
+
+            Image img = Configuration.getGallery().getImage("data/totem.png");
+            g.drawImage(img, xCoord - totemWeight /2, yCoord - totemHeight / 2, totemWeight, totemHeight, MyPanel.this);
 
             Font font = new Font("Tahoma", Font.BOLD, basicFontSize);
             g.setColor(Color.cyan);
@@ -118,6 +121,28 @@ public class MyPanel extends JPanel {
             totemV.yCoord = (int) (haracteristicScale / 2);
             totemV.xCoord = (int) (totemV.yCoord * sizesDiv + haracteristicScale / 30);
         }
+        private PlayerView.PlayerAura totemAura = PlayerView.PlayerAura.NOT;
+        public void setTotemAura(PlayerView.PlayerAura pa){
+            totemAura = pa;
+        }
+        private void drawTotemAura(Graphics g, MyPanel panel) {
+            Image image = null;
+            switch (totemAura) {
+                case GREEN:
+                    image = Configuration.getGallery().getImage("data/conf/sq_green.png");
+                break;
+                case RED:
+                    image = Configuration.getGallery().getImage("data/conf/sq_red.png");
+                break;
+                case BLUE:
+                    image = Configuration.getGallery().getImage("data/conf/sq_blue.png");
+                break;
+            }
+            if (totemAura != PlayerView.PlayerAura.NOT) {
+                g.drawImage(image, xCoord - totemWeight*3/3, yCoord - totemHeight*3/3, totemWeight*6/3, totemHeight*6/3, panel);
+            }
+
+        }
     }
 
     private void reSize(int haracteristicScale) {
@@ -131,6 +156,7 @@ public class MyPanel extends JPanel {
         }
 
     }
+
 
     /**
      * функция для отладки. Рисует, где находится заданная точка
@@ -235,6 +261,10 @@ public class MyPanel extends JPanel {
         if (isSmbdCatch){
             Game.WhatPlayerDid what = whatDid.remove();
             whoPlayed = what.whoWasIt;
+
+//            for (Integer i : client.checkDuelWithPlayer(whoPlayed)) {
+  //                  playersView.get(i).setPlayerAura(PlayerView.PlayerAura.BLUE);
+    //        }
             resultOfMakeMove = client.makeMove(what);
             switch (resultOfMakeMove) {
                 case TOTEM_WAS_CATCH_CORRECT:
@@ -244,11 +274,14 @@ public class MyPanel extends JPanel {
 //                    MyPanel.this.repaint();
                     System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
                             client.getPlayer(whoPlayed).getName());
+                    playersView.get(whoPlayed).setPlayerAura(PlayerView.PlayerAura.GREEN);
+
                     break;
                 case TOTEM_WAS_CATCH_INCORRECT:
                     mesOk = 1;
                     message = "You mustn't take totem, " + client.getPlayer(whoPlayed).getName() + " So you took all open cards!";
                     typeTotem = 1;
+                    playersView.get(whoPlayed).setPlayerAura(PlayerView.PlayerAura.RED);
   //                  MyPanel.this.repaint();
                     System.out.printf("You mustn't take totem, %s! So you took all open cards!\n",
                             client.getPlayer(whoPlayed).getName());
@@ -440,9 +473,7 @@ public class MyPanel extends JPanel {
                     Configuration.getGallery().getImage("data/avatars/"+i+".png")));
         }
         totemV = new TotemView(client.getTotem());
-        addKeyListener(initMyKeyListener());
         addMouseListener(initMyMouseListener());
-
     }
 
 

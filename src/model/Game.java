@@ -246,10 +246,10 @@ public class Game {
      * @return список номеров игроков, с которыми была дуэль у данного
      */
     public ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem) {
-        if (playerTookTotem.getOpenCardsCount() == 0) {
-            return null;
-        }
         ArrayList<Integer> result = new ArrayList<>();
+        if (playerTookTotem.getOpenCardsCount() == 0) {
+            return result;
+        }
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
             if ((player != playerTookTotem) && (player.getOpenCardsCount() > 0)) {
@@ -263,9 +263,6 @@ public class Game {
                     }
                 }
             }
-        }
-        if (result.size() == 0) {
-            return null;
         }
         return result;
     }
@@ -313,8 +310,10 @@ public class Game {
         switch (whatPlayerDid) {
             case TOOK_TOTEM:
                 ArrayList<Integer> result = checkDuelWithPlayer(players.get(playerIndex));
+                System.out.println("get to make move");
+                System.out.println("mode = " + gameMode);
                 if (gameMode == GameMode.CATCH_TOTEM_MODE) {
-                    if (result == null) {
+                    if (result.size() == 0) {
                         arrowsInMakeMove(playerIndex);
                         gameMode = GameMode.NORMAL_MODE;
                         return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
@@ -322,7 +321,7 @@ public class Game {
                         return ResultOfMakeMove.NOT_DEFINED_CATCH;
                     }
                 } else {
-                    if (result == null) {
+                    if (result.size() == 0) {
                         takeAllCardsOnTheTable(players.get(playerIndex));
                         gameMode = GameMode.NORMAL_MODE;
                         playerWhoWillGo = playerIndex;

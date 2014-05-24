@@ -112,6 +112,13 @@ public class PlayerView {
         topCardView = cardsView.get(playerInfo.getTopOpenedCard().getCardNumber());
     }
 
+    private enum Position{
+        LEFT,
+        RIGHT,
+        DOWN,
+        UP
+    }
+    private Position position;
     /**
      * изменяет масштаб
      * @param haracteristicScale новый масштаб
@@ -149,6 +156,7 @@ public class PlayerView {
         //низ
         if ((openCardCenterX / MyPanel.sizesDiv < openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv < openCardCenterY)) {
+            position = Position.DOWN;
             int CS = CardView.getCardSize();
             closeCardCenterX = xCoordinate + CS / 4;
             closeCardCenterY = yCoordinate - (int) (CS * 3.2 / 4);
@@ -168,6 +176,7 @@ public class PlayerView {
         //верх
         if ((openCardCenterX / MyPanel.sizesDiv > openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv > openCardCenterY)) {
+            position = Position.UP;
             int CS = CardView.getCardSize();
             closeCardCenterX = xCoordinate + CS / 4;
             closeCardCenterY = yCoordinate + (int) (CS * 3.2 / 4);
@@ -189,6 +198,7 @@ public class PlayerView {
         //право
         if ((openCardCenterX / MyPanel.sizesDiv >= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv <= openCardCenterY)) {
+            position = Position.RIGHT;
             int CS = CardView.getCardSize();
             closeCardCenterX = xCoordinate - (int) (CS * (2 + 1 + 0.2) / 4);
             closeCardCenterY = yCoordinate + (int) (CS / 4);
@@ -209,6 +219,7 @@ public class PlayerView {
         //лево
         if ((openCardCenterX / MyPanel.sizesDiv <= openCardCenterY) &&
                 (haracteristicScale - openCardCenterX / MyPanel.sizesDiv >= openCardCenterY)) {
+            position = Position.LEFT;
             int CS = CardView.getCardSize();
             closeCardCenterX = xCoordinate + (int) (CS * (2 + 1 + 0.2) / 4);
             closeCardCenterY = yCoordinate + (int) (CS / 4);
@@ -270,12 +281,42 @@ public class PlayerView {
         return ((Math.abs(p.x - avatarCenterX) < avatarWeight / 2) && (Math.abs(p.y - avatarCenterY) < avatarHeight / 2));
     }
 
+    public enum PlayerAura {
+        GREEN,
+        RED,
+        BLUE,
+        NOT
+    }
+    private PlayerAura playerAura = PlayerAura.NOT;
+    public void setPlayerAura(PlayerAura pa){
+        playerAura = pa;
+    }
+    private void drawPlayerAura(Graphics g, MyPanel panel) {
+        Image image = null;
+        switch (playerAura) {
+            case GREEN:
+                image = Configuration.getGallery().getImage("data/conf/sq_green.png");
+            break;
+            case RED:
+                image = Configuration.getGallery().getImage("data/conf/sq_red.png");
+            break;
+            case BLUE:
+                image = Configuration.getGallery().getImage("data/conf/sq_blue.png");
+            break;
+        }
+        if (playerAura != PlayerAura.NOT) {
+            g.drawImage(image, avatarCenterX - avatarWeight*2, avatarCenterY - avatarHeight*2, avatarWeight*4, avatarHeight*4, panel);
+        }
+
+    }
     /**
      * рисует игрока
      * @param g ссылка на графику
      * @param panel ссылка на панельку
      */
     public void drawPlayer(Graphics g, MyPanel panel, int basicFontSize, int whoWillGo){
+        drawPlayerAura(g, panel);
+        playerAura = PlayerAura.NOT;
         g.setColor(Color.cyan);
         g.drawImage(avatarImage, avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
                 avatarWeight, avatarHeight, panel);
@@ -298,8 +339,8 @@ public class PlayerView {
             }
         } else {
             int halfCS = CardView.getCardSize() / 2;
-            g.drawImage(Configuration.getGallery().getImage("alphaback.png"), openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
-            g.drawRect(openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS);
+            g.drawImage(Configuration.getGallery().getImage("data/alphaback.png"), openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
+//            g.drawRect(openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS);
         }
         if (playerInfo.getCloseCardsCount() != 0) {
             int halfCS = CardView.getCardSize() / 4;
@@ -310,13 +351,24 @@ public class PlayerView {
         g.drawString(closeCardsNumber, closeCardsNumberCoordX, closeCardsNumberCoordY);
         String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
         g.drawString(catchKey, keysCoordX, keysCoordY);
-//        g.drawImage(Configuration.getGallery().getImage("conf/1_sec.png"), 10, 10, 100, 100, panel);
         if (playerInfo.getId() == whoWillGo) {
-            g.drawImage(Configuration.getGallery().getImage("conf/turn_switch_indicator.png"),
-                avatarCenterX - avatarWeight*3/2, avatarCenterY - avatarHeight/2, avatarWeight, avatarHeight, panel);
-            g.drawOval(avatarCenterX - avatarWeight*3/2, avatarCenterY - avatarHeight/2, avatarWeight, avatarHeight);
+            switch (position) {
+                case DOWN:
+                case UP:
+                    g.drawImage(Configuration.getGallery().getImage("data/conf/turn_switch_indicator.png"),
+                        avatarCenterX - avatarWeight*3/2, avatarCenterY - avatarHeight/2, avatarWeight, avatarHeight, panel);
+                break;
+                case LEFT:
+                    g.drawImage(Configuration.getGallery().getImage("data/conf/turn_switch_indicator.png"),
+                        avatarCenterX - avatarWeight*4/3, avatarCenterY - avatarHeight, avatarWeight, avatarHeight, panel);
+                break;
+                case RIGHT:
+                    g.drawImage(Configuration.getGallery().getImage("data/conf/turn_switch_indicator.png"),
+                        avatarCenterX + avatarWeight/2, avatarCenterY - avatarHeight, avatarWeight, avatarHeight, panel);
+                break;
+                
+            }
 
         }
-
     }
 }
