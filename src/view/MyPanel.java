@@ -275,7 +275,7 @@ public class MyPanel extends JPanel {
                     System.out.printf("You won duel, %s! All your open cards and all cards under totem go to your opponent\n",
                             client.getPlayer(whoPlayed).getName());
                     playersView.get(whoPlayed).setPlayerAura(PlayerView.PlayerAura.GREEN);
-
+                    playersView.get(possibleLosers.get(0)).setPlayerAura(PlayerView.PlayerAura.RED);
                     break;
                 case TOTEM_WAS_CATCH_INCORRECT:
                     mesOk = 1;
