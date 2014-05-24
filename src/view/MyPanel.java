@@ -261,10 +261,10 @@ public class MyPanel extends JPanel {
         if (isSmbdCatch){
             Game.WhatPlayerDid what = whatDid.remove();
             whoPlayed = what.whoWasIt;
-
-//            for (Integer i : client.checkDuelWithPlayer(whoPlayed)) {
-  //                  playersView.get(i).setPlayerAura(PlayerView.PlayerAura.BLUE);
-    //        }
+            ArrayList<Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
+            for (Integer i : possibleLosers) {
+                    playersView.get(i).setPlayerAura(PlayerView.PlayerAura.BLUE);
+            }
             resultOfMakeMove = client.makeMove(what);
             switch (resultOfMakeMove) {
                 case TOTEM_WAS_CATCH_CORRECT:

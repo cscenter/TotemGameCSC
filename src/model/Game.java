@@ -101,7 +101,8 @@ public class Game {
         NORMAL_MODE,
         COLOR_MODE,
         CATCH_TOTEM_MODE,
-        OPEN_CARD_MODE
+        OPEN_CARD_MODE, 
+        NOT_DEF
     }
 
     /**
@@ -248,14 +249,35 @@ public class Game {
     public ArrayList<Integer> checkDuelWithPlayer(Player playerTookTotem) {
         ArrayList<Integer> result = new ArrayList<>();
         if (playerTookTotem.getOpenCardsCount() == 0) {
+            System.out.println("no cards");
             return result;
+        }
+        System.out.println("his card is "+playerTookTotem.getTopOpenedCard());
+        GameMode tempGameMode = GameMode.NORMAL_MODE;
+        if (gameMode == GameMode.NOT_DEF) {
+            for (Player player : players) {
+                if (player.getTopCardType() == Card.CardType.ARROWS_COLORED) {
+                    tempGameMode = GameMode.COLOR_MODE;
+                }
+            }
         }
         for (int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
             if ((player != playerTookTotem) && (player.getOpenCardsCount() > 0)) {
+                System.out.println("they card is "+player.getTopOpenedCard());
                 if (gameMode == GameMode.COLOR_MODE) {
                     if (player.getTopOpenedCard().getCardColor() == playerTookTotem.getTopOpenedCard().getCardColor()) {
                         result.add(i);
+                    }
+                } else if (gameMode == GameMode.NOT_DEF) {
+                    if (tempGameMode == GameMode.COLOR_MODE) {
+                        if (player.getTopOpenedCard().getCardColor() == playerTookTotem.getTopOpenedCard().getCardColor()) {
+                            result.add(i);
+                        }                        
+                    } else {
+                        if (player.getTopOpenedCard().getCardFormNumber() == playerTookTotem.getTopOpenedCard().getCardFormNumber()) {
+                            result.add(i);
+                        }                        
                     }
                 } else {
                     if (player.getTopOpenedCard().getCardFormNumber() == playerTookTotem.getTopOpenedCard().getCardFormNumber()) {
@@ -273,9 +295,11 @@ public class Game {
      */
     private void takeAllCardsOnTheTable(Player looser) {
         looser.setCardsToPlayer(totem.pickUpAllCards());
+
         for (Player player : players) {
             looser.setCardsToPlayer(player.pickUpAllOpenedCards());
         }
+        gameMode = GameMode.NORMAL_MODE;
     }
 
     /**
@@ -307,11 +331,25 @@ public class Game {
      */
     public ResultOfMakeMove makeMove(WhatPlayerDid whatPlayerDid) {
         int playerIndex = whatPlayerDid.whoWasIt;
-        switch (whatPlayerDid) {
+        switch (whatPlayerDid) {          
             case TOOK_TOTEM:
                 ArrayList<Integer> result = checkDuelWithPlayer(players.get(playerIndex));
                 System.out.println("get to make move");
                 System.out.println("mode = " + gameMode);
+                
+                if (gameMode == GameMode.NOT_DEF) {
+                    for (int i = 0; i < players.size(); i++) {
+                        if (players.get(i).getTopCardType() == Card.CardType.ARROWS_IN) {
+                            if (result.size() == 0) {
+                                arrowsInMakeMove(playerIndex);
+                                gameMode = GameMode.NORMAL_MODE;
+                                return ResultOfMakeMove.TOTEM_WAS_CATCH_CORRECT;
+                            } else {
+                                return ResultOfMakeMove.NOT_DEFINED_CATCH;
+                            }
+                        }
+                    }
+                }
                 if (gameMode == GameMode.CATCH_TOTEM_MODE) {
                     if (result.size() == 0) {
                         arrowsInMakeMove(playerIndex);
@@ -343,8 +381,11 @@ public class Game {
                             (players.get(playerWhoWillGo).getTopOpenedCard().getCardType() == Card.CardType.ARROWS_COLORED)) {
                         gameMode = GameMode.NORMAL_MODE;
                     }
+                    if (gameMode == GameMode.NOT_DEF){
+                        gameMode = GameMode.NORMAL_MODE;
+                    }
                     switch (players.get(playerWhoWillGo).openNextCard().getCardType()) {
-                        case ARROWS_COLORED:
+                            case ARROWS_COLORED:
                             gameMode = GameMode.COLOR_MODE;
                             break;
                         case ARROWS_IN:
@@ -398,13 +439,14 @@ public class Game {
      * ход после спец. карты "стрелки наружу". Все открывают верхнюю
      */
     public void openAllTopCards() {
+        gameMode = GameMode.NORMAL_MODE;
         for (Player player : players) {
             switch (player.openNextCard().getCardType()) {
                 case ARROWS_COLORED:
-                    gameMode = GameMode.COLOR_MODE;
                 case ARROWS_IN:
-                    gameMode = GameMode.CATCH_TOTEM_MODE;
-                    break;
+                case ARROWS_OUT:
+                    gameMode = GameMode.NOT_DEF;
+                break;
             }
         }
     }
