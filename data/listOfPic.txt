@@ -23,3 +23,5 @@ conf/turn_switch_indicator.png
 conf/sq_blue.png
 conf/sq_green.png
 conf/sq_red.png
+conf/game_end.png
+conf/game_end_r.png

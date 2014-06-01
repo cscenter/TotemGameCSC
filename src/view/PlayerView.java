@@ -371,4 +371,43 @@ public class PlayerView {
 
         }
     }
+    public void drawPlayerAtEnd(Graphics g, MyPanel panel, int basicFontSize, boolean isHeWin) {
+        playerAura = (isHeWin) ? PlayerAura.GREEN : PlayerAura.RED;
+        drawPlayerAura(g, panel);
+        playerAura = PlayerAura.NOT;
+        g.setColor(Color.cyan);
+        g.drawImage(avatarImage, avatarCenterX - avatarWeight / 2, avatarCenterY - avatarHeight / 2,
+                avatarWeight, avatarHeight, panel);
+        Font font = new Font("Tahoma", Font.BOLD, basicFontSize * 4 / 3);
+        g.setFont(font);
+        g.drawString(playerInfo.getName(), nameXCoord, nameYCoord);
+        font = new Font("Tahoma", Font.BOLD, basicFontSize);
+        g.setFont(font);
+        String openCardsNumber = String.valueOf(playerInfo.getOpenCardsCount());
+        g.drawString(openCardsNumber, openCardsNumberCoordX, openCardsNumberCoordY);
+
+        if (playerInfo.getOpenCardsCount() != 0) {
+            Image image;
+            try {
+                image = topCardView.getCardImage();
+                int halfCS = CardView.getCardSize() / 2;
+                g.drawImage(image, openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
+            } catch (Exception e) {
+                System.err.println("can't find image!");
+            }
+        } else {
+            int halfCS = CardView.getCardSize() / 2;
+            g.drawImage(Configuration.getGallery().getImage("data/alphaback.png"), openCardCenterX - halfCS, openCardCenterY - halfCS, 2 * halfCS, 2 * halfCS, panel);
+        }
+        if (playerInfo.getCloseCardsCount() != 0) {
+            int halfCS = CardView.getCardSize() / 4;
+            g.drawImage(Configuration.getGallery().getImage("data/tback.jpg"), closeCardCenterX - halfCS, closeCardCenterY - halfCS,
+                    2 * halfCS, 2 * halfCS, panel);
+        }
+        String closeCardsNumber = String.valueOf(playerInfo.getCloseCardsCount());
+        g.drawString(closeCardsNumber, closeCardsNumberCoordX, closeCardsNumberCoordY);
+        String catchKey = String.valueOf(openCardKey) + ", " + String.valueOf(catchTotemKey);
+        g.drawString(catchKey, keysCoordX, keysCoordY);
+    }
+
 }

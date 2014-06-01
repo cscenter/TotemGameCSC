@@ -19,6 +19,7 @@ public class MyPanel extends JPanel {
     private boolean catchTotemModeFlag;
     private boolean multyDuelFlag;
     private int whoPlayed;
+    private boolean isGameEnded = false;
     private String message;
     private int mesOk;
     private int typeTotem;
@@ -30,6 +31,8 @@ public class MyPanel extends JPanel {
     private ArrayList<PlayerView> playersView;
     private int pos;
     private Timer openCardTimer;
+    private Timer gameEndTimer;
+    private int timeToEndGame;
     private boolean openCardAnimFlag;
     private int timeToOpenCard = 0;
     class AnimListenerCardOpen implements ActionListener {
@@ -39,6 +42,14 @@ public class MyPanel extends JPanel {
             timeToOpenCard++;
         }
     }
+    class AnimListenerGameEnded implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            repaint();
+            timeToEndGame++;
+        }
+    }
+
 
     private Timer arrowsOutTimer;
     private boolean arrowsOutAnimFlag;
@@ -59,7 +70,8 @@ public class MyPanel extends JPanel {
         NEW_CARD_WITH_ARROWS_OUT,
         NOT_DEF,
         ALL_OPEN_TOP_CARD_COUNT,
-        ALL_OPEN_TOP_CARD_ANIM;
+        ALL_OPEN_TOP_CARD_ANIM,
+        GAME_END;
         public int lastPlayerWhoAct;
     }
     /**
@@ -237,15 +249,31 @@ public class MyPanel extends JPanel {
                     makeImageBiggerAnimation(g, 10, cardI, p, sizeX1, sizeY1, sizeX2, sizeY2);
                 }
                 break;
+            case GAME_END:
+                gameEndAnimation(g);
+            break;
+        }
+
+        if (isGameEnded) {
+            if (whatRepaint == WhatRepaint.NOT_DEF) {
+                whatRepaint = WhatRepaint.GAME_END;
+                timeToEndGame = 0;
+                AnimListenerGameEnded animListener = new AnimListenerGameEnded();
+                gameEndTimer = new Timer(100, animListener);
+                gameEndTimer.start();
+            }
         }
         if (lastClicedPlace != null) {
-            drawTarget(g, lastClicedPlace);
+         //   drawTarget(g, lastClicedPlace);
 //            lastClicedPlace = null;
         }
 
     }
 
     private void repaintAll(Graphics g) {
+        int x = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        int y = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        g.clearRect(0, 0, x, y);
         Image img = Configuration.getGallery().getImage("data/b1.png");
         g.drawImage(img, 0, 0, (int) (panel_size * sizesDiv), panel_size,  null);
         totemV.drawTotem(g);
@@ -289,21 +317,13 @@ public class MyPanel extends JPanel {
                 case NOT_DEFINED_CATCH:
                     if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
                         catchTotemModeFlag = true;
+                        totemV.setTotemAura(PlayerView.PlayerAura.BLUE);
                     } else {
                         multyDuelFlag = true;
                     }
                     break;
                 default:
                     break;
-            }
-
-            for (int i = 0; i < client.getPlayersCount(); i++) {
-                if (client.getPlayer(i).getCardsCount() == 0) {
-                    mesOk = 1;
-                    message = "Player %s won! It's very good :)\n" + client.getPlayer(i).getName();
-    //                MyPanel.this.repaint();
-                    System.out.printf("Player %s won! It's very good :)\n", client.getPlayer(i).getName());
-                }
             }
         }
 
@@ -327,6 +347,11 @@ public class MyPanel extends JPanel {
                     playersView.get(whoPlayed).setTopCardView(cardsView);
                     whatRepaint = WhatRepaint.NEW_CARD;
                     whatRepaint.lastPlayerWhoAct = whoPlayed;
+
+                    if (client.getPlayer(whoPlayed).getCardsCount() == 1) {
+
+                    }
+
                     if (! openCardAnimFlag) {
                         timeToOpenCard = 0;
                         AnimListenerCardOpen animListener = new AnimListenerCardOpen();
@@ -338,6 +363,7 @@ public class MyPanel extends JPanel {
                 case NOT_DEFINED_CATCH:
                     if (client.getGameMode() == Game.GameMode.CATCH_TOTEM_MODE) {
                         catchTotemModeFlag = true;
+                        totemV.setTotemAura(PlayerView.PlayerAura.BLUE);
                     } else {
                         multyDuelFlag = true;
                     }
@@ -368,6 +394,12 @@ public class MyPanel extends JPanel {
                     break;
             }
         }
+        for (int i = 0; i < client.getPlayersCount(); i++) {
+            if (client.getPlayer(i).getCardsCount() == 0) {
+                isGameEnded = true;
+            }
+        }
+
 
         if (isSmbdCatch || isSmbOpen) {
             repaint();
@@ -382,6 +414,36 @@ public class MyPanel extends JPanel {
         }
         return -1;
     }
+
+
+    private void gameEndAnimation(Graphics g) {
+        Image img = Configuration.getGallery().getImage("data/conf/game_end_r.png");
+        repaintAll(g);
+        int tMax = 10;
+        int v0 = 0;
+        int a = (panel_size - v0 * tMax) * 2 / (tMax * tMax);
+        int size = 2 * panel_size - v0 * tMax - a * tMax * tMax / 2;
+
+        if (timeToEndGame <= tMax + 1) {
+            size = 2 * panel_size - v0 * timeToEndGame - a * timeToEndGame * timeToEndGame / 2;
+        }
+
+        g.drawImage(img, (int) (((panel_size - size)/2) * sizesDiv), (panel_size - size)/2, 
+            (int) (size * sizesDiv), size,  null);
+        if (timeToEndGame >= tMax + 1) {
+            for (int i = 0; i < client.getPlayersCount(); i++) {
+                if (client.getPlayer(i).getCardsCount() == 0) {
+                    playersView.get(i).drawPlayerAtEnd(g, this, basicFontSize, true);
+                } else {
+                    playersView.get(i).drawPlayerAtEnd(g, this, basicFontSize, false);
+                }
+            }
+
+            gameEndTimer.stop();
+        }
+
+    }
+
     private void makeImageBiggerAnimation(Graphics g, int steps, Image image, Point center,
                                           int sizeXBegin, int sizeYBegin, int sizeXEnd, int sizeYEnd) {
         if (timeToOpenCard >= steps) {
@@ -481,9 +543,11 @@ public class MyPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-
+            if (isGameEnded) {
+                return;
+            }
             Point p = e.getPoint();
-            System.out.println("Mouse cliced "+p);
+//            System.out.println("Mouse cliced "+p);
             if (catchTotemModeFlag) {
                 ArrayList<Integer> possibleLosers = client.checkDuelWithPlayer(client.getPlayer(whoPlayed));
                 for (int i = 0; i < playersView.size(); i++) {
@@ -521,6 +585,9 @@ public class MyPanel extends JPanel {
         // нажатие клавиши
         @Override
         public void keyPressed(KeyEvent k) {
+            if (isGameEnded) {
+                return;
+            }
             Character inputChar = k.getKeyChar();
             inputChar = (new Character(inputChar)).toString().toLowerCase().charAt(0);
             boolean suchKeyHere = false;
