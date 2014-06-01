@@ -428,8 +428,6 @@ public class MyPanel extends JPanel {
             size = 2 * panel_size - v0 * timeToEndGame - a * timeToEndGame * timeToEndGame / 2;
         }
 
-        g.drawImage(img, (int) (((panel_size - size)/2) * sizesDiv), (panel_size - size)/2, 
-            (int) (size * sizesDiv), size,  null);
         if (timeToEndGame >= tMax + 1) {
             for (int i = 0; i < client.getPlayersCount(); i++) {
                 if (client.getPlayer(i).getCardsCount() == 0) {
@@ -441,6 +439,8 @@ public class MyPanel extends JPanel {
 
             gameEndTimer.stop();
         }
+        g.drawImage(img, (int) (((panel_size - size)/2) * sizesDiv), (panel_size - size)/2, 
+            (int) (size * sizesDiv), size,  null);
 
     }
 
@@ -576,6 +576,12 @@ public class MyPanel extends JPanel {
                 }
             }
             lastClicedPlace = p;
+            for (int i = 0; i < client.getPlayersCount(); i++) {
+                if (client.getPlayer(i).getCardsCount() == 0) {
+                    isGameEnded = true;
+                }
+            }
+
             MyPanel.this.repaint();
         }
     }
